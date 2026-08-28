@@ -3,7 +3,9 @@ export const ACCIDENTAL_BUTTONS = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯', 'D♭
 
 export const STAFF_LAYOUT = {
   clefX: 26,
-  trebleClefY: 126,
+  trebleGLineY: 112,
+  trebleClefLoopOffsetY: 20,
+  trebleClefY: 92,
   bassClefY: 112,
   bottomLineY: 132,
   lineGap: 20,

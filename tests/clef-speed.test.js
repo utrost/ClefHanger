@@ -12,6 +12,8 @@ import {
 } from '../src/core/game.js';
 
 test('staff layout anchors treble and bass clefs on their correct staff lines', () => {
+  assert.equal(STAFF_LAYOUT.trebleGLineY, 112);
+  assert.equal(STAFF_LAYOUT.trebleClefY + STAFF_LAYOUT.trebleClefLoopOffsetY, STAFF_LAYOUT.trebleGLineY);
   assert.deepEqual(getClefPresentation('treble'), {
     clef: 'treble',
     glyph: '𝄞',
