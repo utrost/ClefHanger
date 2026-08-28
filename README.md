@@ -40,7 +40,7 @@ Slices 1–5 are implemented as a dependency-free static PWA:
 - Correct / wrong / missed feedback.
 - Mode-weighted points with speed/difficulty/streak bonuses.
 - Per-mode, per-speed, per-difficulty high scores via LocalStorage.
-- Offline app shell via service worker.
+- Installable PWA shell: manifest id/scope, portrait standalone mode, PNG/SVG maskable icons, iOS home-screen tags, mode shortcuts, and offline service-worker cache.
 
 ## Run locally
 

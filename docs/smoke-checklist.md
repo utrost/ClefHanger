@@ -28,5 +28,8 @@ Use this checklist before calling a build ready for actual testing.
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
 - Verify the HTML contains `clefhanger-slice5`.
-- Verify `src/app.js`, `src/core/game.js`, `manifest.webmanifest`, `sw.js`, and both icons return HTTP 200.
+- Verify `src/app.js`, `src/core/game.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
+- Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
+- In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.
+- After first load, switch the browser offline and reload; the app shell should still open from the service worker cache.
 - Repeat the local browser smoke steps against the live URL.

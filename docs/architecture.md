@@ -22,9 +22,9 @@ Current boundaries:
 - `src/app.js`
   - DOM adapter, SVG staff/chord rendering, mode selector, speed selector, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, typed-answer input, Web Audio correct-answer playback, animation loop, per-mode/per-speed/per-difficulty LocalStorage high scores.
 - `index.html`
-  - Mobile-first layout, app shell, inline CSS, service-worker registration.
+  - Mobile-first layout, app shell, inline CSS, service-worker registration, iOS home-screen meta tags, and Apple touch icon link.
 - `manifest.webmanifest` and `sw.js`
-  - Installable/offline PWA shell.
+  - Installable/offline PWA shell with subpath-safe id/scope/start URL, portrait standalone mode, PNG/SVG maskable icons, mode shortcuts, and navigation fallback.
 
 ## Current vs planned behavior
 
@@ -42,6 +42,7 @@ Current repository behavior:
 - Correct-answer Web Audio playback using equal-tempered pitches.
 - 60-second rush round.
 - Mode-weighted scoring, fast-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-speed/per-difficulty high-score persistence.
+- Installable PWA behavior for `https://simiono.com/clefhanger/`: manifest, service worker, PNG/SVG icons, iOS home-screen tags, mode shortcuts, and offline app shell.
 
 Planned later implementation:
 
