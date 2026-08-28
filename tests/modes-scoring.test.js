@@ -7,6 +7,7 @@ import {
   answerActiveNote,
   getHighScoreKey,
   getMode,
+  getAnswerOptions,
   normalizeAnswer,
   spawnNextNote,
 } from '../src/core/game.js';
@@ -40,6 +41,17 @@ test('creates chord prompts with multi-note answers', () => {
   assert.equal(chord.kind, 'chord');
   assert.equal(chord.answer, 'C-E-G');
   assert.equal(chord.displayName, 'C major');
+});
+
+test('chord mode remains playable from touch buttons without typed answers', () => {
+  assert.deepEqual(getAnswerOptions('chords'), [
+    { label: 'C', answer: 'C-E-G' },
+    { label: 'Dm', answer: 'D-F-A' },
+    { label: 'Em', answer: 'E-G-B' },
+    { label: 'F', answer: 'F-A-C' },
+    { label: 'G', answer: 'G-B-D' },
+    { label: 'Am', answer: 'A-C-E' },
+  ]);
 });
 
 test('mode spawning uses mode-specific answer pools', () => {

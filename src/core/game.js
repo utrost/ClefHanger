@@ -117,6 +117,19 @@ export function getMode(modeId = 'basics') {
   return GAME_MODES.find((mode) => mode.id === modeId) || GAME_MODES[0];
 }
 
+export function getAnswerOptions(modeId = 'basics') {
+  const mode = getMode(modeId);
+  if (mode.id === 'sharps') return ACCIDENTAL_BUTTONS.filter((note) => note.includes('♯')).map((note) => ({ label: note, answer: note }));
+  if (mode.id === 'flats') return ACCIDENTAL_BUTTONS.filter((note) => note.includes('♭')).map((note) => ({ label: note, answer: note }));
+  if (mode.kind === 'chord') {
+    return mode.pool.map((chord) => ({
+      label: `${chord.chordName}${chord.quality === 'minor' ? 'm' : ''}`,
+      answer: chord.notes.join('-'),
+    }));
+  }
+  return NOTE_BUTTONS.map((note) => ({ label: note, answer: note }));
+}
+
 export function accidentalSymbol(accidental) {
   if (accidental === 'sharp') return '♯';
   if (accidental === 'flat') return '♭';

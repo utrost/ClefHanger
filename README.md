@@ -24,7 +24,7 @@ The first playable slice should prove the simplest complete loop:
 
 ## Current playable slice
 
-Slices 1–5 are implemented as a dependency-free static PWA:
+Slices 1–6 are implemented as a dependency-free static PWA:
 
 - Treble-clef and bass-clef note/chord rush.
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.
@@ -34,9 +34,9 @@ Slices 1–5 are implemented as a dependency-free static PWA:
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
 - Toggleable input: large note buttons or a one-octave on-screen piano strip.
-- Extra accidental buttons for #/♭ answers; piano black keys map to sharps/flats in those modes.
+- Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play the matching note back with Web Audio.
-- Optional typed answers for accidentals and chords, e.g. `F#`, `Bb`, `C-E-G`.
+- The optional typed-answer row has been removed to keep the mobile controls thumb-first.
 - Correct / wrong / missed feedback.
 - Mode-weighted points with speed/difficulty/streak bonuses.
 - Per-mode, per-speed, per-difficulty high scores via LocalStorage.

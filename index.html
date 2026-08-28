@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice5-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice6-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -77,7 +77,7 @@
 
       .site-link:focus-visible, .site-link:hover { text-decoration: underline; }
 
-      .timer-card, .mode-panel, .stat, #feedback, #summary, .entry-row, .input-mode-row {
+      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row {
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 18px;
         background: var(--panel);
@@ -301,33 +301,7 @@
       .piano-key[data-after="G"] { left: 67.9%; }
       .piano-key[data-after="A"] { left: 82.2%; }
 
-      .entry-row {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 6px;
-        padding: 6px;
-      }
-
-      #answer-entry {
-        min-width: 0;
-        border: 0;
-        border-radius: 12px;
-        background: rgba(255,255,255,0.10);
-        color: var(--ink);
-        padding: 0 10px;
-        font-size: 1rem;
-      }
-
-      #submit-answer {
-        border: 0;
-        border-radius: 12px;
-        background: var(--panel-strong);
-        color: var(--ink);
-        font-weight: 900;
-        padding: 0 12px;
-      }
-
-      .note-button:active, .piano-key:active, #start-round:active, .mode-button:active, .speed-button:active, .difficulty-button:active, .input-mode-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
+      .note-button:active, .piano-key:active, #start-round:active, .mode-button:active, .speed-button:active, .difficulty-button:active, .input-mode-button:active { transform: translateY(2px) scale(0.99); }
       #summary h2 { margin: 0 0 6px; }
       #summary p { margin: 5px 0; color: var(--muted); }
       .microcopy { margin: 0; text-align: center; color: var(--muted); font-size: 0.74rem; }
@@ -387,11 +361,7 @@
         </div>
         <div id="note-buttons" aria-label="Answer buttons"></div>
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
-        <div class="entry-row">
-          <input id="answer-entry" autocomplete="off" inputmode="text" aria-label="Typed answer" placeholder="Optional typed answer, e.g. F# or Bb" />
-          <button id="submit-answer" type="button">Enter</button>
-        </div>
-        <p class="microcopy">Slice 5: note buttons or piano strip · correct answers sing back</p>
+        <p class="microcopy">Slice 6: note buttons or piano strip · correct answers sing back</p>
       </section>
     </main>
     <script type="module" src="./src/app.js"></script>

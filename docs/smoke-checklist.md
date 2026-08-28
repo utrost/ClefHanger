@@ -5,7 +5,7 @@ Use this checklist before calling a build ready for actual testing.
 ## Local browser smoke
 
 - Open the app in a phone-sized viewport around 390 × 844.
-- The title, timer, score, difficulty selector, mode selector, speed selector, staff, feedback, start button, input toggle, typed-answer row, and answer controls are visible without horizontal scrolling.
+- The title, timer, score, difficulty selector, mode selector, speed selector, staff, feedback, start button, input toggle, and answer controls are visible without horizontal scrolling.
 - Switch through Beginner, Easy, Normal, and Hard.
 - Switch through Treble, Bass, Sharps #, Flats ♭, and Chords.
 - Switch through Slow, Normal, and Fast.
@@ -17,9 +17,9 @@ Use this checklist before calling a build ready for actual testing.
 - In Treble, tapping the correct natural note clears it, increases score, and shows positive feedback.
 - Switch to Piano input, tap the matching white key, and verify it clears the note.
 - A correct answer plays a short pitch cue. Wrong answers do not play the success pitch.
-- In Sharps/Flats, accidental button answers and typed answers such as `F#` / `Bb` are accepted.
+- In Sharps/Flats, accidental button answers such as `F♯` / `B♭` are accepted.
 - In Sharps/Flats with Piano input, the black keys use sharp/flat labels for the selected mode.
-- In Chords, typed answers such as `C-E-G` are accepted.
+- In Chords, direct triad buttons such as C, Dm, and Am are accepted.
 - Tapping a wrong note leaves the note active and shows wrong-answer feedback.
 - Letting a note reach the cliff records a miss.
 - Browser console has no errors.
@@ -27,7 +27,7 @@ Use this checklist before calling a build ready for actual testing.
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice5`.
+- Verify the HTML contains `clefhanger-slice6`.
 - Verify `src/app.js`, `src/core/game.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

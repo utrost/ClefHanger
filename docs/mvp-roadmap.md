@@ -45,7 +45,7 @@ Verification:
 - Four selectable modes: Basics, Sharps #, Flats ♭, Chords.
 - Level 1 note pool remains treble-clef staff lines/spaces.
 - Accidentals are introduced as separate sharp and flat drills.
-- Chords use three-note triad stacks with typed answers such as `C-E-G`.
+- Chords use three-note triad stacks with touch-button answers such as `C`, `Dm`, and `Am`.
 - Mode-weighted scoring gives harder drills more points.
 - Streak bonuses reward clean runs.
 - Per-mode high scores are persisted in LocalStorage.
@@ -75,16 +75,22 @@ Verification:
 - Keep note buttons as the default mobile input.
 - Test mapping between displayed note prompts and equal-tempered playback frequencies.
 - Play the matching pitch after a correct answer. Chords play a short arpeggio.
-- Keep typed answers available for chords and compound answers.
+- Correct answers play from touch note buttons or the piano strip; the optional typed-answer row was removed in Slice 6 to keep the mobile controls focused.
 
-## Slice 6 — Vocal tracking prototype
+## Slice 6 — Remove optional typed answers — implemented
+
+- Remove the optional typed-answer row from the mobile controls.
+- Keep every shipped mode playable from buttons: accidentals use accidental buttons, and chords use direct triad buttons.
+- Bump the service-worker cache so installed PWAs receive the simplified control tray.
+
+## Slice 7 — Vocal tracking prototype
 
 - Add microphone permission flow.
 - Use Web Audio API and Pitchy for pitch detection.
 - Convert detected frequency to nearest note.
 - Start with calibration/debug mode before scoring voice input as a competitive mode.
 
-## Slice 7 — Learning depth
+## Slice 8 — Learning depth
 
 - Wider ledger-line range.
 - Ledger lines.

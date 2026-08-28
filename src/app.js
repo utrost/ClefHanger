@@ -18,11 +18,11 @@ import {
   getSpeed,
   getDifficulty,
   getClefPresentation,
-  normalizeAnswer,
+  getAnswerOptions,
   getPromptFrequencies,
 } from './core/game.js';
 
-const appVersion = 'clefhanger-slice5-2026-08-28';
+const appVersion = 'clefhanger-slice6-2026-08-28';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -42,8 +42,6 @@ const modeHelpEl = document.querySelector('#mode-help');
 const speedLabelEl = document.querySelector('#speed-label');
 const difficultyLabelEl = document.querySelector('#difficulty-label');
 const difficultyHelpEl = document.querySelector('#difficulty-help');
-const answerEntry = document.querySelector('#answer-entry');
-const submitAnswer = document.querySelector('#submit-answer');
 
 let selectedModeId = localStorage.getItem('clefhanger.selectedMode.v3') || 'basics';
 let selectedSpeedId = localStorage.getItem('clefhanger.selectedSpeed.v3') || 'normal';
@@ -149,8 +147,6 @@ function renderHud(nowMs) {
   difficultyLabelEl.textContent = difficulty.label;
   difficultyHelpEl.textContent = difficulty.help;
   startButton.textContent = state.phase === 'running' ? 'Restart sprint' : 'Start 60s sprint';
-  answerEntry.placeholder = mode.kind === 'chord' ? 'Chord answer, e.g. C-E-G' : 'Optional typed answer, e.g. F# or Bb';
-
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of speedButtons.querySelectorAll('button')) button.dataset.active = button.dataset.speed === selectedSpeedId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
@@ -198,7 +194,6 @@ function beginRound() {
   const now = performance.now();
   state = startRound(state, now, selectedModeId, selectedSpeedId, selectedDifficultyId);
   summaryEl.hidden = true;
-  answerEntry.value = '';
   render(now);
   rafId = requestAnimationFrame(tick);
 }
@@ -238,25 +233,19 @@ function handleAnswer(answer) {
   state = answerActiveNote(state, answer, now);
   if (state.feedback.kind === 'correct') playPromptAudio(answeredPrompt);
   if (state.phase === 'running') state = updateRound(state, now);
-  answerEntry.value = '';
   render(now);
 }
 
 function installButtons() {
   buttons.innerHTML = '';
-  const mode = getMode(selectedModeId);
-  const answers = mode.id === 'sharps'
-    ? ACCIDENTAL_BUTTONS.filter((note) => note.includes('♯'))
-    : mode.id === 'flats'
-      ? ACCIDENTAL_BUTTONS.filter((note) => note.includes('♭'))
-      : NOTE_BUTTONS;
-  for (const note of answers) {
+  const answers = getAnswerOptions(selectedModeId);
+  for (const option of answers) {
     const button = document.createElement('button');
     button.type = 'button';
-    button.className = note.length === 1 ? 'note-button' : 'note-button accidental-button';
-    button.textContent = note;
-    button.setAttribute('aria-label', `Answer ${note}`);
-    button.addEventListener('click', () => handleAnswer(note));
+    button.className = option.label.length === 1 ? 'note-button' : 'note-button accidental-button';
+    button.textContent = option.label;
+    button.setAttribute('aria-label', `Answer ${option.label}`);
+    button.addEventListener('click', () => handleAnswer(option.answer));
     buttons.append(button);
   }
 }
@@ -355,10 +344,6 @@ function installDifficulties() {
   }
 }
 
-submitAnswer.addEventListener('click', () => handleAnswer(normalizeAnswer(answerEntry.value)));
-answerEntry.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') handleAnswer(normalizeAnswer(answerEntry.value));
-});
 startButton.addEventListener('click', beginRound);
 installInputModes();
 installModes();
