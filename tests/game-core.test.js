@@ -12,6 +12,7 @@ import {
   missExpiredNotes,
   getRoundSummary,
   getHighScoreKey,
+  getPromptFrequencies,
 } from '../src/core/game.js';
 
 test('Level 1 exposes seven oversized natural-note answers', () => {
@@ -75,4 +76,15 @@ test('round summary reports readiness for actual testing', () => {
   assert.match(summary.title, /Sprint complete/);
   assert.equal(summary.score, 300);
   assert.equal(summary.accuracy, 50);
+});
+
+test('maps answered prompts to audible equal-tempered pitches', () => {
+  const note = createNote({ id: 'note-1', noteName: 'A', octave: 4, spawnedAtMs: 0, staffStep: 3 });
+  assert.deepEqual(getPromptFrequencies(note), [440]);
+
+  const sharp = createNote({ id: 'note-2', noteName: 'C', accidental: 'sharp', octave: 4, spawnedAtMs: 0, staffStep: -2 });
+  assert.equal(Math.round(getPromptFrequencies(sharp)[0] * 100) / 100, 277.18);
+
+  const chord = createNote({ id: 'note-3', kind: 'chord', chordName: 'C', quality: 'major', notes: ['C', 'E', 'G'], staffSteps: [-2, 0, 2], spawnedAtMs: 0 });
+  assert.deepEqual(getPromptFrequencies(chord).map((frequency) => Math.round(frequency)), [262, 330, 392]);
 });

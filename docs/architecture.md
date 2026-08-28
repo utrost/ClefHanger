@@ -18,9 +18,9 @@ Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested
 Current boundaries:
 
 - `src/core/game.js`
-  - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, mode definitions, speed definitions, difficulty definitions, staff/clef layout anchors, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
+  - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef layout anchors, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/app.js`
-  - DOM adapter, SVG staff/chord rendering, mode selector, speed selector, difficulty selector, fainter upcoming-note previews, note-button input, typed-answer input, animation loop, per-mode/per-speed/per-difficulty LocalStorage high scores.
+  - DOM adapter, SVG staff/chord rendering, mode selector, speed selector, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, typed-answer input, Web Audio correct-answer playback, animation loop, per-mode/per-speed/per-difficulty LocalStorage high scores.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration.
 - `manifest.webmanifest` and `sw.js`
@@ -37,14 +37,14 @@ Current repository behavior:
 - Slow, normal, and fast speed settings.
 - Beginner, easy, normal, and hard difficulty presets.
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
-- Natural-note and accidental button input.
+- Natural-note, accidental-button, and one-octave piano-strip input.
 - Typed answers for accidentals/chords.
+- Correct-answer Web Audio playback using equal-tempered pitches.
 - 60-second rush round.
 - Mode-weighted scoring, fast-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-speed/per-difficulty high-score persistence.
 
 Planned later implementation:
 
-- Piano strip input.
 - Vocal pitch input.
 - Ledger lines.
 - Intervals and rapid jumps.

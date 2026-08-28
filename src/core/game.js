@@ -1,5 +1,13 @@
 export const NOTE_BUTTONS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 export const ACCIDENTAL_BUTTONS = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯', 'D♭', 'E♭', 'G♭', 'A♭', 'B♭'];
+export const PIANO_WHITE_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+export const PIANO_BLACK_KEYS = [
+  { id: 'c-sharp', sharp: 'C♯', flat: 'D♭', after: 'C' },
+  { id: 'd-sharp', sharp: 'D♯', flat: 'E♭', after: 'D' },
+  { id: 'f-sharp', sharp: 'F♯', flat: 'G♭', after: 'F' },
+  { id: 'g-sharp', sharp: 'G♯', flat: 'A♭', after: 'G' },
+  { id: 'a-sharp', sharp: 'A♯', flat: 'B♭', after: 'A' },
+];
 
 export const STAFF_LAYOUT = {
   clefX: 26,
@@ -117,6 +125,45 @@ export function accidentalSymbol(accidental) {
 
 export function answerLabel(noteName, accidental) {
   return `${noteName}${accidentalSymbol(accidental)}`;
+}
+
+const SEMITONES_FROM_C = {
+  C: 0,
+  'C♯': 1,
+  'D♭': 1,
+  D: 2,
+  'D♯': 3,
+  'E♭': 3,
+  E: 4,
+  F: 5,
+  'F♯': 6,
+  'G♭': 6,
+  G: 7,
+  'G♯': 8,
+  'A♭': 8,
+  A: 9,
+  'A♯': 10,
+  'B♭': 10,
+  B: 11,
+};
+
+export function getPitchFrequency(noteName, octave = 4, accidental) {
+  const label = answerLabel(noteName, accidental);
+  const semitone = SEMITONES_FROM_C[label];
+  if (semitone === undefined) return null;
+  const midi = (octave + 1) * 12 + semitone;
+  return 440 * (2 ** ((midi - 69) / 12));
+}
+
+export function getPromptFrequencies(prompt) {
+  if (!prompt) return [];
+  if (prompt.kind === 'chord') {
+    return (prompt.notes || [])
+      .map((noteName) => getPitchFrequency(noteName, 4))
+      .filter((frequency) => frequency !== null);
+  }
+  const frequency = getPitchFrequency(prompt.noteName, prompt.octave, prompt.accidental);
+  return frequency === null ? [] : [frequency];
 }
 
 export function normalizeAnswer(answer) {

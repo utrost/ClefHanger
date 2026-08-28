@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice4-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice5-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -72,7 +72,7 @@
 
       .site-link:focus-visible, .site-link:hover { text-decoration: underline; }
 
-      .timer-card, .mode-panel, .stat, #feedback, #summary, .entry-row {
+      .timer-card, .mode-panel, .stat, #feedback, #summary, .entry-row, .input-mode-row {
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 18px;
         background: var(--panel);
@@ -205,11 +205,34 @@
         box-shadow: 0 10px 24px rgba(245,197,66,0.28);
       }
 
+      .input-mode-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+        padding: 5px;
+      }
+
+      .input-mode-button {
+        min-height: 34px;
+        border: 0;
+        border-radius: 12px;
+        background: transparent;
+        color: var(--muted);
+        font-weight: 900;
+      }
+
+      .input-mode-button[data-active="true"] {
+        background: var(--accent);
+        color: #1d1300;
+      }
+
       #note-buttons {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 5px;
       }
+
+      #note-buttons[hidden], #piano-strip[hidden] { display: none; }
 
       .note-button {
         min-height: 52px;
@@ -228,6 +251,50 @@
         font-size: clamp(0.82rem, 4.2vw, 1.05rem);
         background: rgba(255,255,255,0.08);
       }
+
+      #piano-strip {
+        position: relative;
+        height: 94px;
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 3px;
+      }
+
+      .piano-key {
+        touch-action: manipulation;
+        border: 1px solid rgba(23,17,43,0.45);
+        font-weight: 950;
+      }
+
+      .piano-key.white-key {
+        align-self: stretch;
+        border-radius: 0 0 12px 12px;
+        background: #fff7d2;
+        color: #17112b;
+        padding-top: 52px;
+      }
+
+      .piano-key.black-key {
+        position: absolute;
+        top: 0;
+        z-index: 2;
+        width: 10%;
+        height: 58px;
+        border-radius: 0 0 9px 9px;
+        background: #17112b;
+        color: var(--ink);
+        font-size: 0.74rem;
+      }
+
+      .piano-key.black-key:disabled {
+        opacity: 0.32;
+      }
+
+      .piano-key[data-after="C"] { left: 10.7%; }
+      .piano-key[data-after="D"] { left: 25.1%; }
+      .piano-key[data-after="F"] { left: 53.6%; }
+      .piano-key[data-after="G"] { left: 67.9%; }
+      .piano-key[data-after="A"] { left: 82.2%; }
 
       .entry-row {
         display: grid;
@@ -255,7 +322,7 @@
         padding: 0 12px;
       }
 
-      .note-button:active, #start-round:active, .mode-button:active, .speed-button:active, .difficulty-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
+      .note-button:active, .piano-key:active, #start-round:active, .mode-button:active, .speed-button:active, .difficulty-button:active, .input-mode-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
       #summary h2 { margin: 0 0 6px; }
       #summary p { margin: 5px 0; color: var(--muted); }
       .microcopy { margin: 0; text-align: center; color: var(--muted); font-size: 0.74rem; }
@@ -309,12 +376,17 @@
 
       <section class="controls" aria-label="Game controls">
         <button id="start-round" type="button">Start 60s sprint</button>
+        <div id="input-mode-buttons" class="input-mode-row" aria-label="Input mode buttons">
+          <button class="input-mode-button" type="button" data-input-mode="buttons" data-active="true">Notes</button>
+          <button class="input-mode-button" type="button" data-input-mode="piano">Piano</button>
+        </div>
         <div id="note-buttons" aria-label="Answer buttons"></div>
+        <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
         <div class="entry-row">
           <input id="answer-entry" autocomplete="off" inputmode="text" aria-label="Typed answer" placeholder="Optional typed answer, e.g. F# or Bb" />
           <button id="submit-answer" type="button">Enter</button>
         </div>
-        <p class="microcopy">Slice 4: difficulty ladder · two/three-note queues · per-level high scores</p>
+        <p class="microcopy">Slice 5: note buttons or piano strip · correct answers sing back</p>
       </section>
     </main>
     <script type="module" src="./src/app.js"></script>

@@ -69,11 +69,13 @@ Verification:
 - Only the front note is answerable; upcoming notes are fainter previews.
 - High scores are separated by mode, speed, and difficulty.
 
-## Slice 5 — Touch piano strip
+## Slice 5 — Touch piano strip and note playback — implemented
 
 - Add optional one-octave keyboard input.
 - Keep note buttons as the default mobile input.
-- Test mapping between displayed note names and piano keys.
+- Test mapping between displayed note prompts and equal-tempered playback frequencies.
+- Play the matching pitch after a correct answer. Chords play a short arpeggio.
+- Keep typed answers available for chords and compound answers.
 
 ## Slice 6 — Vocal tracking prototype
 

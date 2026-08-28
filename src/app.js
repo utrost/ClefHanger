@@ -1,6 +1,8 @@
 import {
   NOTE_BUTTONS,
   ACCIDENTAL_BUTTONS,
+  PIANO_WHITE_KEYS,
+  PIANO_BLACK_KEYS,
   GAME_MODES,
   SPEED_SETTINGS,
   DIFFICULTY_LEVELS,
@@ -17,11 +19,14 @@ import {
   getDifficulty,
   getClefPresentation,
   normalizeAnswer,
+  getPromptFrequencies,
 } from './core/game.js';
 
-const appVersion = 'clefhanger-slice4-2026-08-28';
+const appVersion = 'clefhanger-slice5-2026-08-28';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
+const pianoStrip = document.querySelector('#piano-strip');
+const inputModeButtons = document.querySelector('#input-mode-buttons');
 const modeButtons = document.querySelector('#mode-buttons');
 const speedButtons = document.querySelector('#speed-buttons');
 const difficultyButtons = document.querySelector('#difficulty-buttons');
@@ -43,8 +48,10 @@ const submitAnswer = document.querySelector('#submit-answer');
 let selectedModeId = localStorage.getItem('clefhanger.selectedMode.v3') || 'basics';
 let selectedSpeedId = localStorage.getItem('clefhanger.selectedSpeed.v3') || 'normal';
 let selectedDifficultyId = localStorage.getItem('clefhanger.selectedDifficulty.v4') || 'beginner';
+let selectedInputMode = localStorage.getItem('clefhanger.selectedInputMode.v5') || 'buttons';
 let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
 let rafId = null;
+let audioContext = null;
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId, difficultyId)) || '0', 10) || 0;
@@ -147,6 +154,9 @@ function renderHud(nowMs) {
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of speedButtons.querySelectorAll('button')) button.dataset.active = button.dataset.speed === selectedSpeedId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
+  for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
+  buttons.hidden = selectedInputMode !== 'buttons';
+  pianoStrip.hidden = selectedInputMode !== 'piano';
 
   if (state.phase === 'ended') {
     const summary = getRoundSummary(state);
@@ -179,6 +189,7 @@ function resetIdleState() {
   rafId = null;
   state = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs: performance.now(), seed: state.seed, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
   installButtons();
+  installPiano();
   render();
 }
 
@@ -192,9 +203,40 @@ function beginRound() {
   rafId = requestAnimationFrame(tick);
 }
 
+function getAudioContext() {
+  if (!window.AudioContext && !window.webkitAudioContext) return null;
+  if (!audioContext) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContextClass();
+  }
+  if (audioContext.state === 'suspended') audioContext.resume();
+  return audioContext;
+}
+
+function playPromptAudio(prompt) {
+  const context = getAudioContext();
+  if (!context) return;
+  const frequencies = getPromptFrequencies(prompt);
+  frequencies.forEach((frequency, index) => {
+    const startAt = context.currentTime + index * 0.075;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, startAt);
+    gain.gain.setValueAtTime(0.0001, startAt);
+    gain.gain.exponentialRampToValueAtTime(0.18, startAt + 0.018);
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.34);
+    oscillator.connect(gain).connect(context.destination);
+    oscillator.start(startAt);
+    oscillator.stop(startAt + 0.38);
+  });
+}
+
 function handleAnswer(answer) {
   const now = performance.now();
+  const answeredPrompt = state.activeNote;
   state = answerActiveNote(state, answer, now);
+  if (state.feedback.kind === 'correct') playPromptAudio(answeredPrompt);
   if (state.phase === 'running') state = updateRound(state, now);
   answerEntry.value = '';
   render(now);
@@ -216,6 +258,49 @@ function installButtons() {
     button.setAttribute('aria-label', `Answer ${note}`);
     button.addEventListener('click', () => handleAnswer(note));
     buttons.append(button);
+  }
+}
+
+function blackKeyAnswer(key, mode) {
+  if (mode.id === 'flats') return key.flat;
+  if (mode.id === 'sharps') return key.sharp;
+  return null;
+}
+
+function installPiano() {
+  pianoStrip.innerHTML = '';
+  const mode = getMode(selectedModeId);
+  for (const note of PIANO_WHITE_KEYS) {
+    const key = document.createElement('button');
+    key.type = 'button';
+    key.className = 'piano-key white-key';
+    key.textContent = note;
+    key.setAttribute('aria-label', `Piano key ${note}`);
+    key.addEventListener('click', () => handleAnswer(note));
+    pianoStrip.append(key);
+  }
+
+  for (const keyDefinition of PIANO_BLACK_KEYS) {
+    const answer = blackKeyAnswer(keyDefinition, mode);
+    const key = document.createElement('button');
+    key.type = 'button';
+    key.className = 'piano-key black-key';
+    key.dataset.after = keyDefinition.after;
+    key.textContent = answer || keyDefinition.sharp;
+    key.disabled = !answer;
+    key.setAttribute('aria-label', answer ? `Piano black key ${answer}` : `Black key ${keyDefinition.sharp}`);
+    if (answer) key.addEventListener('click', () => handleAnswer(answer));
+    pianoStrip.append(key);
+  }
+}
+
+function installInputModes() {
+  for (const button of inputModeButtons.querySelectorAll('button')) {
+    button.addEventListener('click', () => {
+      selectedInputMode = button.dataset.inputMode === 'piano' ? 'piano' : 'buttons';
+      localStorage.setItem('clefhanger.selectedInputMode.v5', selectedInputMode);
+      render();
+    });
   }
 }
 
@@ -275,16 +360,20 @@ answerEntry.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') handleAnswer(normalizeAnswer(answerEntry.value));
 });
 startButton.addEventListener('click', beginRound);
+installInputModes();
 installModes();
 installSpeeds();
 installDifficulties();
 installButtons();
+installPiano();
 render();
 
 window.__clefHanger = {
   appVersion,
   NOTE_BUTTONS,
   ACCIDENTAL_BUTTONS,
+  PIANO_WHITE_KEYS,
+  PIANO_BLACK_KEYS,
   GAME_MODES,
   SPEED_SETTINGS,
   DIFFICULTY_LEVELS,
@@ -303,4 +392,9 @@ window.__clefHanger = {
     selectedDifficultyId = getDifficulty(difficultyId).id;
     resetIdleState();
   },
+  selectInputMode: (inputMode) => {
+    selectedInputMode = inputMode === 'piano' ? 'piano' : 'buttons';
+    render();
+  },
+  playPromptAudio,
 };
