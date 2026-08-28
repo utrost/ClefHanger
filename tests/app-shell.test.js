@@ -22,6 +22,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /id="difficulty-buttons"/);
   assert.match(html, /id="difficulty-label"/);
   assert.match(html, /Today.s Sprint/);
+  assert.match(html, /href="https:\/\/simiono\.com\/"/);
+  assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
   assert.match(html, /data-app-version="clefhanger-slice4/);
 });
