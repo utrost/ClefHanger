@@ -18,9 +18,9 @@ Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested
 Current boundaries:
 
 - `src/core/game.js`
-  - Note names, Level 1 treble note pool, accidental pools, chord pools, mode definitions, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
+  - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, mode definitions, speed definitions, staff/clef layout anchors, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/app.js`
-  - DOM adapter, SVG staff/chord rendering, mode selector, note-button input, typed-answer input, animation loop, per-mode LocalStorage high scores.
+  - DOM adapter, SVG staff/chord rendering, mode selector, speed selector, note-button input, typed-answer input, animation loop, per-mode/per-speed LocalStorage high scores.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration.
 - `manifest.webmanifest` and `sw.js`
@@ -31,12 +31,14 @@ Current boundaries:
 Current repository behavior:
 
 - Static PWA shell.
-- Treble clef only.
-- Basics, sharps, flats, and chord modes.
+- Treble and bass clef.
+- Corrected SVG clef anchors for treble and bass.
+- Treble, bass, sharps, flats, and chord modes.
+- Slow, normal, and fast speed settings.
 - Natural-note and accidental button input.
 - Typed answers for accidentals/chords.
 - 60-second rush round.
-- Mode-weighted scoring, streak bonuses, and per-mode high-score persistence.
+- Mode-weighted scoring, fast-speed bonus, streak bonuses, and per-mode/per-speed high-score persistence.
 
 Planned later implementation:
 

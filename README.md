@@ -24,11 +24,13 @@ The first playable slice should prove the simplest complete loop:
 
 ## Current playable slice
 
-Slices 1–2 are implemented as a dependency-free static PWA:
+Slices 1–3 are implemented as a dependency-free static PWA:
 
-- Treble-clef note/chord rush.
+- Treble-clef and bass-clef note/chord rush.
+- Corrected SVG clef placement: treble clef centered on the G line, bass clef centered around the F line.
 - 60-second sprint timer.
-- Four practice modes: Basics, Sharps #, Flats ♭, Chords.
+- Five practice modes: Treble, Bass, Sharps #, Flats ♭, Chords.
+- Speed control: Slow, Normal, Fast.
 - Seven large natural-note buttons: C D E F G A B.
 - Extra accidental buttons for #/♭ answers.
 - Optional typed answers for accidentals and chords, e.g. `F#`, `Bb`, `C-E-G`.

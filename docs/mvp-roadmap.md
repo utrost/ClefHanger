@@ -51,22 +51,31 @@ Verification:
 - Per-mode high scores are persisted in LocalStorage.
 - PWA manifest and offline shell remain active.
 
-## Slice 3 — Touch piano strip
+## Slice 3 — Clef correctness, bass mode, and speed control — implemented
+
+- Treble clef glyph placement is corrected and covered by a renderer-free staff-layout contract.
+- Bass clef is available as a natural-note drill mode.
+- Bass-note generation uses lower-register E2–A3 notes mapped to the staff.
+- Speed control is available as Slow, Normal, and Fast.
+- Speed changes the note travel deadline without changing the selected practice mode.
+- High scores are separated by mode and speed.
+
+## Slice 4 — Touch piano strip
 
 - Add optional one-octave keyboard input.
 - Keep note buttons as the default mobile input.
 - Test mapping between displayed note names and piano keys.
 
-## Slice 4 — Vocal tracking prototype
+## Slice 5 — Vocal tracking prototype
 
 - Add microphone permission flow.
 - Use Web Audio API and Pitchy for pitch detection.
 - Convert detected frequency to nearest note.
 - Start with calibration/debug mode before scoring voice input as a competitive mode.
 
-## Slice 5 — Learning depth
+## Slice 6 — Learning depth
 
-- Bass clef.
+- Wider ledger-line range.
 - Ledger lines.
 - Accidentals.
 - Intervals and rapid jumps.

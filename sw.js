@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clefhanger-slice2-v1';
+const CACHE_NAME = 'clefhanger-slice3-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -32,5 +32,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+  event.respondWith(
+    fetch(request)
+      .then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        return response;
+      })
+      .catch(() => caches.match(request)),
+  );
 });

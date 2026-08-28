@@ -14,7 +14,7 @@ import {
 test('ships selectable practice modes for basics, accidentals, flats, and chords', () => {
   assert.deepEqual(
     GAME_MODES.map((mode) => mode.id),
-    ['basics', 'sharps', 'flats', 'chords'],
+    ['basics', 'bass', 'sharps', 'flats', 'chords'],
   );
   assert.equal(getMode('sharps').label, 'Sharps #');
   assert.equal(getMode('flats').label, 'Flats ♭');
@@ -67,6 +67,6 @@ test('points scale by mode and streak bonus', () => {
 });
 
 test('high scores are separated per mode', () => {
-  assert.equal(getHighScoreKey('basics'), 'clefhanger.highScore.basics.v2');
-  assert.equal(getHighScoreKey('chords'), 'clefhanger.highScore.chords.v2');
+  assert.equal(getHighScoreKey('basics'), 'clefhanger.highScore.basics.normal.v3');
+  assert.equal(getHighScoreKey('chords', 'fast'), 'clefhanger.highScore.chords.fast.v3');
 });

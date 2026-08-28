@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice2-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice3-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -113,13 +113,15 @@
       #mode-label { font-weight: 900; }
       #mode-help { margin: 0; color: var(--muted); font-size: 0.78rem; }
 
-      #mode-buttons {
+      #mode-buttons, #speed-buttons {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 6px;
       }
 
-      .mode-button {
+      #mode-buttons { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      #speed-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+      .mode-button, .speed-button {
         border: 1px solid rgba(255,255,255,0.16);
         border-radius: 13px;
         min-height: 38px;
@@ -129,7 +131,7 @@
         font-size: 0.78rem;
       }
 
-      .mode-button[data-active="true"] {
+      .mode-button[data-active="true"], .speed-button[data-active="true"] {
         background: var(--accent);
         color: #1d1300;
       }
@@ -161,7 +163,9 @@
 
       #staff svg { display: block; width: 100%; height: auto; }
       .staff-line, .ledger { stroke: #241707; stroke-width: 2.5; stroke-linecap: round; }
-      .clef { font-size: 48px; fill: #241707; }
+      .clef { fill: #241707; text-anchor: middle; dominant-baseline: central; }
+      .clef-treble { font-size: 86px; }
+      .clef-bass { font-size: 70px; }
       .cliff-line { stroke: var(--danger); stroke-width: 4; stroke-dasharray: 8 7; }
       .cliff-rock { fill: #4b342d; }
       .active-note { fill: #17112b; stroke: #17112b; stroke-width: 4; }
@@ -241,7 +245,7 @@
         padding: 0 12px;
       }
 
-      .note-button:active, #start-round:active, .mode-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
+      .note-button:active, #start-round:active, .mode-button:active, .speed-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
       #summary h2 { margin: 0 0 6px; }
       #summary p { margin: 5px 0; color: var(--muted); }
       .microcopy { margin: 0; text-align: center; color: var(--muted); font-size: 0.74rem; }
@@ -265,7 +269,7 @@
       <header>
         <div>
           <h1>ClefHanger</h1>
-          <p class="tagline">Name notes, accidentals, and chords before they drop.</p>
+          <p class="tagline">Name notes, bass notes, accidentals, and chords before they drop.</p>
         </div>
         <div class="timer-card" aria-live="polite"><small>seconds</small><span id="timer">60</span></div>
       </header>
@@ -277,8 +281,10 @@
       </section>
 
       <section class="mode-panel" aria-label="Practice mode">
-        <div class="mode-copy"><small>mode</small><span id="mode-label">Basics</span></div>
-        <div id="mode-buttons" aria-label="Mode buttons"></div>
+        <div class="mode-copy"><small>mode</small><span id="mode-label">Treble</span></div>
+        <div id="mode-buttons" aria-label="Mode buttons">Bass</div>
+        <div class="mode-copy"><small>speed</small><span id="speed-label">Normal</span></div>
+        <div id="speed-buttons" aria-label="Speed buttons"></div>
         <p id="mode-help">Natural treble notes.</p>
       </section>
 
@@ -295,7 +301,7 @@
           <input id="answer-entry" autocomplete="off" inputmode="text" aria-label="Typed answer" placeholder="Optional typed answer, e.g. F# or Bb" />
           <button id="submit-answer" type="button">Enter</button>
         </div>
-        <p class="microcopy">Slice 2: modes · #/♭ · triads · mode high scores</p>
+        <p class="microcopy">Slice 3: corrected clefs · bass mode · speed control</p>
       </section>
     </main>
     <script type="module" src="./src/app.js"></script>
