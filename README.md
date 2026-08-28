@@ -22,8 +22,30 @@ The first playable slice should prove the simplest complete loop:
 - A one-octave touch piano strip.
 - Microphone pitch detection for singers.
 
+## Current playable slice
+
+Slice 1 is implemented as a dependency-free static PWA:
+
+- Treble-clef note rush.
+- 60-second sprint timer.
+- Seven large answer buttons: C D E F G A B.
+- Score, streak, wrong-answer, and missed-note feedback.
+- Local best score via LocalStorage.
+- Offline app shell via service worker.
+
+## Run locally
+
+```bash
+npm test
+npm run check
+npm run serve
+```
+
+Then open `http://localhost:4173/`.
+
 ## Documentation
 
 - [Product specification](docs/product-specification.md)
 - [MVP implementation roadmap](docs/mvp-roadmap.md)
 - [Architecture notes](docs/architecture.md)
+- [Smoke checklist](docs/smoke-checklist.md)

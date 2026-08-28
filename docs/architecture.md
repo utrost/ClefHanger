@@ -13,38 +13,29 @@ ClefHanger should stay mobile-first and renderer-light. The first implementation
 
 ## Initial app shape
 
-Recommended first scaffold: Vite with a small TypeScript core.
+Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested core. This keeps Slice 1 deployable under `https://simiono.com/clefhanger/` without a build step. A later Vite/TypeScript migration is still reasonable once the app needs bundled dependencies such as VexFlow and Pitchy.
 
-Suggested boundaries:
+Current boundaries:
 
-- `src/core/notes.ts`
-  - Note names, clef note pools, staff positions, pitch helpers.
-- `src/core/gameState.ts`
-  - Round lifecycle, timer state, active note queue, score, streak, misses.
-- `src/core/scoring.ts`
-  - Pure answer reducer: correct, wrong, missed, next note.
-- `src/ui/inputButtons.ts`
-  - C D E F G A B touch controls.
-- `src/ui/staffRenderer.ts`
-  - VexFlow/SVG rendering adapter.
-- `src/ui/pianoStrip.ts`
-  - Planned optional keyboard input.
-- `src/audio/pitchInput.ts`
-  - Planned microphone/pitch tracking input.
-- `src/storage/progressStore.ts`
-  - Local best scores and settings.
+- `src/core/game.js`
+  - Note names, Level 1 treble note pool, round lifecycle, scoring, misses, timer helpers, and summary view data.
+- `src/app.js`
+  - DOM adapter, SVG staff rendering, note-button input, animation loop, LocalStorage best score.
+- `index.html`
+  - Mobile-first layout, app shell, inline CSS, service-worker registration.
+- `manifest.webmanifest` and `sw.js`
+  - Installable/offline PWA shell.
 
 ## Current vs planned behavior
 
-Current repository behavior is documentation-only until the first app scaffold lands.
+Current repository behavior:
 
-Planned first implementation:
-
+- Static PWA shell.
 - Treble clef only.
 - No accidentals.
 - Button input only.
 - 60-second rush round.
-- Local-only scoring.
+- Local-only scoring and best-score persistence.
 
 Planned later implementation:
 

@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en" data-app-version="clefhanger-slice1-2026-08-28">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#17112b" />
+    <title>ClefHanger</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f8f4df;
+        --muted: #c7bddf;
+        --paper: #fff7d2;
+        --stage: #17112b;
+        --panel: rgba(255, 255, 255, 0.08);
+        --accent: #f5c542;
+        --danger: #ff6b6b;
+        --good: #62e6a7;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100svh;
+        font-family: ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(245, 197, 66, 0.18), transparent 32rem),
+          linear-gradient(160deg, #17112b 0%, #211842 58%, #0f0b1e 100%);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
+      }
+
+      main {
+        width: min(100%, 440px);
+        min-height: 100svh;
+        display: grid;
+        grid-template-rows: auto auto 1fr auto;
+        gap: 12px;
+        padding: 16px 0 12px;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: start;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2rem, 11vw, 3.4rem);
+        line-height: 0.9;
+        letter-spacing: -0.07em;
+      }
+
+      .tagline {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .timer-card {
+        min-width: 82px;
+        padding: 10px;
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 18px;
+        background: var(--panel);
+        text-align: center;
+      }
+
+      .timer-card span {
+        display: block;
+        font-size: 2rem;
+        font-weight: 900;
+      }
+
+      .hud {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+
+      .stat, #feedback, #summary {
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 18px;
+        background: var(--panel);
+        padding: 10px;
+      }
+
+      .stat b {
+        display: block;
+        font-size: 1.45rem;
+      }
+
+      .stat small, .timer-card small {
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        font-size: 0.68rem;
+      }
+
+      .stage {
+        position: relative;
+        display: grid;
+        align-content: center;
+        gap: 10px;
+        min-height: 290px;
+        border-radius: 28px;
+        padding: 18px 10px;
+        background: linear-gradient(180deg, rgba(255,247,210,0.96), rgba(255,236,164,0.90));
+        color: #221500;
+        box-shadow: 0 24px 70px rgba(0,0,0,0.35);
+        overflow: hidden;
+      }
+
+      .stage::after {
+        content: "";
+        position: absolute;
+        right: -28px;
+        top: 12%;
+        width: 72px;
+        height: 76%;
+        background: linear-gradient(90deg, rgba(23,17,43,0), rgba(23,17,43,0.22));
+        pointer-events: none;
+      }
+
+      #staff svg {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .staff-line, .ledger {
+        stroke: #241707;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+      }
+
+      .clef {
+        font-size: 48px;
+        fill: #241707;
+      }
+
+      .cliff-line {
+        stroke: var(--danger);
+        stroke-width: 4;
+        stroke-dasharray: 8 7;
+      }
+
+      .cliff-rock { fill: #4b342d; }
+      .active-note { fill: #17112b; stroke: #17112b; stroke-width: 4; }
+
+      #feedback {
+        min-height: 52px;
+        font-weight: 800;
+        text-align: center;
+      }
+
+      #feedback[data-kind="correct"] { color: var(--good); }
+      #feedback[data-kind="wrong"], #feedback[data-kind="missed"] { color: var(--danger); }
+
+      .controls {
+        display: grid;
+        gap: 10px;
+      }
+
+      #start-round {
+        min-height: 54px;
+        border: 0;
+        border-radius: 18px;
+        background: var(--accent);
+        color: #1d1300;
+        font-size: 1.05rem;
+        font-weight: 900;
+        box-shadow: 0 10px 24px rgba(245,197,66,0.28);
+      }
+
+      #note-buttons {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .note-button {
+        min-height: 64px;
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.13);
+        color: var(--ink);
+        font-size: clamp(1.2rem, 7vw, 1.65rem);
+        font-weight: 950;
+        touch-action: manipulation;
+      }
+
+      .note-button:active, #start-round:active {
+        transform: translateY(2px) scale(0.99);
+      }
+
+      #summary h2 { margin: 0 0 6px; }
+      #summary p { margin: 5px 0; color: var(--muted); }
+
+      .microcopy {
+        margin: 0;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.78rem;
+      }
+
+      @media (max-width: 720px) {
+        body { padding-inline: 10px; }
+        main { min-height: 100svh; }
+        .stage { min-height: 36svh; }
+        .note-button { min-height: max(58px, 8.5svh); }
+      }
+
+      @media (min-width: 721px) {
+        body { padding-block: 24px; }
+        main { min-height: min(820px, 100svh); }
+      }
+    </style>
+  </head>
+  <body>
+    <main aria-label="ClefHanger sight-reading game">
+      <header>
+        <div>
+          <h1>ClefHanger</h1>
+          <p class="tagline">Name the note before it drops.</p>
+        </div>
+        <div class="timer-card" aria-live="polite">
+          <small>seconds</small>
+          <span id="timer">60</span>
+        </div>
+      </header>
+
+      <section class="hud" aria-label="Round stats">
+        <div class="stat"><small>score</small><b id="score">0</b></div>
+        <div class="stat"><small>streak</small><b id="streak">0</b></div>
+        <div class="stat"><small>best</small><b id="best-score">0</b></div>
+      </section>
+
+      <section class="stage" aria-label="Treble clef rush playfield">
+        <div id="staff"></div>
+        <div id="feedback" aria-live="polite">Tap Start when ready.</div>
+        <aside id="summary" hidden></aside>
+      </section>
+
+      <section class="controls" aria-label="Game controls">
+        <button id="start-round" type="button">Start 60s sprint</button>
+        <div id="note-buttons" aria-label="Answer buttons"></div>
+        <p class="microcopy">Slice 1: treble clef basics · buttons only · no hardware</p>
+      </section>
+    </main>
+    <script type="module" src="./src/app.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+      }
+    </script>
+  </body>
+</html>

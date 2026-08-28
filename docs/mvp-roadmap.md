@@ -2,14 +2,14 @@
 
 This roadmap separates the first shippable game loop from later learning depth. Features below are planned unless explicitly marked as implemented in code.
 
-## Slice 0 — Repo foundation
+## Slice 0 — Repo foundation — implemented
 
 - Capture product specification.
 - Add README, roadmap, and architecture notes.
 - Choose the initial browser app scaffold.
-- Add a basic quality gate: tests, build, and browser smoke once code exists.
+- Add a basic quality gate: tests, static checks, and browser smoke checklist.
 
-## Slice 1 — Treble-note rush greybox
+## Slice 1 — Treble-note rush greybox — implemented
 
 Goal: one complete 60-second round using only oversized note buttons.
 
