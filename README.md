@@ -24,13 +24,17 @@ The first playable slice should prove the simplest complete loop:
 
 ## Current playable slice
 
-Slice 1 is implemented as a dependency-free static PWA:
+Slices 1–2 are implemented as a dependency-free static PWA:
 
-- Treble-clef note rush.
+- Treble-clef note/chord rush.
 - 60-second sprint timer.
-- Seven large answer buttons: C D E F G A B.
-- Score, streak, wrong-answer, and missed-note feedback.
-- Local best score via LocalStorage.
+- Four practice modes: Basics, Sharps #, Flats ♭, Chords.
+- Seven large natural-note buttons: C D E F G A B.
+- Extra accidental buttons for #/♭ answers.
+- Optional typed answers for accidentals and chords, e.g. `F#`, `Bb`, `C-E-G`.
+- Correct / wrong / missed feedback.
+- Mode-weighted points with streak bonuses.
+- Per-mode high scores via LocalStorage.
 - Offline app shell via service worker.
 
 ## Run locally

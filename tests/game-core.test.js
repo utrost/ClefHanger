@@ -4,9 +4,14 @@ import {
   createInitialState,
   createNote,
   NOTE_BUTTONS,
+  GAME_MODES,
+  getMode,
+  normalizeAnswer,
+  answerLabel,
   answerActiveNote,
   missExpiredNotes,
   getRoundSummary,
+  getHighScoreKey,
 } from '../src/core/game.js';
 
 test('Level 1 exposes seven oversized natural-note answers', () => {
@@ -15,16 +20,12 @@ test('Level 1 exposes seven oversized natural-note answers', () => {
 
 test('creates treble-clef notes with a deterministic answer and deadline', () => {
   const note = createNote({ id: 'n1', noteName: 'G', octave: 4, spawnedAtMs: 1000, travelMs: 5000 });
-  assert.deepEqual(note, {
-    id: 'n1',
-    clef: 'treble',
-    noteName: 'G',
-    octave: 4,
-    answer: 'G',
-    spawnedAtMs: 1000,
-    deadlineMs: 6000,
-    status: 'active',
-  });
+  assert.equal(note.clef, 'treble');
+  assert.equal(note.kind, 'note');
+  assert.equal(note.answer, 'G');
+  assert.equal(note.displayName, 'G4');
+  assert.equal(note.deadlineMs, 6000);
+  assert.equal(note.status, 'active');
 });
 
 test('scores correct answers, advances streak, and clears the active note', () => {

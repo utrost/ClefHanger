@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clefhanger-slice1-v1';
+const CACHE_NAME = 'clefhanger-slice2-v1';
 const APP_SHELL = [
   './',
   './index.html',

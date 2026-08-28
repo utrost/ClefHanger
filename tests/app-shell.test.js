@@ -15,7 +15,10 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
   assert.match(html, /id="note-buttons"/);
-  assert.match(html, /data-app-version="clefhanger-slice1/);
+  assert.match(html, /id="mode-buttons"/);
+  assert.match(html, /id="answer-entry"/);
+  assert.match(html, /id="submit-answer"/);
+  assert.match(html, /data-app-version="clefhanger-slice2/);
 });
 
 test('manifest and service worker describe an installable subpath-safe app shell', () => {

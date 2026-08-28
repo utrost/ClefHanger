@@ -40,12 +40,16 @@ Verification:
 - Browser smoke in a phone-like viewport.
 - Console has no runtime errors.
 
-## Slice 2 — Level progression and local progress
+## Slice 2 — Modes, accidentals, chords, and high scores — implemented
 
-- Level 1 note pool: treble clef staff lines/spaces without accidentals.
-- Unlock and persist local best scores.
-- Keep progress in LocalStorage.
-- Add PWA manifest and offline shell.
+- Four selectable modes: Basics, Sharps #, Flats ♭, Chords.
+- Level 1 note pool remains treble-clef staff lines/spaces.
+- Accidentals are introduced as separate sharp and flat drills.
+- Chords use three-note triad stacks with typed answers such as `C-E-G`.
+- Mode-weighted scoring gives harder drills more points.
+- Streak bonuses reward clean runs.
+- Per-mode high scores are persisted in LocalStorage.
+- PWA manifest and offline shell remain active.
 
 ## Slice 3 — Touch piano strip
 

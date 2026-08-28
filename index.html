@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice1-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice2-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -14,6 +14,7 @@
         --paper: #fff7d2;
         --stage: #17112b;
         --panel: rgba(255, 255, 255, 0.08);
+        --panel-strong: rgba(255, 255, 255, 0.15);
         --accent: #f5c542;
         --danger: #ff6b6b;
         --good: #62e6a7;
@@ -31,89 +32,119 @@
         color: var(--ink);
         display: grid;
         place-items: center;
-        padding: env(safe-area-inset-top) 12px env(safe-area-inset-bottom);
+        padding: env(safe-area-inset-top) 10px env(safe-area-inset-bottom);
       }
 
       main {
-        width: min(100%, 440px);
+        width: min(100%, 460px);
         min-height: 100svh;
         display: grid;
-        grid-template-rows: auto auto 1fr auto;
-        gap: 12px;
-        padding: 16px 0 12px;
+        grid-template-rows: auto auto auto 1fr auto;
+        gap: 9px;
+        padding: 12px 0 10px;
       }
 
       header {
         display: flex;
         justify-content: space-between;
-        gap: 12px;
+        gap: 10px;
         align-items: start;
       }
 
       h1 {
         margin: 0;
-        font-size: clamp(2rem, 11vw, 3.4rem);
+        font-size: clamp(1.8rem, 10vw, 3.4rem);
         line-height: 0.9;
         letter-spacing: -0.07em;
       }
 
       .tagline {
-        margin: 6px 0 0;
+        margin: 5px 0 0;
         color: var(--muted);
-        font-size: 0.95rem;
+        font-size: 0.9rem;
       }
 
-      .timer-card {
-        min-width: 82px;
-        padding: 10px;
+      .timer-card, .mode-panel, .stat, #feedback, #summary, .entry-row {
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 18px;
         background: var(--panel);
+      }
+
+      .timer-card {
+        min-width: 76px;
+        padding: 8px;
         text-align: center;
       }
 
       .timer-card span {
         display: block;
-        font-size: 2rem;
+        font-size: 1.8rem;
         font-weight: 900;
       }
 
       .hud {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
+        gap: 7px;
       }
 
-      .stat, #feedback, #summary {
-        border: 1px solid rgba(255,255,255,0.14);
-        border-radius: 18px;
-        background: var(--panel);
-        padding: 10px;
-      }
-
-      .stat b {
-        display: block;
-        font-size: 1.45rem;
-      }
-
-      .stat small, .timer-card small {
+      .stat { padding: 8px; }
+      .stat b { display: block; font-size: 1.3rem; }
+      .stat small, .timer-card small, .mode-panel small {
         color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.08em;
-        font-size: 0.68rem;
+        font-size: 0.64rem;
+      }
+
+      .mode-panel {
+        padding: 8px;
+        display: grid;
+        gap: 7px;
+      }
+
+      .mode-copy {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: baseline;
+      }
+
+      #mode-label { font-weight: 900; }
+      #mode-help { margin: 0; color: var(--muted); font-size: 0.78rem; }
+
+      #mode-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+      }
+
+      .mode-button {
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 13px;
+        min-height: 38px;
+        background: rgba(255,255,255,0.10);
+        color: var(--ink);
+        font-weight: 850;
+        font-size: 0.78rem;
+      }
+
+      .mode-button[data-active="true"] {
+        background: var(--accent);
+        color: #1d1300;
       }
 
       .stage {
         position: relative;
         display: grid;
         align-content: center;
-        gap: 10px;
-        min-height: 290px;
-        border-radius: 28px;
-        padding: 18px 10px;
+        gap: 8px;
+        min-height: 250px;
+        border-radius: 26px;
+        padding: 14px 8px;
         background: linear-gradient(180deg, rgba(255,247,210,0.96), rgba(255,236,164,0.90));
         color: #221500;
-        box-shadow: 0 24px 70px rgba(0,0,0,0.35);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.35);
         overflow: hidden;
       }
 
@@ -128,53 +159,34 @@
         pointer-events: none;
       }
 
-      #staff svg {
-        display: block;
-        width: 100%;
-        height: auto;
-      }
-
-      .staff-line, .ledger {
-        stroke: #241707;
-        stroke-width: 2.5;
-        stroke-linecap: round;
-      }
-
-      .clef {
-        font-size: 48px;
-        fill: #241707;
-      }
-
-      .cliff-line {
-        stroke: var(--danger);
-        stroke-width: 4;
-        stroke-dasharray: 8 7;
-      }
-
+      #staff svg { display: block; width: 100%; height: auto; }
+      .staff-line, .ledger { stroke: #241707; stroke-width: 2.5; stroke-linecap: round; }
+      .clef { font-size: 48px; fill: #241707; }
+      .cliff-line { stroke: var(--danger); stroke-width: 4; stroke-dasharray: 8 7; }
       .cliff-rock { fill: #4b342d; }
       .active-note { fill: #17112b; stroke: #17112b; stroke-width: 4; }
+      .accidental { fill: #17112b; stroke: none; font-size: 27px; font-weight: 900; }
+      .chord-note { stroke-width: 4; }
 
       #feedback {
-        min-height: 52px;
-        font-weight: 800;
+        min-height: 44px;
+        font-weight: 850;
         text-align: center;
+        padding: 9px;
       }
 
       #feedback[data-kind="correct"] { color: var(--good); }
       #feedback[data-kind="wrong"], #feedback[data-kind="missed"] { color: var(--danger); }
 
-      .controls {
-        display: grid;
-        gap: 10px;
-      }
+      .controls { display: grid; gap: 8px; }
 
       #start-round {
-        min-height: 54px;
+        min-height: 50px;
         border: 0;
         border-radius: 18px;
         background: var(--accent);
         color: #1d1300;
-        font-size: 1.05rem;
+        font-size: 1.02rem;
         font-weight: 900;
         box-shadow: 0 10px 24px rgba(245,197,66,0.28);
       }
@@ -182,44 +194,69 @@
       #note-buttons {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 6px;
+        gap: 5px;
       }
 
       .note-button {
-        min-height: 64px;
+        min-height: 52px;
         border: 1px solid rgba(255,255,255,0.16);
-        border-radius: 18px;
+        border-radius: 15px;
         background: rgba(255,255,255,0.13);
         color: var(--ink);
-        font-size: clamp(1.2rem, 7vw, 1.65rem);
+        font-size: clamp(1.05rem, 5.8vw, 1.55rem);
         font-weight: 950;
         touch-action: manipulation;
+        padding: 0;
       }
 
-      .note-button:active, #start-round:active {
-        transform: translateY(2px) scale(0.99);
+      .accidental-button {
+        min-height: 38px;
+        font-size: clamp(0.82rem, 4.2vw, 1.05rem);
+        background: rgba(255,255,255,0.08);
       }
 
+      .entry-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 6px;
+        padding: 6px;
+      }
+
+      #answer-entry {
+        min-width: 0;
+        border: 0;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.10);
+        color: var(--ink);
+        padding: 0 10px;
+        font-size: 1rem;
+      }
+
+      #submit-answer {
+        border: 0;
+        border-radius: 12px;
+        background: var(--panel-strong);
+        color: var(--ink);
+        font-weight: 900;
+        padding: 0 12px;
+      }
+
+      .note-button:active, #start-round:active, .mode-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
       #summary h2 { margin: 0 0 6px; }
       #summary p { margin: 5px 0; color: var(--muted); }
-
-      .microcopy {
-        margin: 0;
-        text-align: center;
-        color: var(--muted);
-        font-size: 0.78rem;
-      }
+      .microcopy { margin: 0; text-align: center; color: var(--muted); font-size: 0.74rem; }
 
       @media (max-width: 720px) {
-        body { padding-inline: 10px; }
+        body { padding-inline: 8px; }
         main { min-height: 100svh; }
-        .stage { min-height: 36svh; }
-        .note-button { min-height: max(58px, 8.5svh); }
+        .stage { min-height: 30svh; }
+        .note-button { min-height: max(48px, 7svh); }
+        .accidental-button { min-height: 36px; }
       }
 
       @media (min-width: 721px) {
         body { padding-block: 24px; }
-        main { min-height: min(820px, 100svh); }
+        main { min-height: min(860px, 100svh); }
       }
     </style>
   </head>
@@ -228,18 +265,21 @@
       <header>
         <div>
           <h1>ClefHanger</h1>
-          <p class="tagline">Name the note before it drops.</p>
+          <p class="tagline">Name notes, accidentals, and chords before they drop.</p>
         </div>
-        <div class="timer-card" aria-live="polite">
-          <small>seconds</small>
-          <span id="timer">60</span>
-        </div>
+        <div class="timer-card" aria-live="polite"><small>seconds</small><span id="timer">60</span></div>
       </header>
 
       <section class="hud" aria-label="Round stats">
         <div class="stat"><small>score</small><b id="score">0</b></div>
         <div class="stat"><small>streak</small><b id="streak">0</b></div>
-        <div class="stat"><small>best</small><b id="best-score">0</b></div>
+        <div class="stat"><small>high</small><b id="best-score">0</b></div>
+      </section>
+
+      <section class="mode-panel" aria-label="Practice mode">
+        <div class="mode-copy"><small>mode</small><span id="mode-label">Basics</span></div>
+        <div id="mode-buttons" aria-label="Mode buttons"></div>
+        <p id="mode-help">Natural treble notes.</p>
       </section>
 
       <section class="stage" aria-label="Treble clef rush playfield">
@@ -251,7 +291,11 @@
       <section class="controls" aria-label="Game controls">
         <button id="start-round" type="button">Start 60s sprint</button>
         <div id="note-buttons" aria-label="Answer buttons"></div>
-        <p class="microcopy">Slice 1: treble clef basics · buttons only · no hardware</p>
+        <div class="entry-row">
+          <input id="answer-entry" autocomplete="off" inputmode="text" aria-label="Typed answer" placeholder="Optional typed answer, e.g. F# or Bb" />
+          <button id="submit-answer" type="button">Enter</button>
+        </div>
+        <p class="microcopy">Slice 2: modes · #/♭ · triads · mode high scores</p>
       </section>
     </main>
     <script type="module" src="./src/app.js"></script>

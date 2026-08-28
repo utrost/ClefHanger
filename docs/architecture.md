@@ -13,14 +13,14 @@ ClefHanger should stay mobile-first and renderer-light. The first implementation
 
 ## Initial app shape
 
-Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested core. This keeps Slice 1 deployable under `https://simiono.com/clefhanger/` without a build step. A later Vite/TypeScript migration is still reasonable once the app needs bundled dependencies such as VexFlow and Pitchy.
+Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested core. This keeps the app deployable under `https://simiono.com/clefhanger/` without a build step. A later Vite/TypeScript migration is still reasonable once the app needs bundled dependencies such as VexFlow and Pitchy.
 
 Current boundaries:
 
 - `src/core/game.js`
-  - Note names, Level 1 treble note pool, round lifecycle, scoring, misses, timer helpers, and summary view data.
+  - Note names, Level 1 treble note pool, accidental pools, chord pools, mode definitions, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/app.js`
-  - DOM adapter, SVG staff rendering, note-button input, animation loop, LocalStorage best score.
+  - DOM adapter, SVG staff/chord rendering, mode selector, note-button input, typed-answer input, animation loop, per-mode LocalStorage high scores.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration.
 - `manifest.webmanifest` and `sw.js`
@@ -32,18 +32,19 @@ Current repository behavior:
 
 - Static PWA shell.
 - Treble clef only.
-- No accidentals.
-- Button input only.
+- Basics, sharps, flats, and chord modes.
+- Natural-note and accidental button input.
+- Typed answers for accidentals/chords.
 - 60-second rush round.
-- Local-only scoring and best-score persistence.
+- Mode-weighted scoring, streak bonuses, and per-mode high-score persistence.
 
 Planned later implementation:
 
 - Piano strip input.
 - Vocal pitch input.
 - Bass clef and ledger lines.
-- Accidentals and intervals.
-- PWA offline install support.
+- Intervals and rapid jumps.
+- VexFlow notation rendering upgrade once richer notation needs it.
 
 ## Quality gate once code exists
 
