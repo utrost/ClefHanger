@@ -22,13 +22,13 @@ import {
   getPromptFrequencies,
 } from './core/game.js';
 
-const appVersion = 'clefhanger-slice6-2026-08-28';
+const appVersion = 'clefhanger-slice7-2026-08-28';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
 const inputModeButtons = document.querySelector('#input-mode-buttons');
 const modeButtons = document.querySelector('#mode-buttons');
-const speedButtons = document.querySelector('#speed-buttons');
+const speedSlider = document.querySelector('#speed-slider');
 const difficultyButtons = document.querySelector('#difficulty-buttons');
 const startButton = document.querySelector('#start-round');
 const scoreEl = document.querySelector('#score');
@@ -44,7 +44,7 @@ const difficultyLabelEl = document.querySelector('#difficulty-label');
 const difficultyHelpEl = document.querySelector('#difficulty-help');
 
 let selectedModeId = localStorage.getItem('clefhanger.selectedMode.v3') || 'basics';
-let selectedSpeedId = localStorage.getItem('clefhanger.selectedSpeed.v3') || 'normal';
+let selectedSpeedId = getSpeed(localStorage.getItem('clefhanger.selectedSpeed.v6') || localStorage.getItem('clefhanger.selectedSpeed.v3') || '5').id;
 let selectedDifficultyId = localStorage.getItem('clefhanger.selectedDifficulty.v4') || 'beginner';
 let selectedInputMode = localStorage.getItem('clefhanger.selectedInputMode.v5') || 'buttons';
 let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
@@ -144,11 +144,11 @@ function renderHud(nowMs) {
   modeLabelEl.textContent = mode.label;
   modeHelpEl.textContent = mode.help;
   speedLabelEl.textContent = speed.label;
+  speedSlider.value = speed.id;
   difficultyLabelEl.textContent = difficulty.label;
   difficultyHelpEl.textContent = difficulty.help;
   startButton.textContent = state.phase === 'running' ? 'Restart sprint' : 'Start 60s sprint';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
-  for (const button of speedButtons.querySelectorAll('button')) button.dataset.active = button.dataset.speed === selectedSpeedId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
   for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
   buttons.hidden = selectedInputMode !== 'buttons';
@@ -310,21 +310,12 @@ function installModes() {
   }
 }
 
-function installSpeeds() {
-  speedButtons.innerHTML = '';
-  for (const speed of SPEED_SETTINGS) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'speed-button';
-    button.dataset.speed = speed.id;
-    button.textContent = speed.label;
-    button.addEventListener('click', () => {
-      selectedSpeedId = speed.id;
-      localStorage.setItem('clefhanger.selectedSpeed.v3', selectedSpeedId);
-      resetIdleState();
-    });
-    speedButtons.append(button);
-  }
+function installSpeedSlider() {
+  speedSlider.addEventListener('input', () => {
+    selectedSpeedId = getSpeed(speedSlider.value).id;
+    localStorage.setItem('clefhanger.selectedSpeed.v6', selectedSpeedId);
+    resetIdleState();
+  });
 }
 
 function installDifficulties() {
@@ -347,7 +338,7 @@ function installDifficulties() {
 startButton.addEventListener('click', beginRound);
 installInputModes();
 installModes();
-installSpeeds();
+installSpeedSlider();
 installDifficulties();
 installButtons();
 installPiano();
@@ -371,6 +362,7 @@ window.__clefHanger = {
   },
   selectSpeed: (speedId) => {
     selectedSpeedId = getSpeed(speedId).id;
+    localStorage.setItem('clefhanger.selectedSpeed.v6', selectedSpeedId);
     resetIdleState();
   },
   selectDifficulty: (difficultyId) => {

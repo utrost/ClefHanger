@@ -27,11 +27,12 @@ export function getClefPresentation(clef = 'treble') {
   return { clef: 'treble', glyph: '𝄞', x: STAFF_LAYOUT.clefX, y: STAFF_LAYOUT.trebleClefY, anchorLine: 'G4 line' };
 }
 
-export const SPEED_SETTINGS = [
-  { id: 'slow', label: 'Slow', multiplier: 1.35 },
-  { id: 'normal', label: 'Normal', multiplier: 1 },
-  { id: 'fast', label: 'Fast', multiplier: 0.72 },
-];
+const SPEED_MULTIPLIERS = [1.45, 1.32, 1.2, 1.1, 1, 0.92, 0.84, 0.77, 0.71, 0.65];
+
+export const SPEED_SETTINGS = SPEED_MULTIPLIERS.map((multiplier, index) => {
+  const value = index + 1;
+  return { id: String(value), value, label: `Speed ${value}`, multiplier };
+});
 
 export const DIFFICULTY_LEVELS = [
   { id: 'beginner', label: 'Beginner', noteQueueSize: 1, travelMultiplier: 1.2, scoreMultiplier: 1, help: 'Slow single notes in a forgiving starter lane.' },
@@ -40,8 +41,11 @@ export const DIFFICULTY_LEVELS = [
   { id: 'hard', label: 'Hard', noteQueueSize: 3, travelMultiplier: 0.78, scoreMultiplier: 1.8, help: 'Three notes on the staff and higher reward.' },
 ];
 
-export function getSpeed(speedId = 'normal') {
-  return SPEED_SETTINGS.find((speed) => speed.id === speedId) || SPEED_SETTINGS[1];
+export function getSpeed(speedId = '5') {
+  const parsed = Number.parseInt(speedId, 10);
+  if (Number.isNaN(parsed)) return SPEED_SETTINGS[4];
+  const clamped = Math.min(10, Math.max(1, parsed));
+  return SPEED_SETTINGS[clamped - 1];
 }
 
 export function getDifficulty(difficultyId = 'beginner') {
@@ -193,11 +197,11 @@ export function normalizeAnswer(answer) {
     .replace(/^[A-G]{3}$/, (value) => value.split('').join('-'));
 }
 
-export function getHighScoreKey(modeId = 'basics', speedId = 'normal', difficultyId = 'beginner') {
-  return `clefhanger.highScore.${getMode(modeId).id}.${getSpeed(speedId).id}.${getDifficulty(difficultyId).id}.v4`;
+export function getHighScoreKey(modeId = 'basics', speedId = '5', difficultyId = 'beginner') {
+  return `clefhanger.highScore.${getMode(modeId).id}.speed${getSpeed(speedId).id}.${getDifficulty(difficultyId).id}.v5`;
 }
 
-export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Date.now(), modeId = 'basics', speedId = 'normal', difficultyId = 'beginner' } = {}) {
+export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Date.now(), modeId = 'basics', speedId = '5', difficultyId = 'beginner' } = {}) {
   const mode = getMode(modeId);
   const speed = getSpeed(speedId);
   const difficulty = getDifficulty(difficultyId);
@@ -291,10 +295,11 @@ export function spawnNextNote(state, nowMs) {
 }
 
 export function startRound(state, nowMs, modeId = state.modeId, speedId = state.speedId, difficultyId = state.difficultyId) {
+  const speed = getSpeed(speedId);
   const difficulty = getDifficulty(difficultyId);
-  const next = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs, seed: state.seed, modeId, speedId, difficultyId: difficulty.id });
+  const next = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs, seed: state.seed, modeId, speedId: speed.id, difficultyId: difficulty.id });
   next.phase = 'running';
-  next.feedback = { kind: 'running', text: `${getMode(modeId).label} · ${getSpeed(speedId).label} · ${difficulty.label}: name the front note.` };
+  next.feedback = { kind: 'running', text: `${getMode(modeId).label} · ${speed.label} · ${difficulty.label}: name the front note.` };
   return spawnNextNote(next, nowMs);
 }
 
@@ -309,7 +314,7 @@ export function answerActiveNote(state, answer, nowMs) {
     const speed = getSpeed(next.speedId);
     const difficulty = getDifficulty(next.difficultyId);
     const streakBonus = Math.min(80, Math.max(0, next.streak) * 20);
-    const speedBonus = speed.id === 'fast' ? 40 : 0;
+    const speedBonus = speed.value >= 8 ? 40 : speed.value >= 6 ? 20 : 0;
     const points = Math.round((mode.basePoints + speedBonus + streakBonus) * difficulty.scoreMultiplier);
     next.correct += 1;
     next.streak += 1;

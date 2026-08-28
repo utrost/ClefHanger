@@ -5,6 +5,7 @@ import {
   createInitialState,
   getDifficulty,
   getHighScoreKey,
+  getSpeed,
   spawnNextNote,
   answerActiveNote,
   updateRound,
@@ -23,11 +24,22 @@ test('ships a guided difficulty ladder from beginner to hard', () => {
 });
 
 test('difficulty presets initialize state and separate high scores', () => {
-  const state = createInitialState({ nowMs: 0, seed: 1975, difficultyId: 'hard' });
+  const state = createInitialState({ nowMs: 0, seed: 1975, difficultyId: 'hard', speedId: '8' });
 
   assert.equal(state.difficultyId, 'hard');
+  assert.equal(state.speedId, '8');
   assert.deepEqual(state.noteQueue, []);
-  assert.equal(getHighScoreKey('bass', 'fast', 'hard'), 'clefhanger.highScore.bass.fast.hard.v4');
+  assert.equal(getHighScoreKey('bass', '8', 'hard'), 'clefhanger.highScore.bass.speed8.hard.v5');
+});
+
+test('speed is a clamped slider scale from 1 to 10', () => {
+  assert.equal(getSpeed('1').id, '1');
+  assert.equal(getSpeed('1').label, 'Speed 1');
+  assert.equal(getSpeed('5').multiplier, 1);
+  assert.equal(getSpeed('10').id, '10');
+  assert.equal(getSpeed('0').id, '1');
+  assert.equal(getSpeed('11').id, '10');
+  assert.equal(getSpeed('missing').id, '5');
 });
 
 test('normal difficulty keeps two concurrent notes with the first note answerable', () => {

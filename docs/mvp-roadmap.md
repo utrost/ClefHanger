@@ -56,9 +56,15 @@ Verification:
 - Treble clef glyph placement is corrected and covered by a renderer-free staff-layout contract.
 - Bass clef is available as a natural-note drill mode.
 - Bass-note generation uses lower-register E2–A3 notes mapped to the staff.
-- Speed control is available as Slow, Normal, and Fast.
+- Speed control is available as a 1–10 slider.
 - Speed changes the note travel deadline without changing the selected practice mode.
 - High scores are separated by mode and speed.
+
+## Slice 3a — Speed slider — implemented
+
+- Replace the Slow / Normal / Fast buttons with a 1–10 speed slider.
+- Keep speed separate from difficulty: speed changes travel timing and a small speed bonus, while difficulty still owns queue size and score multiplier.
+- High scores include the exact slider speed so scores remain comparable.
 
 ## Slice 4 — Guided difficulty ladder and note queues — implemented
 

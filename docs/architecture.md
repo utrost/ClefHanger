@@ -20,7 +20,7 @@ Current boundaries:
 - `src/core/game.js`
   - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef layout anchors, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/app.js`
-  - DOM adapter, SVG staff/chord rendering, mode selector, speed selector, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, Web Audio correct-answer playback, animation loop, per-mode/per-speed/per-difficulty LocalStorage high scores.
+  - DOM adapter, SVG staff/chord rendering, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration, iOS home-screen meta tags, and Apple touch icon link.
 - `manifest.webmanifest` and `sw.js`
@@ -34,13 +34,13 @@ Current repository behavior:
 - Treble and bass clef.
 - Corrected SVG clef anchors for treble and bass.
 - Treble, bass, sharps, flats, and chord modes.
-- Slow, normal, and fast speed settings.
+- A 1–10 speed slider.
 - Beginner, easy, normal, and hard difficulty presets.
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
 - Natural-note, accidental-button, chord-button, and one-octave piano-strip input.
 - Correct-answer Web Audio playback using equal-tempered pitches.
 - 60-second rush round.
-- Mode-weighted scoring, fast-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-speed/per-difficulty high-score persistence.
+- Mode-weighted scoring, slider-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-slider-speed/per-difficulty high-score persistence.
 - Installable PWA behavior for `https://simiono.com/clefhanger/`: manifest, service worker, PNG/SVG icons, iOS home-screen tags, mode shortcuts, and offline app shell.
 
 Planned later implementation:

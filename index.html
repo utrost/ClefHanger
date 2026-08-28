@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice6-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice7-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -126,14 +126,28 @@
       #mode-label { font-weight: 900; }
       #mode-help { margin: 0; color: var(--muted); font-size: 0.78rem; }
 
-      #mode-buttons, #speed-buttons, #difficulty-buttons {
+      #mode-buttons, #difficulty-buttons {
         display: grid;
         gap: 6px;
       }
 
       #mode-buttons { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-      #speed-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       #difficulty-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+      .speed-slider-row {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 8px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 0.7rem;
+        font-weight: 850;
+      }
+
+      #speed-slider {
+        width: 100%;
+        accent-color: var(--accent);
+      }
 
       .mode-button, .speed-button, .difficulty-button {
         border: 1px solid rgba(255,255,255,0.16);
@@ -342,8 +356,12 @@
         <p id="difficulty-help">Slow single notes in a forgiving starter lane.</p>
         <div class="mode-copy"><small>mode</small><span id="mode-label">Treble</span></div>
         <div id="mode-buttons" aria-label="Mode buttons">Bass</div>
-        <div class="mode-copy"><small>speed</small><span id="speed-label">Normal</span></div>
-        <div id="speed-buttons" aria-label="Speed buttons"></div>
+        <div class="mode-copy"><small>speed</small><span id="speed-label">Speed 5</span></div>
+        <div class="speed-slider-row">
+          <span>slow</span>
+          <input id="speed-slider" type="range" min="1" max="10" step="1" value="5" aria-label="Speed slider" />
+          <span>fast</span>
+        </div>
         <p id="mode-help">Natural treble notes.</p>
       </section>
 
@@ -361,7 +379,7 @@
         </div>
         <div id="note-buttons" aria-label="Answer buttons"></div>
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
-        <p class="microcopy">Slice 6: note buttons or piano strip · correct answers sing back</p>
+        <p class="microcopy">Slice 7: note buttons or piano strip · slider speed · correct answers sing back</p>
       </section>
     </main>
     <script type="module" src="./src/app.js"></script>

@@ -8,7 +8,7 @@ Use this checklist before calling a build ready for actual testing.
 - The title, timer, score, difficulty selector, mode selector, speed selector, staff, feedback, start button, input toggle, and answer controls are visible without horizontal scrolling.
 - Switch through Beginner, Easy, Normal, and Hard.
 - Switch through Treble, Bass, Sharps #, Flats ♭, and Chords.
-- Switch through Slow, Normal, and Fast.
+- Drag the speed slider from slow to fast and verify the speed label changes.
 - Treble mode shows the treble-clef loop anchored on the G line rather than floating above it.
 - Bass mode shows a bass clef and lower-register natural notes.
 - Tap **Start 60s sprint**.
@@ -27,7 +27,7 @@ Use this checklist before calling a build ready for actual testing.
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice6`.
+- Verify the HTML contains `clefhanger-slice7`.
 - Verify `src/app.js`, `src/core/game.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

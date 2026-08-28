@@ -40,14 +40,14 @@ test('ships a bass-clef basics mode with lower-register natural notes', () => {
 });
 
 test('speed settings regulate travel deadlines without changing scoring mode', () => {
-  assert.deepEqual(SPEED_SETTINGS.map((speed) => speed.id), ['slow', 'normal', 'fast']);
-  assert.equal(getSpeed('slow').label, 'Slow');
+  assert.deepEqual(SPEED_SETTINGS.map((speed) => speed.id), ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']);
+  assert.equal(getSpeed('1').label, 'Speed 1');
 
-  const slow = spawnNextNote(createInitialState({ nowMs: 1000, seed: 5, modeId: 'basics', speedId: 'slow' }), 1000);
-  const fast = spawnNextNote(createInitialState({ nowMs: 1000, seed: 5, modeId: 'basics', speedId: 'fast' }), 1000);
+  const slow = spawnNextNote(createInitialState({ nowMs: 1000, seed: 5, modeId: 'basics', speedId: '1' }), 1000);
+  const fast = spawnNextNote(createInitialState({ nowMs: 1000, seed: 5, modeId: 'basics', speedId: '10' }), 1000);
 
-  assert.equal(slow.speedId, 'slow');
-  assert.equal(fast.speedId, 'fast');
+  assert.equal(slow.speedId, '1');
+  assert.equal(fast.speedId, '10');
   assert.ok(slow.activeNote.deadlineMs - slow.activeNote.spawnedAtMs > fast.activeNote.deadlineMs - fast.activeNote.spawnedAtMs);
   assert.equal(slow.modeId, fast.modeId);
 });

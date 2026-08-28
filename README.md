@@ -30,7 +30,7 @@ Slices 1–6 are implemented as a dependency-free static PWA:
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.
 - 60-second sprint timer.
 - Five practice modes: Treble, Bass, Sharps #, Flats ♭, Chords.
-- Speed control: Slow, Normal, Fast.
+- Speed slider: 1–10, from slow practice to fast rush.
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
 - Toggleable input: large note buttons or a one-octave on-screen piano strip.
@@ -39,7 +39,7 @@ Slices 1–6 are implemented as a dependency-free static PWA:
 - The optional typed-answer row has been removed to keep the mobile controls thumb-first.
 - Correct / wrong / missed feedback.
 - Mode-weighted points with speed/difficulty/streak bonuses.
-- Per-mode, per-speed, per-difficulty high scores via LocalStorage.
+- Per-mode, per-slider-speed, per-difficulty high scores via LocalStorage.
 - Installable PWA shell: manifest id/scope, portrait standalone mode, PNG/SVG maskable icons, iOS home-screen tags, mode shortcuts, and offline service-worker cache.
 
 ## Run locally
