@@ -25,8 +25,19 @@ export const SPEED_SETTINGS = [
   { id: 'fast', label: 'Fast', multiplier: 0.72 },
 ];
 
+export const DIFFICULTY_LEVELS = [
+  { id: 'beginner', label: 'Beginner', noteQueueSize: 1, travelMultiplier: 1.2, scoreMultiplier: 1, help: 'Slow single notes in a forgiving starter lane.' },
+  { id: 'easy', label: 'Easy', noteQueueSize: 1, travelMultiplier: 1, scoreMultiplier: 1, help: 'Classic one-note rush with normal scoring.' },
+  { id: 'normal', label: 'Normal', noteQueueSize: 2, travelMultiplier: 0.9, scoreMultiplier: 1.35, help: 'Two-note preview: answer the front note first.' },
+  { id: 'hard', label: 'Hard', noteQueueSize: 3, travelMultiplier: 0.78, scoreMultiplier: 1.8, help: 'Three notes on the staff and higher reward.' },
+];
+
 export function getSpeed(speedId = 'normal') {
   return SPEED_SETTINGS.find((speed) => speed.id === speedId) || SPEED_SETTINGS[1];
+}
+
+export function getDifficulty(difficultyId = 'beginner') {
+  return DIFFICULTY_LEVELS.find((difficulty) => difficulty.id === difficultyId) || DIFFICULTY_LEVELS[0];
 }
 
 export const LEVEL_ONE_NOTES = [
@@ -122,23 +133,26 @@ export function normalizeAnswer(answer) {
     .replace(/^[A-G]{3}$/, (value) => value.split('').join('-'));
 }
 
-export function getHighScoreKey(modeId = 'basics', speedId = 'normal') {
-  return `clefhanger.highScore.${getMode(modeId).id}.${getSpeed(speedId).id}.v3`;
+export function getHighScoreKey(modeId = 'basics', speedId = 'normal', difficultyId = 'beginner') {
+  return `clefhanger.highScore.${getMode(modeId).id}.${getSpeed(speedId).id}.${getDifficulty(difficultyId).id}.v4`;
 }
 
-export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Date.now(), modeId = 'basics', speedId = 'normal' } = {}) {
+export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Date.now(), modeId = 'basics', speedId = 'normal', difficultyId = 'beginner' } = {}) {
   const mode = getMode(modeId);
   const speed = getSpeed(speedId);
+  const difficulty = getDifficulty(difficultyId);
   return {
     phase: 'idle',
     modeId: mode.id,
     speedId: speed.id,
+    difficultyId: difficulty.id,
     roundLengthMs,
     startedAtMs: nowMs,
     endsAtMs: nowMs + roundLengthMs,
     seed: seed >>> 0,
     noteCounter: 0,
     activeNote: null,
+    noteQueue: [],
     score: 0,
     pointsEarned: 0,
     streak: 0,
@@ -162,10 +176,16 @@ export function createNote({ id, noteName, accidental, octave = 4, clef = 'trebl
   return { id, kind: 'note', clef, noteName, accidental, octave, answer, displayName: `${answer}${octave}`, spawnedAtMs, deadlineMs: spawnedAtMs + travelMs, status: 'active', ...(staffStep === undefined && definition ? {} : { staffStep }) };
 }
 
+function cloneNote(note) {
+  return note ? { ...note, notes: note.notes ? [...note.notes] : undefined, staffSteps: note.staffSteps ? [...note.staffSteps] : undefined } : null;
+}
+
 function cloneState(state) {
+  const noteQueue = (state.noteQueue || []).map(cloneNote);
   return {
     ...state,
-    activeNote: state.activeNote ? { ...state.activeNote, notes: state.activeNote.notes ? [...state.activeNote.notes] : undefined, staffSteps: state.activeNote.staffSteps ? [...state.activeNote.staffSteps] : undefined } : null,
+    activeNote: state.activeNote ? cloneNote(state.activeNote) : (noteQueue[0] || null),
+    noteQueue,
     feedback: { ...state.feedback },
   };
 }
@@ -174,36 +194,47 @@ function nextRandom(seed) {
   return (Math.imul(seed, 1664525) + 1013904223) >>> 0;
 }
 
-function travelMsFor(mode, speed) {
+function travelMsFor(mode, speed, difficulty) {
   const base = mode.kind === 'chord' ? 6200 : mode.id === 'basics' || mode.id === 'bass' ? 5200 : 5600;
-  return Math.round(base * speed.multiplier);
+  return Math.round(base * speed.multiplier * difficulty.travelMultiplier);
+}
+
+function createPromptFromSource(source, mode, noteCounter, spawnedAtMs, travelMs) {
+  if (mode.kind === 'chord') {
+    return { ...createNote({ id: `note-${noteCounter}`, kind: 'chord', clef: source.clef || mode.clef, chordName: source.chordName, quality: source.quality, notes: source.notes, staffSteps: source.staffSteps, spawnedAtMs, travelMs }), label: `${source.chordName} ${source.quality}` };
+  }
+
+  return { ...createNote({ id: `note-${noteCounter}`, clef: source.clef || mode.clef, noteName: source.noteName, accidental: source.accidental, octave: source.octave, spawnedAtMs, travelMs, staffStep: source.staffStep }), staffStep: source.staffStep, label: source.label || `${answerLabel(source.noteName, source.accidental)}${source.octave}` };
 }
 
 export function spawnNextNote(state, nowMs) {
   const next = cloneState(state);
   const mode = getMode(next.modeId);
   const speed = getSpeed(next.speedId);
-  const seed = nextRandom(next.seed || 1);
-  const index = seed % mode.pool.length;
-  const source = mode.pool[index];
-  const travelMs = travelMsFor(mode, speed);
-  next.seed = seed;
+  const difficulty = getDifficulty(next.difficultyId);
   next.speedId = speed.id;
-  next.noteCounter += 1;
+  next.difficultyId = difficulty.id;
 
-  if (mode.kind === 'chord') {
-    next.activeNote = { ...createNote({ id: `note-${next.noteCounter}`, kind: 'chord', clef: source.clef || mode.clef, chordName: source.chordName, quality: source.quality, notes: source.notes, staffSteps: source.staffSteps, spawnedAtMs: nowMs, travelMs }), label: `${source.chordName} ${source.quality}` };
-    return next;
+  while (next.noteQueue.length < difficulty.noteQueueSize) {
+    const seed = nextRandom(next.seed || 1);
+    const index = seed % mode.pool.length;
+    const source = mode.pool[index];
+    const travelMs = travelMsFor(mode, speed, difficulty);
+    const offsetMs = next.noteQueue.length * Math.round(travelMs * 0.18);
+    next.seed = seed;
+    next.noteCounter += 1;
+    next.noteQueue.push(createPromptFromSource(source, mode, next.noteCounter, nowMs + offsetMs, travelMs));
   }
 
-  next.activeNote = { ...createNote({ id: `note-${next.noteCounter}`, clef: source.clef || mode.clef, noteName: source.noteName, accidental: source.accidental, octave: source.octave, spawnedAtMs: nowMs, travelMs, staffStep: source.staffStep }), staffStep: source.staffStep, label: source.label || `${answerLabel(source.noteName, source.accidental)}${source.octave}` };
+  next.activeNote = next.noteQueue[0] || null;
   return next;
 }
 
-export function startRound(state, nowMs, modeId = state.modeId, speedId = state.speedId) {
-  const next = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs, seed: state.seed, modeId, speedId });
+export function startRound(state, nowMs, modeId = state.modeId, speedId = state.speedId, difficultyId = state.difficultyId) {
+  const difficulty = getDifficulty(difficultyId);
+  const next = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs, seed: state.seed, modeId, speedId, difficultyId: difficulty.id });
   next.phase = 'running';
-  next.feedback = { kind: 'running', text: `${getMode(modeId).label} · ${getSpeed(speedId).label}: name it before it drops.` };
+  next.feedback = { kind: 'running', text: `${getMode(modeId).label} · ${getSpeed(speedId).label} · ${difficulty.label}: name the front note.` };
   return spawnNextNote(next, nowMs);
 }
 
@@ -216,16 +247,18 @@ export function answerActiveNote(state, answer, nowMs) {
   if (normalized === next.activeNote.answer) {
     const mode = getMode(next.modeId);
     const speed = getSpeed(next.speedId);
+    const difficulty = getDifficulty(next.difficultyId);
     const streakBonus = Math.min(80, Math.max(0, next.streak) * 20);
     const speedBonus = speed.id === 'fast' ? 40 : 0;
-    const points = mode.basePoints + speedBonus + streakBonus;
+    const points = Math.round((mode.basePoints + speedBonus + streakBonus) * difficulty.scoreMultiplier);
     next.correct += 1;
     next.streak += 1;
     next.bestStreak = Math.max(next.bestStreak, next.streak);
     next.pointsEarned = points;
     next.score += points;
     next.feedback = { kind: 'correct', text: `${normalized} — held on! +${points}` };
-    next.activeNote = null;
+    next.noteQueue = (next.noteQueue || []).slice(1);
+    next.activeNote = next.noteQueue[0] || null;
   } else {
     next.wrong += 1;
     next.streak = 0;
@@ -243,7 +276,8 @@ export function missExpiredNotes(state, nowMs) {
   next.streak = 0;
   next.pointsEarned = 0;
   next.feedback = { kind: 'missed', text: `${next.activeNote.answer} fell off the staff.` };
-  next.activeNote = null;
+  next.noteQueue = (next.noteQueue || []).slice(1);
+  next.activeNote = next.noteQueue[0] || null;
   return next;
 }
 
@@ -252,6 +286,7 @@ export function maybeEndRound(state, nowMs) {
     const next = cloneState(state);
     next.phase = 'ended';
     next.activeNote = null;
+    next.noteQueue = [];
     next.feedback = { kind: 'ended', text: 'Sprint complete.' };
     return next;
   }
@@ -261,7 +296,7 @@ export function maybeEndRound(state, nowMs) {
 export function updateRound(state, nowMs) {
   let next = missExpiredNotes(state, nowMs);
   next = maybeEndRound(next, nowMs);
-  if (next.phase === 'running' && !next.activeNote) next = spawnNextNote(next, nowMs);
+  if (next.phase === 'running') next = spawnNextNote(next, nowMs);
   return next;
 }
 
@@ -272,5 +307,5 @@ export function getRemainingSeconds(state, nowMs) {
 export function getRoundSummary(state) {
   const attempts = state.correct + state.wrong + state.missed;
   const accuracy = attempts === 0 ? 0 : Math.round((state.correct / attempts) * 100);
-  return { title: 'Sprint complete', mode: getMode(state.modeId).label, speed: getSpeed(state.speedId).label, score: state.score, correct: state.correct, wrong: state.wrong, missed: state.missed, bestStreak: state.bestStreak, accuracy };
+  return { title: 'Sprint complete', mode: getMode(state.modeId).label, speed: getSpeed(state.speedId).label, difficulty: getDifficulty(state.difficultyId).label, score: state.score, correct: state.correct, wrong: state.wrong, missed: state.missed, bestStreak: state.bestStreak, accuracy };
 }

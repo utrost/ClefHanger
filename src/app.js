@@ -3,6 +3,7 @@ import {
   ACCIDENTAL_BUTTONS,
   GAME_MODES,
   SPEED_SETTINGS,
+  DIFFICULTY_LEVELS,
   STAFF_LAYOUT,
   createInitialState,
   startRound,
@@ -13,15 +14,17 @@ import {
   getHighScoreKey,
   getMode,
   getSpeed,
+  getDifficulty,
   getClefPresentation,
   normalizeAnswer,
 } from './core/game.js';
 
-const appVersion = 'clefhanger-slice3-2026-08-28';
+const appVersion = 'clefhanger-slice4-2026-08-28';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const modeButtons = document.querySelector('#mode-buttons');
 const speedButtons = document.querySelector('#speed-buttons');
+const difficultyButtons = document.querySelector('#difficulty-buttons');
 const startButton = document.querySelector('#start-round');
 const scoreEl = document.querySelector('#score');
 const streakEl = document.querySelector('#streak');
@@ -32,20 +35,23 @@ const bestEl = document.querySelector('#best-score');
 const modeLabelEl = document.querySelector('#mode-label');
 const modeHelpEl = document.querySelector('#mode-help');
 const speedLabelEl = document.querySelector('#speed-label');
+const difficultyLabelEl = document.querySelector('#difficulty-label');
+const difficultyHelpEl = document.querySelector('#difficulty-help');
 const answerEntry = document.querySelector('#answer-entry');
 const submitAnswer = document.querySelector('#submit-answer');
 
 let selectedModeId = localStorage.getItem('clefhanger.selectedMode.v3') || 'basics';
 let selectedSpeedId = localStorage.getItem('clefhanger.selectedSpeed.v3') || 'normal';
-let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId });
+let selectedDifficultyId = localStorage.getItem('clefhanger.selectedDifficulty.v4') || 'beginner';
+let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
 let rafId = null;
 
-function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId) {
-  return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId)) || '0', 10) || 0;
+function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
+  return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId, difficultyId)) || '0', 10) || 0;
 }
 
-function setBestScore(score, modeId = selectedModeId, speedId = selectedSpeedId) {
-  if (score > getBestScore(modeId, speedId)) localStorage.setItem(getHighScoreKey(modeId, speedId), String(score));
+function setBestScore(score, modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
+  if (score > getBestScore(modeId, speedId, difficultyId)) localStorage.setItem(getHighScoreKey(modeId, speedId, difficultyId), String(score));
 }
 
 function yForStaffStep(step) {
@@ -95,13 +101,21 @@ function renderStaff(nowMs) {
   `;
 
   let active = '';
-  if (note) {
-    const progress = Math.min(1, Math.max(0, (nowMs - note.spawnedAtMs) / (note.deadlineMs - note.spawnedAtMs)));
-    const x = 72 + progress * 202;
-    active = note.kind === 'chord'
-      ? `<g class="active-note chord-note" aria-label="Current chord">${renderChord(note, x)}</g>`
-      : renderSingleNote(note, x, yForStaffStep(note.staffStep ?? 0));
-  }
+  const queue = state.noteQueue?.length ? state.noteQueue : (note ? [note] : []);
+  active = [
+    ...queue.slice(1).map((queuedNote, index) => ({ queuedNote, index: index + 1 })),
+    ...queue.slice(0, 1).map((queuedNote) => ({ queuedNote, index: 0 })),
+  ]
+    .map(({ queuedNote, index }) => {
+      const progress = Math.min(1, Math.max(0, (nowMs - queuedNote.spawnedAtMs) / (queuedNote.deadlineMs - queuedNote.spawnedAtMs)));
+      const x = 72 + progress * 202;
+      const noteMarkup = queuedNote.kind === 'chord'
+        ? renderChord(queuedNote, x)
+        : renderSingleNote(queuedNote, x, yForStaffStep(queuedNote.staffStep ?? 0));
+      const previewClass = index === 0 ? 'lead-note' : 'preview-note';
+      return `<g class="queue-note ${previewClass}" data-queue-index="${index}">${noteMarkup}</g>`;
+    })
+    .join('');
 
   staff.innerHTML = `
     <svg viewBox="0 0 330 180" role="img" aria-label="${clef.clef} staff with cliff edge">
@@ -115,25 +129,29 @@ function renderStaff(nowMs) {
 function renderHud(nowMs) {
   const mode = getMode(selectedModeId);
   const speed = getSpeed(selectedSpeedId);
+  const difficulty = getDifficulty(selectedDifficultyId);
   scoreEl.textContent = String(state.score);
   streakEl.textContent = String(state.streak);
   timerEl.textContent = String(getRemainingSeconds(state, nowMs));
   feedbackEl.textContent = state.feedback.text;
   feedbackEl.dataset.kind = state.feedback.kind;
-  bestEl.textContent = String(getBestScore(selectedModeId, selectedSpeedId));
+  bestEl.textContent = String(getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
   modeLabelEl.textContent = mode.label;
   modeHelpEl.textContent = mode.help;
   speedLabelEl.textContent = speed.label;
+  difficultyLabelEl.textContent = difficulty.label;
+  difficultyHelpEl.textContent = difficulty.help;
   startButton.textContent = state.phase === 'running' ? 'Restart sprint' : 'Start 60s sprint';
   answerEntry.placeholder = mode.kind === 'chord' ? 'Chord answer, e.g. C-E-G' : 'Optional typed answer, e.g. F# or Bb';
 
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of speedButtons.querySelectorAll('button')) button.dataset.active = button.dataset.speed === selectedSpeedId ? 'true' : 'false';
+  for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
 
   if (state.phase === 'ended') {
     const summary = getRoundSummary(state);
     summaryEl.hidden = false;
-    summaryEl.innerHTML = `<h2>${summary.title}</h2><p>${summary.mode} · ${summary.speed} · <strong>${summary.score}</strong> points · ${summary.accuracy}% accuracy</p><p>${summary.correct} correct · ${summary.wrong} wrong · ${summary.missed} missed · best streak ${summary.bestStreak}</p>`;
+    summaryEl.innerHTML = `<h2>${summary.title}</h2><p>${summary.mode} · ${summary.speed} · ${summary.difficulty} · <strong>${summary.score}</strong> points · ${summary.accuracy}% accuracy</p><p>${summary.correct} correct · ${summary.wrong} wrong · ${summary.missed} missed · best streak ${summary.bestStreak}</p>`;
   } else {
     summaryEl.hidden = true;
   }
@@ -147,7 +165,7 @@ function render(nowMs = performance.now()) {
 function tick(nowMs) {
   state = updateRound(state, nowMs);
   if (state.phase === 'ended') {
-    setBestScore(state.score, state.modeId, state.speedId);
+    setBestScore(state.score, state.modeId, state.speedId, state.difficultyId);
     render(nowMs);
     rafId = null;
     return;
@@ -159,7 +177,7 @@ function tick(nowMs) {
 function resetIdleState() {
   if (rafId !== null) cancelAnimationFrame(rafId);
   rafId = null;
-  state = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs: performance.now(), seed: state.seed, modeId: selectedModeId, speedId: selectedSpeedId });
+  state = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs: performance.now(), seed: state.seed, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
   installButtons();
   render();
 }
@@ -167,7 +185,7 @@ function resetIdleState() {
 function beginRound() {
   if (rafId !== null) cancelAnimationFrame(rafId);
   const now = performance.now();
-  state = startRound(state, now, selectedModeId, selectedSpeedId);
+  state = startRound(state, now, selectedModeId, selectedSpeedId, selectedDifficultyId);
   summaryEl.hidden = true;
   answerEntry.value = '';
   render(now);
@@ -177,7 +195,7 @@ function beginRound() {
 function handleAnswer(answer) {
   const now = performance.now();
   state = answerActiveNote(state, answer, now);
-  if (state.phase === 'running' && !state.activeNote) state = updateRound(state, now);
+  if (state.phase === 'running') state = updateRound(state, now);
   answerEntry.value = '';
   render(now);
 }
@@ -235,6 +253,23 @@ function installSpeeds() {
   }
 }
 
+function installDifficulties() {
+  difficultyButtons.innerHTML = '';
+  for (const difficulty of DIFFICULTY_LEVELS) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'difficulty-button';
+    button.dataset.difficulty = difficulty.id;
+    button.textContent = difficulty.label;
+    button.addEventListener('click', () => {
+      selectedDifficultyId = difficulty.id;
+      localStorage.setItem('clefhanger.selectedDifficulty.v4', selectedDifficultyId);
+      resetIdleState();
+    });
+    difficultyButtons.append(button);
+  }
+}
+
 submitAnswer.addEventListener('click', () => handleAnswer(normalizeAnswer(answerEntry.value)));
 answerEntry.addEventListener('keydown', (event) => {
   if (event.key === 'Enter') handleAnswer(normalizeAnswer(answerEntry.value));
@@ -242,6 +277,7 @@ answerEntry.addEventListener('keydown', (event) => {
 startButton.addEventListener('click', beginRound);
 installModes();
 installSpeeds();
+installDifficulties();
 installButtons();
 render();
 
@@ -251,6 +287,7 @@ window.__clefHanger = {
   ACCIDENTAL_BUTTONS,
   GAME_MODES,
   SPEED_SETTINGS,
+  DIFFICULTY_LEVELS,
   STAFF_LAYOUT,
   getState: () => state,
   beginRound,
@@ -260,6 +297,10 @@ window.__clefHanger = {
   },
   selectSpeed: (speedId) => {
     selectedSpeedId = getSpeed(speedId).id;
+    resetIdleState();
+  },
+  selectDifficulty: (difficultyId) => {
+    selectedDifficultyId = getDifficulty(difficultyId).id;
     resetIdleState();
   },
 };

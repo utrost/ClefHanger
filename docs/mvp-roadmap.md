@@ -60,20 +60,29 @@ Verification:
 - Speed changes the note travel deadline without changing the selected practice mode.
 - High scores are separated by mode and speed.
 
-## Slice 4 — Touch piano strip
+## Slice 4 — Guided difficulty ladder and note queues — implemented
+
+- Difficulty presets are available as Beginner, Easy, Normal, and Hard.
+- Difficulty controls note travel timing, scoring multiplier, and concurrent note queue size.
+- Beginner/Easy keep one answerable note visible.
+- Normal shows a two-note queue; Hard shows a three-note queue.
+- Only the front note is answerable; upcoming notes are fainter previews.
+- High scores are separated by mode, speed, and difficulty.
+
+## Slice 5 — Touch piano strip
 
 - Add optional one-octave keyboard input.
 - Keep note buttons as the default mobile input.
 - Test mapping between displayed note names and piano keys.
 
-## Slice 5 — Vocal tracking prototype
+## Slice 6 — Vocal tracking prototype
 
 - Add microphone permission flow.
 - Use Web Audio API and Pitchy for pitch detection.
 - Convert detected frequency to nearest note.
 - Start with calibration/debug mode before scoring voice input as a competitive mode.
 
-## Slice 6 — Learning depth
+## Slice 7 — Learning depth
 
 - Wider ledger-line range.
 - Ledger lines.

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice3-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice4-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -113,15 +113,16 @@
       #mode-label { font-weight: 900; }
       #mode-help { margin: 0; color: var(--muted); font-size: 0.78rem; }
 
-      #mode-buttons, #speed-buttons {
+      #mode-buttons, #speed-buttons, #difficulty-buttons {
         display: grid;
         gap: 6px;
       }
 
       #mode-buttons { grid-template-columns: repeat(5, minmax(0, 1fr)); }
       #speed-buttons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      #difficulty-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 
-      .mode-button, .speed-button {
+      .mode-button, .speed-button, .difficulty-button {
         border: 1px solid rgba(255,255,255,0.16);
         border-radius: 13px;
         min-height: 38px;
@@ -131,7 +132,7 @@
         font-size: 0.78rem;
       }
 
-      .mode-button[data-active="true"], .speed-button[data-active="true"] {
+      .mode-button[data-active="true"], .speed-button[data-active="true"], .difficulty-button[data-active="true"] {
         background: var(--accent);
         color: #1d1300;
       }
@@ -169,6 +170,7 @@
       .cliff-line { stroke: var(--danger); stroke-width: 4; stroke-dasharray: 8 7; }
       .cliff-rock { fill: #4b342d; }
       .active-note { fill: #17112b; stroke: #17112b; stroke-width: 4; }
+      .preview-note { opacity: 0.42; transform-box: fill-box; transform-origin: center; transform: scale(0.82); }
       .accidental { fill: #17112b; stroke: none; font-size: 27px; font-weight: 900; }
       .chord-note { stroke-width: 4; }
 
@@ -245,7 +247,7 @@
         padding: 0 12px;
       }
 
-      .note-button:active, #start-round:active, .mode-button:active, .speed-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
+      .note-button:active, #start-round:active, .mode-button:active, .speed-button:active, .difficulty-button:active, #submit-answer:active { transform: translateY(2px) scale(0.99); }
       #summary h2 { margin: 0 0 6px; }
       #summary p { margin: 5px 0; color: var(--muted); }
       .microcopy { margin: 0; text-align: center; color: var(--muted); font-size: 0.74rem; }
@@ -281,6 +283,9 @@
       </section>
 
       <section class="mode-panel" aria-label="Practice mode">
+        <div class="mode-copy"><small>Today’s Sprint</small><span id="difficulty-label">Beginner</span></div>
+        <div id="difficulty-buttons" aria-label="Difficulty buttons"></div>
+        <p id="difficulty-help">Slow single notes in a forgiving starter lane.</p>
         <div class="mode-copy"><small>mode</small><span id="mode-label">Treble</span></div>
         <div id="mode-buttons" aria-label="Mode buttons">Bass</div>
         <div class="mode-copy"><small>speed</small><span id="speed-label">Normal</span></div>
@@ -301,7 +306,7 @@
           <input id="answer-entry" autocomplete="off" inputmode="text" aria-label="Typed answer" placeholder="Optional typed answer, e.g. F# or Bb" />
           <button id="submit-answer" type="button">Enter</button>
         </div>
-        <p class="microcopy">Slice 3: corrected clefs · bass mode · speed control</p>
+        <p class="microcopy">Slice 4: difficulty ladder · two/three-note queues · per-level high scores</p>
       </section>
     </main>
     <script type="module" src="./src/app.js"></script>

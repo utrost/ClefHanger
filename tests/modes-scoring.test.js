@@ -67,6 +67,6 @@ test('points scale by mode and streak bonus', () => {
 });
 
 test('high scores are separated per mode', () => {
-  assert.equal(getHighScoreKey('basics'), 'clefhanger.highScore.basics.normal.v3');
-  assert.equal(getHighScoreKey('chords', 'fast'), 'clefhanger.highScore.chords.fast.v3');
+  assert.equal(getHighScoreKey('basics'), 'clefhanger.highScore.basics.normal.beginner.v4');
+  assert.equal(getHighScoreKey('chords', 'fast', 'hard'), 'clefhanger.highScore.chords.fast.hard.v4');
 });
