@@ -28,13 +28,14 @@ import {
   buildMicrophoneListeningMessage,
   classifyVocalMatch,
   createMicrophoneState,
+  detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice21-mic-recording-diagnostic-2026-08-29';
+const appVersion = 'clefhanger-slice22-recorded-audio-pitch-diagnostic-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -417,12 +418,22 @@ async function recordMicrophoneDiagnostic() {
     const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
     let message = `Recording test: captured ${blob.size} bytes.`;
     let decodedRms = null;
+    let recordedFrequency = null;
+    let recordedPitch = null;
     if (blob.size > 0) {
       try {
         const arrayBuffer = await blob.arrayBuffer();
         const decoded = await getAudioContext().decodeAudioData(arrayBuffer.slice(0));
-        decodedRms = getCenteredRms(decoded.getChannelData(0));
+        const decodedSamples = decoded.getChannelData(0);
+        decodedRms = getCenteredRms(decodedSamples);
+        recordedFrequency = detectPitchFromRecordedAudio(decodedSamples, decoded.sampleRate);
+        recordedPitch = frequencyToNearestPitch(recordedFrequency);
         message += ` Decoded level ${Math.round(decodedRms * 100)}%.`;
+        if (recordedPitch) {
+          message += ` Recorded pitch ${recordedPitch.answer}${recordedPitch.octave} · ${Math.round(recordedFrequency)} Hz.`;
+        } else {
+          message += ' No steady recorded pitch found.';
+        }
       } catch {
         message += ' Browser recorded data, but Web Audio could not decode it here.';
       }
@@ -431,7 +442,7 @@ async function recordMicrophoneDiagnostic() {
     else if (decodedRms === 0) message += ' Decoded audio is silent.';
     microphoneRecordingDiagnostic = message;
     render();
-    return { status: 'ok', bytes: blob.size, decodedRms, message };
+    return { status: 'ok', bytes: blob.size, decodedRms, recordedFrequency, recordedPitch, message };
   } catch (error) {
     microphoneRecordingDiagnostic = `Recording test failed: ${error?.message || String(error)}`;
     render();

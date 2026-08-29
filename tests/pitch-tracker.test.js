@@ -6,6 +6,7 @@ import {
   centsBetween,
   classifyVocalMatch,
   createMicrophoneState,
+  detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
   frequencyToNearestPitch,
   getCenteredRms,
@@ -121,6 +122,18 @@ test('time-domain pitch detector keeps quiet Firefox-like sung tones', () => {
 
   assert.ok(getCenteredRms(quietSamples) < 0.01, 'fixture must stay below the old silence threshold');
   assert.ok(Math.abs(detected - 440) < 8, `expected about 440 Hz, got ${detected}`);
+});
+
+test('recording diagnostic scans decoded audio chunks for a sung pitch', () => {
+  const sampleRate = 44100;
+  const silence = Float32Array.from({ length: 4096 }, () => 0);
+  const sung = sineSamples({ frequency: 440, sampleRate, length: 8192, amplitude: 0.05 });
+  const recording = new Float32Array(silence.length + sung.length);
+  recording.set(silence, 0);
+  recording.set(sung, silence.length);
+
+  const detected = detectPitchFromRecordedAudio(recording, sampleRate);
+  assert.ok(Math.abs(detected - 440) < 8, `expected recorded A4, got ${detected}`);
 });
 
 test('microphone listening copy shows input level when no sung note is detected', () => {

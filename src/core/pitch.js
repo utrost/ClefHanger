@@ -153,6 +153,23 @@ export function detectPitchFromTimeDomain(samples, sampleRate) {
   return null;
 }
 
+export function detectPitchFromRecordedAudio(samples, sampleRate, { windowSize = 4096, hopSize = 2048, maxWindows = 32 } = {}) {
+  if (!samples || !samples.length || !sampleRate) return null;
+  if (samples.length <= windowSize) return detectPitchFromTimeDomain(samples, sampleRate);
+
+  let best = null;
+  let checked = 0;
+  for (let start = 0; start + windowSize <= samples.length && checked < maxWindows; start += hopSize, checked += 1) {
+    const window = samples.subarray(start, start + windowSize);
+    const inputLevel = getCenteredRms(window);
+    const frequency = detectPitchFromTimeDomain(window, sampleRate);
+    if (frequency && (!best || inputLevel > best.inputLevel)) {
+      best = { frequency, inputLevel };
+    }
+  }
+  return best?.frequency || null;
+}
+
 export function getCenteredRms(samples) {
   if (!samples || !samples.length) return 0;
   const centered = centerSamples(samples);
