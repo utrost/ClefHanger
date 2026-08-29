@@ -136,6 +136,18 @@ test('recording diagnostic scans decoded audio chunks for a sung pitch', () => {
   assert.ok(Math.abs(detected - 440) < 8, `expected recorded A4, got ${detected}`);
 });
 
+test('recording diagnostic accepts comfortable low male voice notes, not just A4', () => {
+  const sampleRate = 44100;
+  for (const [frequency, note] of [[98, 'G2'], [110, 'A2'], [130.81, 'C3'], [146.83, 'D3']]) {
+    const recording = sineSamples({ frequency, sampleRate, length: sampleRate, amplitude: 0.02 });
+    const detected = detectPitchFromRecordedAudio(recording, sampleRate);
+    const pitch = frequencyToNearestPitch(detected);
+
+    assert.ok(Math.abs(detected - frequency) < 3, `expected about ${frequency} Hz for ${note}, got ${detected}`);
+    assert.equal(`${pitch.answer}${pitch.octave}`, note);
+  }
+});
+
 test('microphone listening copy shows input level when no sung note is detected', () => {
   assert.equal(microphoneInputLevelPercent(0.024), 2);
   assert.match(

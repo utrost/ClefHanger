@@ -175,7 +175,7 @@ function calibrationReadingText() {
   if (microphoneState.permission === 'requesting' || microphoneState.permission === 'blocked' || microphoneState.permission === 'granted') {
     return microphoneStatusText();
   }
-  return 'Grant mic, tap Play A, then sing A for a live cents reading.';
+  return 'Grant mic, then sing any steady comfortable note; Play A is only a reference.';
 }
 
 function renderHud(nowMs) {
@@ -399,7 +399,7 @@ async function recordMicrophoneDiagnostic() {
     return { status: 'no-stream', message: microphoneRecordingDiagnostic };
   }
 
-  microphoneRecordingDiagnostic = 'Recording test: recording for 1 second… sing now.';
+  microphoneRecordingDiagnostic = 'Recording test: recording for 1 second… sing any steady comfortable note now.';
   render();
   try {
     const chunks = [];
