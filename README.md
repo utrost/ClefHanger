@@ -40,6 +40,7 @@ Slices 1–7 are implemented as a dependency-free static PWA:
 - Implausible microphone spikes outside the playable vocal range are ignored instead of being shown as absurd octave readings such as `G♯8`.
 - Mic startup shows immediate visible progress in both the main Mic panel and the settings calibration line, uses a simpler Chrome-friendly mic request, checks the browser permission state before requesting, and turns permission denials/timeouts into explicit Chrome + Android system permission instructions.
 - Firefox/mobile mic debugging now shows input level while listening, so a granted-but-silent stream can be distinguished from a pitch-detection failure; the detector also keeps quieter phone/browser analyser signals, retains the Web Audio media-stream source, and connects the analyser through a muted keepalive gain node so Firefox keeps pulling the input graph.
+- A 1-second microphone recording diagnostic can compare MediaRecorder capture against the Web Audio analyser path when a browser still reports `mic level 0%`.
 - Microphone mode can score sung natural-note answers when the detected pitch is within tolerance; chord singing is not scored yet.
 - Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play a small piano-like Web Audio voice instead of a plain beep; chords play as short arpeggios.

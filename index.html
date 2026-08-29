@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice20-firefox-mic-graph-keepalive-2026-08-29">
+<html lang="en" data-app-version="clefhanger-slice21-mic-recording-diagnostic-2026-08-29">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -426,7 +426,7 @@
           <p id="heard-note" aria-live="polite">You played —</p>
           <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
         </div>
-        <p class="microcopy">Slice 20: Firefox mic graph keepalive</p>
+        <p class="microcopy">Slice 21: mic recording diagnostic</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -467,7 +467,9 @@
             <button id="start-microphone" type="button">Grant mic</button>
             <button id="stop-microphone" type="button">Stop mic</button>
             <button id="play-calibration-tone" type="button">Play A</button>
+            <button id="record-microphone-diagnostic" type="button">Record 1s test</button>
           </div>
+          <p id="microphone-recording-diagnostic" aria-live="polite">Recording test: not run yet.</p>
           <p id="calibration-reading" aria-live="polite">Grant mic, tap Play A, then sing A for a live cents reading.</p>
         </section>
       </dialog>

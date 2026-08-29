@@ -34,7 +34,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice20-firefox-mic-graph-keepalive-2026-08-29';
+const appVersion = 'clefhanger-slice21-mic-recording-diagnostic-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -42,9 +42,11 @@ const calibrationPanel = document.querySelector('#calibration-panel');
 const playCalibrationToneButton = document.querySelector('#play-calibration-tone');
 const startMicrophoneButton = document.querySelector('#start-microphone');
 const stopMicrophoneButton = document.querySelector('#stop-microphone');
+const recordMicrophoneDiagnosticButton = document.querySelector('#record-microphone-diagnostic');
 const microphonePanel = document.querySelector('#microphone-panel');
 const microphoneStatusEl = document.querySelector('#microphone-status');
 const heardNoteEl = document.querySelector('#heard-note');
+const microphoneRecordingDiagnosticEl = document.querySelector('#microphone-recording-diagnostic');
 const calibrationReadingEl = document.querySelector('#calibration-reading');
 const settingsLineEl = document.querySelector('#settings-line');
 const openSettingsButton = document.querySelector('#open-settings');
@@ -81,6 +83,7 @@ let microphoneAnalyser = null;
 let microphoneKeepAliveGain = null;
 let microphoneBuffer = null;
 let microphoneRafId = null;
+let microphoneRecordingDiagnostic = 'Recording test: not run yet.';
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId, difficultyId)) || '0', 10) || 0;
@@ -201,6 +204,7 @@ function renderHud(nowMs) {
   microphonePanel.hidden = selectedInputMode !== 'microphone';
   microphoneStatusEl.textContent = microphoneStatusText();
   heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
+  microphoneRecordingDiagnosticEl.textContent = microphoneRecordingDiagnostic;
   calibrationReadingEl.textContent = calibrationReadingText();
   calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 
@@ -382,6 +386,59 @@ async function startMicrophone() {
   }
 }
 
+async function recordMicrophoneDiagnostic() {
+  if (!window.MediaRecorder) {
+    microphoneRecordingDiagnostic = 'Recording test: MediaRecorder is not available in this browser.';
+    render();
+    return { status: 'unavailable', message: microphoneRecordingDiagnostic };
+  }
+  if (!microphoneStream) {
+    microphoneRecordingDiagnostic = 'Recording test: tap Grant mic first, then Record 1s test.';
+    render();
+    return { status: 'no-stream', message: microphoneRecordingDiagnostic };
+  }
+
+  microphoneRecordingDiagnostic = 'Recording test: recording for 1 second… sing now.';
+  render();
+  try {
+    const chunks = [];
+    const recorder = new MediaRecorder(microphoneStream);
+    const stopped = new Promise((resolve, reject) => {
+      recorder.addEventListener('dataavailable', (event) => {
+        if (event.data?.size) chunks.push(event.data);
+      });
+      recorder.addEventListener('stop', resolve, { once: true });
+      recorder.addEventListener('error', () => reject(recorder.error || new Error('MediaRecorder failed')), { once: true });
+    });
+    recorder.start();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (recorder.state !== 'inactive') recorder.stop();
+    await stopped;
+    const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+    let message = `Recording test: captured ${blob.size} bytes.`;
+    let decodedRms = null;
+    if (blob.size > 0) {
+      try {
+        const arrayBuffer = await blob.arrayBuffer();
+        const decoded = await getAudioContext().decodeAudioData(arrayBuffer.slice(0));
+        decodedRms = getCenteredRms(decoded.getChannelData(0));
+        message += ` Decoded level ${Math.round(decodedRms * 100)}%.`;
+      } catch {
+        message += ' Browser recorded data, but Web Audio could not decode it here.';
+      }
+    }
+    if (blob.size === 0) message = 'Recording test: captured 0 bytes — Firefox/Android is not delivering microphone audio.';
+    else if (decodedRms === 0) message += ' Decoded audio is silent.';
+    microphoneRecordingDiagnostic = message;
+    render();
+    return { status: 'ok', bytes: blob.size, decodedRms, message };
+  } catch (error) {
+    microphoneRecordingDiagnostic = `Recording test failed: ${error?.message || String(error)}`;
+    render();
+    return { status: 'error', message: microphoneRecordingDiagnostic };
+  }
+}
+
 function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.now()) {
   let frequency = frequencyOverride;
   let inputLevel = microphoneState.inputLevel || 0;
@@ -542,6 +599,7 @@ startButton.addEventListener('click', beginRound);
 playCalibrationToneButton.addEventListener('click', playCalibrationTone);
 startMicrophoneButton.addEventListener('click', startMicrophone);
 stopMicrophoneButton.addEventListener('click', stopMicrophone);
+recordMicrophoneDiagnosticButton.addEventListener('click', recordMicrophoneDiagnostic);
 openSettingsButton.addEventListener('click', openSettings);
 closeSettingsButton.addEventListener('click', closeSettings);
 installInputModes();
@@ -585,8 +643,10 @@ window.__clefHanger = {
   playCalibrationTone,
   startMicrophone,
   stopMicrophone,
+  recordMicrophoneDiagnostic,
   processMicrophoneFrame,
   getMicrophoneState: () => microphoneState,
+  getMicrophoneRecordingDiagnostic: () => microphoneRecordingDiagnostic,
   openSettings,
   closeSettings,
 };
