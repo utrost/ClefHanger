@@ -107,12 +107,13 @@ Verification:
 - Keep the main play surface focused on current settings, staff, start button, and the selected answer input.
 - Treat calibration as a settings tool rather than a third answer input mode.
 
-## Slice 7 — Vocal tracking prototype
+## Slice 7 — Vocal tracking prototype — implemented
 
 - Add microphone permission flow.
-- Use Web Audio API and Pitchy for pitch detection.
+- Use Web Audio API analyser input plus a small dependency-free autocorrelation pitch detector. Pitchy remains a possible later upgrade if the detector needs better noisy-room behavior.
 - Convert detected frequency to nearest note.
-- Start with calibration/debug mode before scoring voice input as a competitive mode.
+- Add actual A4 calibration/debug readout: detected note, frequency, cents, and flat/sharp/in-tune status.
+- Add Mic as an answer input mode. Sung natural-note answers score when the detected pitch is within tolerance and debounce; chord singing is explicitly not scored yet.
 
 ## Slice 8 — Learning depth
 

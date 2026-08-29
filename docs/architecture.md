@@ -8,7 +8,7 @@ ClefHanger should stay mobile-first and renderer-light. The first implementation
 - Tailwind CSS for responsive mobile layout.
 - JavaScript or TypeScript for game logic.
 - VexFlow for notation rendering.
-- Web Audio API plus Pitchy for later microphone input.
+- Web Audio API analyser input with a dependency-free autocorrelation detector for microphone input; Pitchy remains a possible later upgrade.
 - LocalStorage and PWA support for offline progress.
 
 ## Initial app shape
@@ -19,8 +19,10 @@ Current boundaries:
 
 - `src/core/game.js`
   - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef layout anchors, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
+- `src/core/pitch.js`
+  - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, and a small autocorrelation detector for analyser buffers.
 - `src/app.js`
-  - DOM adapter, SVG staff/chord rendering, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, vocal calibration tone UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
+  - DOM adapter, SVG staff/chord rendering, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, microphone permission/listening UI, vocal calibration tone/readout UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration, iOS home-screen meta tags, and Apple touch icon link.
 - `manifest.webmanifest` and `sw.js`
@@ -38,8 +40,9 @@ Current repository behavior:
 - A 1–10 speed slider.
 - Beginner, easy, normal, and hard difficulty presets.
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
-- Natural-note, accidental-button, chord-button, and one-octave piano-strip input.
-- Vocal calibration can play a concert A for listen-and-sing-back practice before microphone scoring exists.
+- Natural-note, accidental-button, chord-button, one-octave piano-strip, and microphone input.
+- Vocal calibration can play a concert A and show a live microphone readout with detected note, frequency, cents, and flat/sharp/in-tune status.
+- Microphone mode can score sung natural-note prompts when the detected pitch is within tolerance and debounce. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
 - 60-second rush round.
 - Mode-weighted scoring, slider-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-slider-speed/per-difficulty high-score persistence.
@@ -47,9 +50,9 @@ Current repository behavior:
 
 Planned later implementation:
 
-- Vocal pitch input.
 - Ledger lines.
 - Intervals and rapid jumps.
+- Pitchy/noise-hardening if real phones need more robust pitch detection than the dependency-free first pass.
 - VexFlow notation rendering upgrade once richer notation needs it.
 
 ## Quality gate once code exists

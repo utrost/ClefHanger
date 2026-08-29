@@ -1,0 +1,80 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {
+  buildCalibrationReading,
+  centsBetween,
+  classifyVocalMatch,
+  createMicrophoneState,
+  frequencyToNearestPitch,
+  normalizeMicrophoneInputMode,
+} from '../src/core/pitch.js';
+
+test('maps sung frequencies to nearest note names with cents offset', () => {
+  assert.deepEqual(frequencyToNearestPitch(440), {
+    frequency: 440,
+    midi: 69,
+    noteName: 'A',
+    octave: 4,
+    answer: 'A',
+    cents: 0,
+  });
+
+  const c4 = frequencyToNearestPitch(261.63);
+  assert.equal(c4.noteName, 'C');
+  assert.equal(c4.octave, 4);
+  assert.equal(c4.answer, 'C');
+  assert.ok(Math.abs(c4.cents) <= 1);
+});
+
+test('reports cent distance between detected pitch and target prompt', () => {
+  assert.equal(Math.round(centsBetween(440, 440)), 0);
+  assert.equal(Math.round(centsBetween(466.16, 440)), 100);
+  assert.equal(Math.round(centsBetween(415.3, 440)), -100);
+});
+
+test('builds calibration readings around concert A', () => {
+  const inTune = buildCalibrationReading(440);
+  assert.equal(inTune.status, 'in-tune');
+  assert.equal(inTune.detected.answer, 'A');
+  assert.equal(inTune.target.frequency, 440);
+  assert.equal(inTune.cents, 0);
+  assert.match(inTune.message, /A4/);
+  assert.match(inTune.message, /in tune/i);
+
+  const sharp = buildCalibrationReading(452);
+  assert.equal(sharp.status, 'sharp');
+  assert.ok(sharp.cents > 40);
+  assert.match(sharp.message, /sharp/i);
+});
+
+test('classifies a sung note as an answer only inside tolerance and after debounce', () => {
+  const prompt = { answer: 'A', noteName: 'A', octave: 4 };
+  const first = classifyVocalMatch({ prompt, frequency: 442, nowMs: 1000, lastAcceptedAtMs: 0 });
+  assert.equal(first.answer, 'A');
+  assert.equal(first.status, 'match');
+  assert.ok(Math.abs(first.cents) < 10);
+
+  const bounced = classifyVocalMatch({ prompt, frequency: 442, nowMs: 1100, lastAcceptedAtMs: 1000 });
+  assert.equal(bounced.status, 'debounce');
+  assert.equal(bounced.answer, null);
+
+  const wrong = classifyVocalMatch({ prompt, frequency: 392, nowMs: 2000, lastAcceptedAtMs: 1000 });
+  assert.equal(wrong.status, 'wrong-note');
+  assert.equal(wrong.detected.answer, 'G');
+  assert.equal(wrong.answer, null);
+});
+
+test('microphone mode is a first-class input option with permission state', () => {
+  assert.equal(normalizeMicrophoneInputMode('microphone'), 'microphone');
+  assert.equal(normalizeMicrophoneInputMode('calibration'), 'buttons');
+  assert.deepEqual(createMicrophoneState(), {
+    permission: 'idle',
+    listening: false,
+    frequency: null,
+    note: null,
+    cents: null,
+    calibration: null,
+    error: null,
+    lastAcceptedAtMs: 0,
+  });
+});

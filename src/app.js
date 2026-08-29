@@ -22,13 +22,26 @@ import {
   getPromptFrequencies,
 } from './core/game.js';
 import { getCalibrationTone, playPianoVoice } from './core/audio.js';
+import {
+  buildCalibrationReading,
+  classifyVocalMatch,
+  createMicrophoneState,
+  detectPitchFromTimeDomain,
+  frequencyToNearestPitch,
+  normalizeMicrophoneInputMode,
+} from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice10-settings-dialog-2026-08-28';
+const appVersion = 'clefhanger-slice11-microphone-calibration-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
 const calibrationPanel = document.querySelector('#calibration-panel');
 const playCalibrationToneButton = document.querySelector('#play-calibration-tone');
+const startMicrophoneButton = document.querySelector('#start-microphone');
+const stopMicrophoneButton = document.querySelector('#stop-microphone');
+const microphonePanel = document.querySelector('#microphone-panel');
+const microphoneStatusEl = document.querySelector('#microphone-status');
+const calibrationReadingEl = document.querySelector('#calibration-reading');
 const settingsLineEl = document.querySelector('#settings-line');
 const openSettingsButton = document.querySelector('#open-settings');
 const closeSettingsButton = document.querySelector('#close-settings');
@@ -57,6 +70,11 @@ let selectedInputMode = normalizeInputMode(localStorage.getItem('clefhanger.sele
 let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
 let rafId = null;
 let audioContext = null;
+let microphoneState = createMicrophoneState();
+let microphoneStream = null;
+let microphoneAnalyser = null;
+let microphoneBuffer = null;
+let microphoneRafId = null;
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId, difficultyId)) || '0', 10) || 0;
@@ -67,7 +85,7 @@ function setBestScore(score, modeId = selectedModeId, speedId = selectedSpeedId,
 }
 
 function normalizeInputMode(inputMode) {
-  return inputMode === 'piano' ? 'piano' : 'buttons';
+  return normalizeMicrophoneInputMode(inputMode);
 }
 
 function yForStaffStep(step) {
@@ -158,13 +176,18 @@ function renderHud(nowMs) {
   speedSlider.value = speed.id;
   difficultyLabelEl.textContent = difficulty.label;
   difficultyHelpEl.textContent = difficulty.help;
-  settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${selectedInputMode === 'piano' ? 'Piano' : 'Notes'}`;
+  const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Mic' : 'Notes';
+  settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel}`;
   startButton.textContent = state.phase === 'running' ? 'Restart sprint' : 'Start 60s sprint';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
   for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
   buttons.hidden = selectedInputMode !== 'buttons';
   pianoStrip.hidden = selectedInputMode !== 'piano';
+  microphonePanel.hidden = selectedInputMode !== 'microphone';
+  microphoneStatusEl.textContent = microphoneStatusText();
+  calibrationReadingEl.textContent = microphoneState.calibration?.message || 'Grant mic, tap Play A, then sing A for a live cents reading.';
+  calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 
   if (state.phase === 'ended') {
     const summary = getRoundSummary(state);
@@ -237,6 +260,83 @@ function playCalibrationTone() {
   playPianoVoice(context, tone.frequency, context.currentTime);
   feedbackEl.dataset.kind = 'correct';
   feedbackEl.textContent = `${tone.label}: ${tone.help}`;
+}
+
+function microphoneStatusText() {
+  if (microphoneState.permission === 'blocked') return `Mic blocked: ${microphoneState.error || 'permission denied'}`;
+  if (microphoneState.listening && microphoneState.note) {
+    const cents = microphoneState.cents === null ? '' : ` (${microphoneState.cents > 0 ? '+' : ''}${microphoneState.cents}¢)`;
+    return `Listening: ${microphoneState.note.answer}${microphoneState.note.octave} ${Math.round(microphoneState.frequency)} Hz${cents}`;
+  }
+  if (microphoneState.listening) return 'Listening: sing a steady note.';
+  if (microphoneState.permission === 'granted') return 'Mic ready. Sing notes to answer.';
+  return 'Mic off. Grant mic to calibrate and sing answers.';
+}
+
+function stopMicrophone() {
+  if (microphoneRafId !== null) cancelAnimationFrame(microphoneRafId);
+  microphoneRafId = null;
+  if (microphoneStream) {
+    for (const track of microphoneStream.getTracks()) track.stop();
+  }
+  microphoneStream = null;
+  microphoneAnalyser = null;
+  microphoneBuffer = null;
+  microphoneState = { ...microphoneState, listening: false };
+  render();
+}
+
+async function startMicrophone() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: 'getUserMedia unavailable' };
+    render();
+    return false;
+  }
+  try {
+    const context = getAudioContext();
+    if (!context) throw new Error('AudioContext unavailable');
+    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    const source = context.createMediaStreamSource(microphoneStream);
+    microphoneAnalyser = context.createAnalyser();
+    microphoneAnalyser.fftSize = 2048;
+    microphoneBuffer = new Float32Array(microphoneAnalyser.fftSize);
+    source.connect(microphoneAnalyser);
+    microphoneState = { ...microphoneState, permission: 'granted', listening: true, error: null };
+    processMicrophoneFrame();
+    render();
+    return true;
+  } catch (error) {
+    microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: error?.message || 'permission denied' };
+    render();
+    return false;
+  }
+}
+
+function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.now()) {
+  let frequency = frequencyOverride;
+  if (frequency === null && microphoneAnalyser && microphoneBuffer) {
+    microphoneAnalyser.getFloatTimeDomainData(microphoneBuffer);
+    frequency = detectPitchFromTimeDomain(microphoneBuffer, audioContext?.sampleRate || 44100);
+  }
+
+  if (frequency) {
+    const note = frequencyToNearestPitch(frequency);
+    const calibration = buildCalibrationReading(frequency);
+    microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, calibration };
+    if (selectedInputMode === 'microphone' && state.phase === 'running') {
+      const match = classifyVocalMatch({ prompt: state.activeNote, frequency, nowMs, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs });
+      if (match.status === 'match') {
+        microphoneState = { ...microphoneState, lastAcceptedAtMs: nowMs };
+        handleAnswer(match.answer);
+      }
+    }
+  } else {
+    microphoneState = { ...microphoneState, frequency: null, note: null, cents: null };
+  }
+
+  render(nowMs);
+  if (microphoneState.listening && frequencyOverride === null) microphoneRafId = requestAnimationFrame(processMicrophoneFrame);
+  return microphoneState;
 }
 
 function handleAnswer(answer) {
@@ -359,6 +459,8 @@ function installDifficulties() {
 
 startButton.addEventListener('click', beginRound);
 playCalibrationToneButton.addEventListener('click', playCalibrationTone);
+startMicrophoneButton.addEventListener('click', startMicrophone);
+stopMicrophoneButton.addEventListener('click', stopMicrophone);
 openSettingsButton.addEventListener('click', openSettings);
 closeSettingsButton.addEventListener('click', closeSettings);
 installInputModes();
@@ -400,6 +502,10 @@ window.__clefHanger = {
   },
   playPromptAudio,
   playCalibrationTone,
+  startMicrophone,
+  stopMicrophone,
+  processMicrophoneFrame,
+  getMicrophoneState: () => microphoneState,
   openSettings,
   closeSettings,
 };

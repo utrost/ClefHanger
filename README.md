@@ -24,7 +24,7 @@ The first playable slice should prove the simplest complete loop:
 
 ## Current playable slice
 
-Slices 1–6 are implemented as a dependency-free static PWA:
+Slices 1–7 are implemented as a dependency-free static PWA:
 
 - Treble-clef and bass-clef note/chord rush.
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.
@@ -34,8 +34,9 @@ Slices 1–6 are implemented as a dependency-free static PWA:
 - Speed slider: 1–10, from slow practice to fast rush.
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
-- Toggleable input: large note buttons or a one-octave on-screen piano strip.
-- Vocal calibration option: play a concert A and sing it back before real microphone scoring exists.
+- Toggleable input: large note buttons, a one-octave on-screen piano strip, or microphone input.
+- Actual vocal calibration: grant mic access, play concert A, sing it back, and see the detected note/frequency/cents against A4.
+- Microphone mode can score sung natural-note answers when the detected pitch is within tolerance; chord singing is not scored yet.
 - Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play a small piano-like Web Audio voice instead of a plain beep; chords play as short arpeggios.
 - The optional typed-answer row has been removed to keep the mobile controls thumb-first.
