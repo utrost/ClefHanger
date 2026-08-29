@@ -9,6 +9,8 @@ import {
   STAFF_LAYOUT,
   createInitialState,
   startRound,
+  startPractice,
+  spawnNextNote,
   answerActiveNote,
   updateRound,
   getRemainingSeconds,
@@ -34,8 +36,9 @@ import {
   getCenteredRms,
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildTutorialSteps, getBeginnerLesson, getScaffoldedAnswerOptions } from './core/learning.js';
 
-const appVersion = 'clefhanger-slice22-recorded-audio-pitch-diagnostic-2026-08-29';
+const appVersion = 'clefhanger-slice24-beginner-friendly-learning-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -58,6 +61,14 @@ const modeButtons = document.querySelector('#mode-buttons');
 const speedSlider = document.querySelector('#speed-slider');
 const difficultyButtons = document.querySelector('#difficulty-buttons');
 const startButton = document.querySelector('#start-round');
+const tutorialCard = document.querySelector('#tutorial-card');
+const tutorialText = document.querySelector('#tutorial-text');
+const tutorialNextButton = document.querySelector('#tutorial-next');
+const tutorialDismissButton = document.querySelector('#tutorial-dismiss');
+const playStyleButtons = document.querySelectorAll('[data-play-style]');
+const lessonSelect = document.querySelector('#lesson-select');
+const hintToggle = document.querySelector('#hint-toggle');
+const microphoneDebugTextEl = document.querySelector('#microphone-debug-text');
 const scoreEl = document.querySelector('#score');
 const streakEl = document.querySelector('#streak');
 const timerEl = document.querySelector('#timer');
@@ -74,7 +85,11 @@ let selectedModeId = localStorage.getItem('clefhanger.selectedMode.v3') || 'basi
 let selectedSpeedId = getSpeed(localStorage.getItem('clefhanger.selectedSpeed.v6') || localStorage.getItem('clefhanger.selectedSpeed.v3') || '5').id;
 let selectedDifficultyId = localStorage.getItem('clefhanger.selectedDifficulty.v4') || 'beginner';
 let selectedInputMode = normalizeInputMode(localStorage.getItem('clefhanger.selectedInputMode.v7') || localStorage.getItem('clefhanger.selectedInputMode.v5') || 'buttons');
-let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
+let selectedPlayStyle = localStorage.getItem('clefhanger.selectedPlayStyle.v1') || 'practice';
+let selectedLessonId = getBeginnerLesson(localStorage.getItem('clefhanger.selectedLesson.v1') || 'first-steps').id;
+let showHints = localStorage.getItem('clefhanger.showHints.v1') !== 'false';
+let tutorialStepIndex = 0;
+let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId });
 let rafId = null;
 let audioContext = null;
 let microphoneState = createMicrophoneState();
@@ -85,6 +100,7 @@ let microphoneKeepAliveGain = null;
 let microphoneBuffer = null;
 let microphoneRafId = null;
 let microphoneRecordingDiagnostic = 'Recording test: not run yet.';
+let microphoneDebugText = 'No recording details yet.';
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId, difficultyId)) || '0', 10) || 0;
@@ -195,17 +211,25 @@ function renderHud(nowMs) {
   difficultyLabelEl.textContent = difficulty.label;
   difficultyHelpEl.textContent = difficulty.help;
   const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Mic' : 'Notes';
-  settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel}`;
-  startButton.textContent = state.phase === 'running' ? 'Restart sprint' : 'Start 60s sprint';
+  const lesson = getBeginnerLesson(selectedLessonId);
+  settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel} · ${selectedPlayStyle === 'practice' ? lesson.label : 'Rush'}`;
+  startButton.textContent = state.phase === 'running' ? 'Restart sprint' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
   for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
+  for (const button of playStyleButtons) button.dataset.active = button.dataset.playStyle === selectedPlayStyle ? 'true' : 'false';
+  lessonSelect.value = selectedLessonId;
+  hintToggle.checked = showHints;
   buttons.hidden = selectedInputMode !== 'buttons';
   pianoStrip.hidden = selectedInputMode !== 'piano';
   microphonePanel.hidden = selectedInputMode !== 'microphone';
   microphoneStatusEl.textContent = microphoneStatusText();
   heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
   microphoneRecordingDiagnosticEl.textContent = microphoneRecordingDiagnostic;
+  microphoneDebugTextEl.textContent = microphoneDebugText;
+  for (const button of buttons.querySelectorAll('button')) {
+    button.setAttribute('data-correct-answer', state.activeNote?.answer === button.textContent ? 'true' : 'false');
+  }
   calibrationReadingEl.textContent = calibrationReadingText();
   calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 
@@ -238,7 +262,7 @@ function tick(nowMs) {
 function resetIdleState() {
   if (rafId !== null) cancelAnimationFrame(rafId);
   rafId = null;
-  state = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs: performance.now(), seed: state.seed, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
+  state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: state.seed, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId });
   installButtons();
   installPiano();
   render();
@@ -247,6 +271,12 @@ function resetIdleState() {
 function beginRound() {
   if (rafId !== null) cancelAnimationFrame(rafId);
   const now = performance.now();
+  if (selectedPlayStyle === 'practice') {
+    state = startPractice(state, now, selectedModeId, selectedLessonId);
+    summaryEl.hidden = true;
+    render(now);
+    return;
+  }
   state = startRound(state, now, selectedModeId, selectedSpeedId, selectedDifficultyId);
   summaryEl.hidden = true;
   render(now);
@@ -430,7 +460,9 @@ async function recordMicrophoneDiagnostic() {
         recordedPitch = frequencyToNearestPitch(recordedFrequency);
         message += ` Decoded level ${Math.round(decodedRms * 100)}%.`;
         if (recordedPitch) {
-          message += ` Recorded pitch ${recordedPitch.answer}${recordedPitch.octave} · ${Math.round(recordedFrequency)} Hz.`;
+          const pitchLabel = `${recordedPitch.answer}${recordedPitch.octave}`;
+          microphoneDebugText = buildBeginnerMicMessage({ pitchLabel, frequency: recordedFrequency, decodedLevel: decodedRms, bytes: blob.size, advanced: true });
+          message += ` ${buildBeginnerMicMessage({ pitchLabel, frequency: recordedFrequency, decodedLevel: decodedRms, bytes: blob.size })}`;
         } else {
           message += ' No steady recorded pitch found.';
         }
@@ -492,20 +524,23 @@ function handleAnswer(answer) {
   const now = performance.now();
   const answeredPrompt = state.activeNote;
   state = answerActiveNote(state, answer, now);
+  if (!showHints && state.feedback.kind === 'wrong') state.feedback.text = `${answer} is not it. Try again.`;
   if (state.feedback.kind === 'correct') playPromptAudio(answeredPrompt);
   if (state.phase === 'running') state = updateRound(state, now);
+  if (state.phase === 'practice' && !state.activeNote) state = spawnNextNote(state, now + 1);
   render(now);
 }
 
 function installButtons() {
   buttons.innerHTML = '';
-  const answers = getAnswerOptions(selectedModeId);
+  const answers = getScaffoldedAnswerOptions({ modeId: selectedModeId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId, allOptions: getAnswerOptions(selectedModeId) });
   for (const option of answers) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = option.label.length === 1 ? 'note-button' : 'note-button accidental-button';
     button.textContent = option.label;
     button.setAttribute('aria-label', `Answer ${option.label}`);
+    button.setAttribute('data-correct-answer', state.activeNote?.answer === option.answer ? 'true' : 'false');
     button.addEventListener('click', () => handleAnswer(option.answer));
     buttons.append(button);
   }
@@ -589,6 +624,45 @@ function installSpeedSlider() {
   });
 }
 
+function installBeginnerControls() {
+  for (const step of buildTutorialSteps()) {
+    // Keep tutorial content available through the imported contract.
+  }
+  for (const lesson of BEGINNER_LESSONS) {
+    const option = document.createElement('option');
+    option.value = lesson.id;
+    option.textContent = lesson.label;
+    lessonSelect.append(option);
+  }
+  tutorialNextButton.addEventListener('click', () => {
+    const steps = buildTutorialSteps();
+    tutorialStepIndex = (tutorialStepIndex + 1) % steps.length;
+    tutorialText.textContent = steps[tutorialStepIndex].body;
+  });
+  tutorialDismissButton.addEventListener('click', () => {
+    tutorialCard.hidden = true;
+    localStorage.setItem('clefhanger.tutorialDismissed.v1', 'true');
+  });
+  if (localStorage.getItem('clefhanger.tutorialDismissed.v1') === 'true') tutorialCard.hidden = true;
+  for (const button of playStyleButtons) {
+    button.addEventListener('click', () => {
+      selectedPlayStyle = button.dataset.playStyle === 'rush' ? 'rush' : 'practice';
+      localStorage.setItem('clefhanger.selectedPlayStyle.v1', selectedPlayStyle);
+      resetIdleState();
+    });
+  }
+  lessonSelect.addEventListener('change', () => {
+    selectedLessonId = getBeginnerLesson(lessonSelect.value).id;
+    localStorage.setItem('clefhanger.selectedLesson.v1', selectedLessonId);
+    resetIdleState();
+  });
+  hintToggle.addEventListener('change', () => {
+    showHints = hintToggle.checked;
+    localStorage.setItem('clefhanger.showHints.v1', showHints ? 'true' : 'false');
+    render();
+  });
+}
+
 function installDifficulties() {
   difficultyButtons.innerHTML = '';
   for (const difficulty of DIFFICULTY_LEVELS) {
@@ -617,6 +691,7 @@ installInputModes();
 installModes();
 installSpeedSlider();
 installDifficulties();
+installBeginnerControls();
 installButtons();
 installPiano();
 render();
@@ -633,6 +708,7 @@ window.__clefHanger = {
   STAFF_LAYOUT,
   getState: () => state,
   beginRound,
+  startPractice: () => { selectedPlayStyle = 'practice'; beginRound(); },
   selectMode: (modeId) => {
     selectedModeId = getMode(modeId).id;
     resetIdleState();
@@ -644,6 +720,14 @@ window.__clefHanger = {
   },
   selectDifficulty: (difficultyId) => {
     selectedDifficultyId = getDifficulty(difficultyId).id;
+    resetIdleState();
+  },
+  selectLesson: (lessonId) => {
+    selectedLessonId = getBeginnerLesson(lessonId).id;
+    resetIdleState();
+  },
+  selectPlayStyle: (playStyle) => {
+    selectedPlayStyle = playStyle === 'rush' ? 'rush' : 'practice';
     resetIdleState();
   },
   selectInputMode: (inputMode) => {

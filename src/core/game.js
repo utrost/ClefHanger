@@ -1,3 +1,5 @@
+import { buildBeginnerFeedback, getBeginnerLesson, getLessonPool } from './learning.js';
+
 export const NOTE_BUTTONS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 export const ACCIDENTAL_BUTTONS = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯', 'D♭', 'E♭', 'G♭', 'A♭', 'B♭'];
 export const PIANO_WHITE_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
@@ -201,7 +203,7 @@ export function getHighScoreKey(modeId = 'basics', speedId = '5', difficultyId =
   return `clefhanger.highScore.${getMode(modeId).id}.speed${getSpeed(speedId).id}.${getDifficulty(difficultyId).id}.v5`;
 }
 
-export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Date.now(), modeId = 'basics', speedId = '5', difficultyId = 'beginner' } = {}) {
+export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Date.now(), modeId = 'basics', speedId = '5', difficultyId = 'beginner', lessonId = 'first-steps' } = {}) {
   const mode = getMode(modeId);
   const speed = getSpeed(speedId);
   const difficulty = getDifficulty(difficultyId);
@@ -210,6 +212,7 @@ export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Da
     modeId: mode.id,
     speedId: speed.id,
     difficultyId: difficulty.id,
+    lessonId: getBeginnerLesson(lessonId).id,
     roundLengthMs,
     startedAtMs: nowMs,
     endsAtMs: nowMs + roundLengthMs,
@@ -279,10 +282,13 @@ export function spawnNextNote(state, nowMs) {
   next.speedId = speed.id;
   next.difficultyId = difficulty.id;
 
-  while (next.noteQueue.length < difficulty.noteQueueSize) {
+  const pool = next.phase === 'practice' && mode.id === 'basics' ? getLessonPool(mode.pool, next.lessonId) : mode.pool;
+  const targetQueueSize = next.phase === 'practice' ? 1 : difficulty.noteQueueSize;
+
+  while (next.noteQueue.length < targetQueueSize) {
     const seed = nextRandom(next.seed || 1);
-    const index = seed % mode.pool.length;
-    const source = mode.pool[index];
+    const index = seed % pool.length;
+    const source = pool[index];
     const travelMs = travelMsFor(mode, speed, difficulty);
     const offsetMs = next.noteQueue.length * Math.round(travelMs * 0.18);
     next.seed = seed;
@@ -297,14 +303,23 @@ export function spawnNextNote(state, nowMs) {
 export function startRound(state, nowMs, modeId = state.modeId, speedId = state.speedId, difficultyId = state.difficultyId) {
   const speed = getSpeed(speedId);
   const difficulty = getDifficulty(difficultyId);
-  const next = createInitialState({ roundLengthMs: state.roundLengthMs, nowMs, seed: state.seed, modeId, speedId: speed.id, difficultyId: difficulty.id });
+  const next = createInitialState({ roundLengthMs: state.roundLengthMs || 60000, nowMs, seed: state.seed, modeId, speedId: speed.id, difficultyId: difficulty.id, lessonId: state.lessonId });
   next.phase = 'running';
   next.feedback = { kind: 'running', text: `${getMode(modeId).label} · ${speed.label} · ${difficulty.label}: name the front note.` };
   return spawnNextNote(next, nowMs);
 }
 
+export function startPractice(state, nowMs, modeId = state.modeId, lessonId = state.lessonId || 'first-steps') {
+  const lesson = getBeginnerLesson(lessonId);
+  const next = createInitialState({ roundLengthMs: null, nowMs, seed: state.seed, modeId, speedId: '1', difficultyId: 'beginner', lessonId: lesson.id });
+  next.phase = 'practice';
+  next.endsAtMs = null;
+  next.feedback = { kind: 'practice', text: `Practice: ${lesson.title}. No timer — learn the note shape.` };
+  return spawnNextNote(next, nowMs);
+}
+
 export function answerActiveNote(state, answer, nowMs) {
-  if (state.phase !== 'running' && state.phase !== 'idle') return cloneState(state);
+  if (!['running', 'idle', 'practice'].includes(state.phase)) return cloneState(state);
   if (!state.activeNote) return cloneState(state);
 
   const next = cloneState(state);
@@ -321,21 +336,23 @@ export function answerActiveNote(state, answer, nowMs) {
     next.bestStreak = Math.max(next.bestStreak, next.streak);
     next.pointsEarned = points;
     next.score += points;
-    next.feedback = { kind: 'correct', text: `${normalized} — held on! +${points}` };
+    next.feedback = next.phase === 'practice'
+      ? buildBeginnerFeedback({ prompt: next.activeNote, kind: 'correct', points })
+      : { kind: 'correct', text: `${normalized} — held on! +${points}` };
     next.noteQueue = (next.noteQueue || []).slice(1);
     next.activeNote = next.noteQueue[0] || null;
   } else {
     next.wrong += 1;
     next.streak = 0;
     next.pointsEarned = 0;
-    next.feedback = { kind: 'wrong', text: `${normalized || answer} is not it. Try again.` };
+    next.feedback = buildBeginnerFeedback({ prompt: next.activeNote, givenAnswer: normalized || answer, kind: 'wrong' });
   }
   next.lastInputAtMs = nowMs;
   return next;
 }
 
 export function missExpiredNotes(state, nowMs) {
-  if (!state.activeNote || nowMs <= state.activeNote.deadlineMs) return cloneState(state);
+  if (state.phase === 'practice' || !state.activeNote || nowMs <= state.activeNote.deadlineMs) return cloneState(state);
   const next = cloneState(state);
   next.missed += 1;
   next.streak = 0;
@@ -366,6 +383,7 @@ export function updateRound(state, nowMs) {
 }
 
 export function getRemainingSeconds(state, nowMs) {
+  if (state.phase === 'practice' || state.endsAtMs === null) return '∞';
   return Math.max(0, Math.ceil((state.endsAtMs - nowMs) / 1000));
 }
 

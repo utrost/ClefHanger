@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice23-comfortable-voice-diagnostic-2026-08-29">
+<html lang="en" data-app-version="clefhanger-slice24-beginner-friendly-learning-2026-08-29">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -77,7 +77,7 @@
 
       .site-link:focus-visible, .site-link:hover { text-decoration: underline; }
 
-      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row, #calibration-panel, #microphone-panel, .settings-summary, #settings-dialog {
+      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row, #calibration-panel, #microphone-panel, .settings-summary, #settings-dialog, #tutorial-card, #lesson-panel, .play-style-row {
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 18px;
         background: var(--panel);
@@ -210,6 +210,20 @@
 
       #feedback[data-kind="correct"] { color: var(--good); }
       #feedback[data-kind="wrong"], #feedback[data-kind="missed"] { color: var(--danger); }
+
+      #tutorial-card, #lesson-panel {
+        padding: 9px;
+        display: grid;
+        gap: 6px;
+      }
+      #tutorial-card[hidden] { display: none; }
+      #tutorial-card h2, #tutorial-card p, #lesson-panel p { margin: 0; }
+      #tutorial-card h2 { font-size: 1rem; }
+      .tutorial-actions, .play-style-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+      .tutorial-actions button, .play-style-button, #lesson-select, .hint-row { min-height: 36px; border-radius: 12px; }
+      .play-style-button[data-active="true"] { background: var(--accent); color: #1d1300; }
+      .hint-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.8rem; }
+      .note-button[data-correct-answer="true"] { outline: 3px solid var(--good); box-shadow: 0 0 0 4px rgba(98,230,167,0.18); }
 
       .settings-summary {
         grid-template-columns: 1fr auto;
@@ -411,6 +425,26 @@
         <button id="open-settings" type="button">Settings</button>
       </section>
 
+      <section id="tutorial-card" aria-label="Beginner tutorial">
+        <h2>Start with a lesson</h2>
+        <p id="tutorial-text">Notes climb upward through A B C D E F G. Guess if you are unsure — ClefHanger shows the right note.</p>
+        <div class="tutorial-actions">
+          <button id="tutorial-next" type="button">Next tip</button>
+          <button id="tutorial-dismiss" type="button">Got it</button>
+        </div>
+      </section>
+
+      <section id="lesson-panel" aria-label="Beginner lesson controls">
+        <div class="play-style-row" aria-label="Practice or sprint">
+          <button class="play-style-button" type="button" data-play-style="practice" data-active="true">Practice</button>
+          <button class="play-style-button" type="button" data-play-style="rush">Rush</button>
+        </div>
+        <label class="hint-row" for="lesson-select">Tiny lesson
+          <select id="lesson-select" aria-label="Beginner lesson"></select>
+        </label>
+        <label class="hint-row"><input id="hint-toggle" type="checkbox" checked /> Show hints after mistakes</label>
+      </section>
+
       <section class="stage" aria-label="Treble clef rush playfield">
         <div id="staff"></div>
         <div id="feedback" aria-live="polite">Tap Start when ready.</div>
@@ -418,15 +452,16 @@
       </section>
 
       <section class="controls" aria-label="Game controls">
-        <button id="start-round" type="button">Start 60s sprint</button>
+        <button id="start-round" type="button">Start practice</button>
         <div id="note-buttons" aria-label="Answer buttons"></div>
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
         <div id="microphone-panel" aria-label="Microphone answer status" hidden>
           <p id="microphone-status">Mic off. Grant mic to calibrate and sing answers.</p>
           <p id="heard-note" aria-live="polite">You played —</p>
           <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
+          <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 23: comfortable voice diagnostic</p>
+        <p class="microcopy">Slice 24: beginner-friendly learning</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
