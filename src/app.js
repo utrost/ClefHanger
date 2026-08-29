@@ -32,7 +32,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice16-chrome-mic-permission-help-2026-08-29';
+const appVersion = 'clefhanger-slice17-android-mic-permission-help-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -278,9 +278,19 @@ function formatMicrophoneError(error) {
   const name = error?.name || '';
   const lower = `${name} ${message}`.toLowerCase();
   if (lower.includes('denied') || lower.includes('notallowed') || lower.includes('permission')) {
-    return 'Microphone permission denied. In Chrome, tap the lock/site icon in the address bar → Permissions → Microphone → Allow, then reload.';
+    return 'Microphone permission denied. In Chrome, tap the lock/site icon in the address bar → Permissions → Microphone → Allow, then reload. If Allow still returns denied, Android Settings may be blocking Chrome itself: Android Settings → Apps → Chrome → Permissions → Microphone → Allow.';
   }
   return message;
+}
+
+async function checkMicrophonePermissionState() {
+  if (!navigator.permissions?.query) return 'unknown';
+  try {
+    const status = await navigator.permissions.query({ name: 'microphone' });
+    return status.state || 'unknown';
+  } catch {
+    return 'unknown';
+  }
 }
 
 function microphoneStatusText() {
@@ -325,6 +335,10 @@ async function startMicrophone() {
   try {
     microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null };
     render();
+    const permissionState = await checkMicrophonePermissionState();
+    if (permissionState === 'denied') {
+      throw new DOMException('Permission denied before request', 'NotAllowedError');
+    }
     microphoneStream = await withMicrophoneRequestTimeout(navigator.mediaDevices.getUserMedia({ audio: true }));
     const context = getAudioContext();
     if (!context) throw new Error('AudioContext unavailable');

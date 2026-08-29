@@ -45,7 +45,7 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice16-chrome-mic-permission-help/);
+  assert.match(html, /data-app-version="clefhanger-slice17-android-mic-permission-help/);
 });
 
 test('manifest and service worker describe an installable subpath-safe app shell', () => {

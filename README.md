@@ -38,7 +38,7 @@ Slices 1–7 are implemented as a dependency-free static PWA:
 - Actual vocal calibration: grant mic access, play concert A, sing it back, and see the detected note/frequency/cents against A4.
 - Mic input shows a plain `You played A4 · 440 Hz · in tune` style readout so the singer can see what the phone heard even before it scores.
 - Implausible microphone spikes outside the playable vocal range are ignored instead of being shown as absurd octave readings such as `G♯8`.
-- Mic startup shows immediate visible progress in both the main Mic panel and the settings calibration line, uses a simpler Chrome-friendly mic request, and turns permission denials/timeouts into explicit Chrome site-settings instructions.
+- Mic startup shows immediate visible progress in both the main Mic panel and the settings calibration line, uses a simpler Chrome-friendly mic request, checks the browser permission state before requesting, and turns permission denials/timeouts into explicit Chrome + Android system permission instructions.
 - Microphone mode can score sung natural-note answers when the detected pitch is within tolerance; chord singing is not scored yet.
 - Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play a small piano-like Web Audio voice instead of a plain beep; chords play as short arpeggios.
