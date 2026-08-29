@@ -1,9 +1,10 @@
-const CACHE_NAME = 'clefhanger-pwa-v3';
+const CACHE_NAME = 'clefhanger-pwa-v4';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './src/app.js',
+  './src/core/audio.js',
   './src/core/game.js',
   './icons/icon-192.png',
   './icons/icon-512.png',

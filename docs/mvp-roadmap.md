@@ -89,6 +89,12 @@ Verification:
 - Keep every shipped mode playable from buttons: accidentals use accidental buttons, and chords use direct triad buttons.
 - Bump the service-worker cache so installed PWAs receive the simplified control tray.
 
+## Slice 6a — Piano-like note sound — implemented
+
+- Replace the plain sine beep with a small piano-like Web Audio voice.
+- Layer quiet overtones over the played pitch and use a fast attack with a longer decay.
+- Keep the audio synthetic and offline-friendly; no sample files to load.
+
 ## Slice 7 — Vocal tracking prototype
 
 - Add microphone permission flow.

@@ -21,8 +21,9 @@ import {
   getAnswerOptions,
   getPromptFrequencies,
 } from './core/game.js';
+import { playPianoVoice } from './core/audio.js';
 
-const appVersion = 'clefhanger-slice7-2026-08-28';
+const appVersion = 'clefhanger-slice8-piano-audio-2026-08-28';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -213,17 +214,8 @@ function playPromptAudio(prompt) {
   if (!context) return;
   const frequencies = getPromptFrequencies(prompt);
   frequencies.forEach((frequency, index) => {
-    const startAt = context.currentTime + index * 0.075;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(frequency, startAt);
-    gain.gain.setValueAtTime(0.0001, startAt);
-    gain.gain.exponentialRampToValueAtTime(0.18, startAt + 0.018);
-    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.34);
-    oscillator.connect(gain).connect(context.destination);
-    oscillator.start(startAt);
-    oscillator.stop(startAt + 0.38);
+    const startAt = context.currentTime + index * 0.085;
+    playPianoVoice(context, frequency, startAt);
   });
 }
 
