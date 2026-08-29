@@ -129,6 +129,10 @@ test('microphone listening copy shows input level when no sung note is detected'
     /no audio is reaching the app/i,
   );
   assert.match(
+    buildMicrophoneListeningMessage({ listening: true, inputLevel: 0, silentFrameCount: 9 }),
+    /no audio is reaching the app/i,
+  );
+  assert.match(
     buildMicrophoneListeningMessage({ listening: true, inputLevel: 0.018, silentFrameCount: 60 }),
     /too quiet/i,
   );

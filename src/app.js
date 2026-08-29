@@ -34,7 +34,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice18-firefox-mic-level-diagnostics-2026-08-29';
+const appVersion = 'clefhanger-slice19-retain-firefox-mic-source-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -76,6 +76,7 @@ let rafId = null;
 let audioContext = null;
 let microphoneState = createMicrophoneState();
 let microphoneStream = null;
+let microphoneSource = null;
 let microphoneAnalyser = null;
 let microphoneBuffer = null;
 let microphoneRafId = null;
@@ -311,6 +312,7 @@ function stopMicrophone() {
     for (const track of microphoneStream.getTracks()) track.stop();
   }
   microphoneStream = null;
+  microphoneSource = null;
   microphoneAnalyser = null;
   microphoneBuffer = null;
   microphoneState = { ...microphoneState, listening: false };
@@ -342,11 +344,11 @@ async function startMicrophone() {
     const context = getAudioContext();
     if (!context) throw new Error('AudioContext unavailable');
     if (context.state === 'suspended') await context.resume();
-    const source = context.createMediaStreamSource(microphoneStream);
+    microphoneSource = context.createMediaStreamSource(microphoneStream);
     microphoneAnalyser = context.createAnalyser();
     microphoneAnalyser.fftSize = 4096;
     microphoneBuffer = new Float32Array(microphoneAnalyser.fftSize);
-    source.connect(microphoneAnalyser);
+    microphoneSource.connect(microphoneAnalyser);
     microphoneState = { ...microphoneState, permission: 'granted', listening: true, error: null };
     processMicrophoneFrame();
     render();
@@ -356,6 +358,7 @@ async function startMicrophone() {
       for (const track of microphoneStream.getTracks()) track.stop();
     }
     microphoneStream = null;
+    microphoneSource = null;
     microphoneAnalyser = null;
     microphoneBuffer = null;
     microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: formatMicrophoneError(error) };

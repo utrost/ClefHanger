@@ -88,12 +88,12 @@ export function buildMicrophoneListeningMessage({ listening, note, frequency, ce
     const centsText = cents === null ? '' : ` (${cents > 0 ? '+' : ''}${cents}¢)`;
     return `Listening: ${note.answer}${note.octave} ${Math.round(frequency)} Hz${centsText} · level ${levelPercent}%`;
   }
-  if (listening && silentFrameCount > 45) {
+  if (listening && silentFrameCount > 8) {
     if (levelPercent < 1) return 'Listening: mic level 0% — Firefox granted access, but no audio is reaching the app.';
     if (levelPercent < 3) return `Listening: mic level ${levelPercent}% — too quiet for pitch detection. Sing closer/louder.`;
     return `Listening: mic level ${levelPercent}% — no steady pitch yet. Hold one clear note.`;
   }
-  if (listening) return `Listening: sing a steady note. Mic level ${levelPercent}%`;
+  if (listening) return `Listening: checking mic input… level ${levelPercent}%`;
   return null;
 }
 
