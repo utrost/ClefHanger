@@ -23,6 +23,16 @@ export function buildPianoVoicePlan(frequency, startAt = 0) {
   };
 }
 
+export function getCalibrationTone() {
+  return {
+    noteName: 'A',
+    octave: 4,
+    frequency: 440,
+    label: 'Sing A',
+    help: 'Listen, then sing it back.',
+  };
+}
+
 export function playPianoVoice(context, frequency, startAt = context.currentTime, destination = context.destination) {
   const plan = buildPianoVoicePlan(frequency, startAt);
   const masterGain = context.createGain();

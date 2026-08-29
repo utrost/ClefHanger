@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice8-piano-audio-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice9-calibration-a-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -77,7 +77,7 @@
 
       .site-link:focus-visible, .site-link:hover { text-decoration: underline; }
 
-      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row {
+      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row, #calibration-panel {
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 18px;
         background: var(--panel);
@@ -226,7 +226,7 @@
 
       .input-mode-row {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 6px;
         padding: 5px;
       }
@@ -251,7 +251,26 @@
         gap: 5px;
       }
 
-      #note-buttons[hidden], #piano-strip[hidden] { display: none; }
+      #note-buttons[hidden], #piano-strip[hidden], #calibration-panel[hidden] { display: none; }
+
+      #calibration-panel {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 9px;
+      }
+
+      #calibration-panel p { margin: 0; color: var(--muted); font-size: 0.78rem; }
+
+      #play-calibration-tone {
+        min-height: 42px;
+        border: 0;
+        border-radius: 14px;
+        background: var(--accent);
+        color: #1d1300;
+        font-weight: 950;
+      }
 
       .note-button {
         min-height: 52px;
@@ -315,7 +334,7 @@
       .piano-key[data-after="G"] { left: 67.9%; }
       .piano-key[data-after="A"] { left: 82.2%; }
 
-      .note-button:active, .piano-key:active, #start-round:active, .mode-button:active, .speed-button:active, .difficulty-button:active, .input-mode-button:active { transform: translateY(2px) scale(0.99); }
+      .note-button:active, .piano-key:active, #start-round:active, #play-calibration-tone:active, .mode-button:active, .speed-button:active, .difficulty-button:active, .input-mode-button:active { transform: translateY(2px) scale(0.99); }
       #summary h2 { margin: 0 0 6px; }
       #summary p { margin: 5px 0; color: var(--muted); }
       .microcopy { margin: 0; text-align: center; color: var(--muted); font-size: 0.74rem; }
@@ -376,10 +395,15 @@
         <div id="input-mode-buttons" class="input-mode-row" aria-label="Input mode buttons">
           <button class="input-mode-button" type="button" data-input-mode="buttons" data-active="true">Notes</button>
           <button class="input-mode-button" type="button" data-input-mode="piano">Piano</button>
+          <button class="input-mode-button" type="button" data-input-mode="calibration">Calibrate</button>
         </div>
         <div id="note-buttons" aria-label="Answer buttons"></div>
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
-        <p class="microcopy">Slice 8: note buttons or piano strip · slider speed · piano-like answer sound</p>
+        <div id="calibration-panel" aria-label="Vocal calibration" hidden>
+          <p><strong>Sing A</strong><br />Listen, then sing it back.</p>
+          <button id="play-calibration-tone" type="button">Play A</button>
+        </div>
+        <p class="microcopy">Slice 9: note buttons, piano strip, or A calibration tone</p>
       </section>
     </main>
     <script type="module" src="./src/app.js"></script>

@@ -34,6 +34,7 @@ Slices 1–6 are implemented as a dependency-free static PWA:
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
 - Toggleable input: large note buttons or a one-octave on-screen piano strip.
+- Vocal calibration option: play a concert A and sing it back before real microphone scoring exists.
 - Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play a small piano-like Web Audio voice instead of a plain beep; chords play as short arpeggios.
 - The optional typed-answer row has been removed to keep the mobile controls thumb-first.

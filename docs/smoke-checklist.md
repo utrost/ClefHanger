@@ -17,6 +17,7 @@ Use this checklist before calling a build ready for actual testing.
 - In Treble, tapping the correct natural note clears it, increases score, and shows positive feedback.
 - Switch to Piano input, tap the matching white key, and verify it clears the note.
 - A correct answer plays a short piano-like pitch cue. Wrong answers do not play the success pitch.
+- Switch to Calibrate, tap **Play A**, and verify the same piano-like voice plays a concert A prompt for singing back.
 - In Sharps/Flats, accidental button answers such as `F♯` / `B♭` are accepted.
 - In Sharps/Flats with Piano input, the black keys use sharp/flat labels for the selected mode.
 - In Chords, direct triad buttons such as C, Dm, and Am are accepted.
@@ -27,8 +28,8 @@ Use this checklist before calling a build ready for actual testing.
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice8-piano-audio`.
-- Verify `src/app.js`, `src/core/game.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
+- Verify the HTML contains `clefhanger-slice9-calibration-a`.
+- Verify `src/app.js`, `src/core/game.js`, `src/core/audio.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.
 - After first load, switch the browser offline and reload; the app shell should still open from the service worker cache.

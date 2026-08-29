@@ -20,7 +20,7 @@ Current boundaries:
 - `src/core/game.js`
   - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef layout anchors, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/app.js`
-  - DOM adapter, SVG staff/chord rendering, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
+  - DOM adapter, SVG staff/chord rendering, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, vocal calibration tone UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration, iOS home-screen meta tags, and Apple touch icon link.
 - `manifest.webmanifest` and `sw.js`
@@ -38,6 +38,7 @@ Current repository behavior:
 - Beginner, easy, normal, and hard difficulty presets.
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
 - Natural-note, accidental-button, chord-button, and one-octave piano-strip input.
+- Vocal calibration can play a concert A for listen-and-sing-back practice before microphone scoring exists.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
 - 60-second rush round.
 - Mode-weighted scoring, slider-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-slider-speed/per-difficulty high-score persistence.

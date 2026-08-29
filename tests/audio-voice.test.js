@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildPianoVoicePlan } from '../src/core/audio.js';
+import { buildPianoVoicePlan, getCalibrationTone } from '../src/core/audio.js';
 
 test('piano voice uses layered partials instead of a single beep oscillator', () => {
   const plan = buildPianoVoicePlan(440, 0.5);
@@ -28,4 +28,15 @@ test('piano voice has a hammer-like attack and a longer natural decay', () => {
   });
   assert.equal(plan.detuneCents.length, plan.partials.length);
   assert.ok(plan.detuneCents.some((cents) => cents !== 0), 'small detune offsets make the cue less sterile');
+});
+
+test('calibration tone starts with a concert A reference for singers', () => {
+  const tone = getCalibrationTone();
+
+  assert.equal(tone.noteName, 'A');
+  assert.equal(tone.octave, 4);
+  assert.equal(tone.frequency, 440);
+  assert.equal(tone.label, 'Sing A');
+  assert.match(tone.help, /Listen/);
+  assert.match(tone.help, /sing it back/);
 });

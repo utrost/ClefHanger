@@ -22,6 +22,10 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /id="input-mode-buttons"/);
   assert.match(html, /id="piano-strip"/);
   assert.match(html, /aria-label="Piano keyboard answers"/);
+  assert.match(html, /id="calibration-panel"/);
+  assert.match(html, /id="play-calibration-tone"/);
+  assert.match(html, /Sing A/);
+  assert.match(html, /Listen, then sing it back/);
   assert.match(html, /id="mode-buttons"/);
   assert.doesNotMatch(html, /id="answer-entry"/);
   assert.doesNotMatch(html, /id="submit-answer"/);
@@ -37,7 +41,7 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice8-piano-audio/);
+  assert.match(html, /data-app-version="clefhanger-slice9-calibration-a/);
 });
 
 test('manifest and service worker describe an installable subpath-safe app shell', () => {

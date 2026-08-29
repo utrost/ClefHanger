@@ -95,6 +95,12 @@ Verification:
 - Layer quiet overtones over the played pitch and use a fast attack with a longer decay.
 - Keep the audio synthetic and offline-friendly; no sample files to load.
 
+## Slice 6b — Vocal calibration tone — implemented
+
+- Add a Calibrate input option before full microphone scoring.
+- Play a concert A reference tone from a user tap.
+- Let the singer listen and sing it back without granting microphone permission yet.
+
 ## Slice 7 — Vocal tracking prototype
 
 - Add microphone permission flow.
