@@ -19,6 +19,8 @@ export function createMicrophoneState() {
     frequency: null,
     note: null,
     cents: null,
+    inputLevel: 0,
+    silentFrameCount: 0,
     calibration: null,
     error: null,
     lastAcceptedAtMs: 0,
@@ -75,6 +77,26 @@ export function buildHeardNoteMessage(pitch) {
   return `You played ${pitch.answer}${pitch.octave} · ${Math.round(pitch.frequency)} Hz · ${tuning}`;
 }
 
+export function microphoneInputLevelPercent(inputLevel) {
+  if (!Number.isFinite(inputLevel) || inputLevel <= 0) return 0;
+  return Math.max(0, Math.min(100, Math.round(inputLevel * 100)));
+}
+
+export function buildMicrophoneListeningMessage({ listening, note, frequency, cents, inputLevel = 0, silentFrameCount = 0 } = {}) {
+  const levelPercent = microphoneInputLevelPercent(inputLevel);
+  if (listening && note) {
+    const centsText = cents === null ? '' : ` (${cents > 0 ? '+' : ''}${cents}¢)`;
+    return `Listening: ${note.answer}${note.octave} ${Math.round(frequency)} Hz${centsText} · level ${levelPercent}%`;
+  }
+  if (listening && silentFrameCount > 45) {
+    if (levelPercent < 1) return 'Listening: mic level 0% — Firefox granted access, but no audio is reaching the app.';
+    if (levelPercent < 3) return `Listening: mic level ${levelPercent}% — too quiet for pitch detection. Sing closer/louder.`;
+    return `Listening: mic level ${levelPercent}% — no steady pitch yet. Hold one clear note.`;
+  }
+  if (listening) return `Listening: sing a steady note. Mic level ${levelPercent}%`;
+  return null;
+}
+
 export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS } = {}) {
   const detected = frequencyToNearestPitch(frequency);
   if (!prompt || !detected) return { status: 'silent', answer: null, detected, cents: null };
@@ -94,19 +116,10 @@ export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs 
 export function detectPitchFromTimeDomain(samples, sampleRate) {
   if (!samples || !samples.length || !sampleRate) return null;
 
-  let mean = 0;
-  for (const sample of samples) mean += sample;
-  mean /= samples.length;
+  const rms = getCenteredRms(samples);
+  if (rms < 0.002) return null;
 
-  let rms = 0;
-  const centered = new Float32Array(samples.length);
-  for (let i = 0; i < samples.length; i += 1) {
-    centered[i] = samples[i] - mean;
-    rms += centered[i] * centered[i];
-  }
-  rms = Math.sqrt(rms / centered.length);
-  if (rms < 0.01) return null;
-
+  const centered = centerSamples(samples);
   const minLag = Math.floor(sampleRate / MAX_PLAYABLE_MIC_FREQUENCY);
   const maxLag = Math.min(Math.floor(sampleRate / MIN_PLAYABLE_MIC_FREQUENCY), centered.length - 1);
   const correlations = [];
@@ -135,4 +148,24 @@ export function detectPitchFromTimeDomain(samples, sampleRate) {
   }
 
   return null;
+}
+
+export function getCenteredRms(samples) {
+  if (!samples || !samples.length) return 0;
+  const centered = centerSamples(samples);
+  let rms = 0;
+  for (const sample of centered) rms += sample * sample;
+  return Math.sqrt(rms / centered.length);
+}
+
+function centerSamples(samples) {
+  let mean = 0;
+  for (const sample of samples) mean += sample;
+  mean /= samples.length;
+
+  const centered = new Float32Array(samples.length);
+  for (let i = 0; i < samples.length; i += 1) {
+    centered[i] = samples[i] - mean;
+  }
+  return centered;
 }

@@ -2,11 +2,14 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   buildCalibrationReading,
+  buildMicrophoneListeningMessage,
   centsBetween,
   classifyVocalMatch,
   createMicrophoneState,
   detectPitchFromTimeDomain,
   frequencyToNearestPitch,
+  getCenteredRms,
+  microphoneInputLevelPercent,
   normalizeMicrophoneInputMode,
 } from '../src/core/pitch.js';
 
@@ -93,6 +96,8 @@ test('microphone mode is a first-class input option with permission state', () =
     frequency: null,
     note: null,
     cents: null,
+    inputLevel: 0,
+    silentFrameCount: 0,
     calibration: null,
     error: null,
     lastAcceptedAtMs: 0,
@@ -107,4 +112,28 @@ test('time-domain pitch detector ignores flat DC input instead of inventing one 
 test('time-domain pitch detector keeps a real steady sung tone', () => {
   const detected = detectPitchFromTimeDomain(sineSamples({ frequency: 440 }), 44100);
   assert.ok(Math.abs(detected - 440) < 8, `expected about 440 Hz, got ${detected}`);
+});
+
+test('time-domain pitch detector keeps quiet Firefox-like sung tones', () => {
+  const quietSamples = sineSamples({ frequency: 440, amplitude: 0.005 });
+  const detected = detectPitchFromTimeDomain(quietSamples, 44100);
+
+  assert.ok(getCenteredRms(quietSamples) < 0.01, 'fixture must stay below the old silence threshold');
+  assert.ok(Math.abs(detected - 440) < 8, `expected about 440 Hz, got ${detected}`);
+});
+
+test('microphone listening copy shows input level when no sung note is detected', () => {
+  assert.equal(microphoneInputLevelPercent(0.024), 2);
+  assert.match(
+    buildMicrophoneListeningMessage({ listening: true, inputLevel: 0, silentFrameCount: 60 }),
+    /no audio is reaching the app/i,
+  );
+  assert.match(
+    buildMicrophoneListeningMessage({ listening: true, inputLevel: 0.018, silentFrameCount: 60 }),
+    /too quiet/i,
+  );
+  assert.match(
+    buildMicrophoneListeningMessage({ listening: true, inputLevel: 0.12, silentFrameCount: 60 }),
+    /no steady pitch/i,
+  );
 });

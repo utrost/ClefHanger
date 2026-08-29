@@ -20,7 +20,7 @@ Current boundaries:
 - `src/core/game.js`
   - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef layout anchors, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/core/pitch.js`
-  - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, and a small autocorrelation detector for analyser buffers.
+  - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
 - `src/app.js`
   - DOM adapter, SVG staff/chord rendering, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, microphone permission/listening UI, vocal calibration tone/readout UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
 - `index.html`
@@ -41,7 +41,7 @@ Current repository behavior:
 - Beginner, easy, normal, and hard difficulty presets.
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
 - Natural-note, accidental-button, chord-button, one-octave piano-strip, and microphone input.
-- Vocal calibration can play a concert A and show a live microphone readout with detected note, frequency, cents, and flat/sharp/in-tune status.
+- Vocal calibration can play a concert A and show a live microphone readout with detected note, frequency, cents, input level, and flat/sharp/in-tune status. If a browser grants microphone access but no pitch appears, the Mic panel reports whether the app is receiving no audio, too little level, or non-steady pitch.
 - The main Mic panel shows the latest heard note as `You played ...` so calibration feedback remains visible outside the settings dialog.
 - Microphone mode can score sung natural-note prompts when the detected pitch is within tolerance and debounce. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
