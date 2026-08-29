@@ -30,6 +30,7 @@ Slices 1–6 are implemented as a dependency-free static PWA:
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.
 - 60-second sprint timer.
 - Five practice modes: Treble, Bass, Sharps #, Flats ♭, Chords.
+- Settings dialog keeps mode, speed, difficulty, input choice, and calibration out of the main play surface.
 - Speed slider: 1–10, from slow practice to fast rush.
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.

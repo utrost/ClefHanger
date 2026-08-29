@@ -101,6 +101,12 @@ Verification:
 - Play a concert A reference tone from a user tap.
 - Let the singer listen and sing it back without granting microphone permission yet.
 
+## Slice 6c — Settings dialog cleanup — implemented
+
+- Move mode, speed, difficulty, input choice, and vocal calibration into a dedicated settings dialog.
+- Keep the main play surface focused on current settings, staff, start button, and the selected answer input.
+- Treat calibration as a settings tool rather than a third answer input mode.
+
 ## Slice 7 — Vocal tracking prototype
 
 - Add microphone permission flow.

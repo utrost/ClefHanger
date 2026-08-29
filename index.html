@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice9-calibration-a-2026-08-28">
+<html lang="en" data-app-version="clefhanger-slice10-settings-dialog-2026-08-28">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -77,7 +77,7 @@
 
       .site-link:focus-visible, .site-link:hover { text-decoration: underline; }
 
-      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row, #calibration-panel {
+      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row, #calibration-panel, .settings-summary, #settings-dialog {
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 18px;
         background: var(--panel);
@@ -103,14 +103,14 @@
 
       .stat { padding: 8px; }
       .stat b { display: block; font-size: 1.3rem; }
-      .stat small, .timer-card small, .mode-panel small {
+      .stat small, .timer-card small, .mode-panel small, .settings-summary small {
         color: var(--muted);
         text-transform: uppercase;
         letter-spacing: 0.08em;
         font-size: 0.64rem;
       }
 
-      .mode-panel {
+      .mode-panel, .settings-summary {
         padding: 8px;
         display: grid;
         gap: 7px;
@@ -149,7 +149,7 @@
         accent-color: var(--accent);
       }
 
-      .mode-button, .speed-button, .difficulty-button {
+      .mode-button, .speed-button, .difficulty-button, #open-settings, #close-settings {
         border: 1px solid rgba(255,255,255,0.16);
         border-radius: 13px;
         min-height: 38px;
@@ -211,6 +211,30 @@
       #feedback[data-kind="correct"] { color: var(--good); }
       #feedback[data-kind="wrong"], #feedback[data-kind="missed"] { color: var(--danger); }
 
+      .settings-summary {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+
+      #settings-line { color: var(--muted); font-size: 0.78rem; }
+
+      #settings-dialog {
+        width: min(calc(100vw - 24px), 430px);
+        max-height: min(88svh, 760px);
+        overflow: auto;
+        padding: 14px;
+        color: var(--ink);
+        background: #211842;
+        border: 1px solid rgba(255,255,255,0.22);
+        border-radius: 24px;
+      }
+
+      #settings-dialog::backdrop { background: rgba(0, 0, 0, 0.58); }
+      #settings-dialog h2, #settings-dialog h3 { margin: 0; }
+      #settings-dialog h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+      .settings-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+      .settings-section { display: grid; gap: 7px; margin-top: 12px; }
+
       .controls { display: grid; gap: 8px; }
 
       #start-round {
@@ -226,7 +250,7 @@
 
       .input-mode-row {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 6px;
         padding: 5px;
       }
@@ -251,12 +275,10 @@
         gap: 5px;
       }
 
-      #note-buttons[hidden], #piano-strip[hidden], #calibration-panel[hidden] { display: none; }
+      #note-buttons[hidden], #piano-strip[hidden] { display: none; }
 
       #calibration-panel {
         display: grid;
-        grid-template-columns: 1fr auto;
-        align-items: center;
         gap: 8px;
         padding: 8px 9px;
       }
@@ -369,19 +391,12 @@
         <div class="stat"><small>high</small><b id="best-score">0</b></div>
       </section>
 
-      <section class="mode-panel" aria-label="Practice mode">
-        <div class="mode-copy"><small>Today’s Sprint</small><span id="difficulty-label">Beginner</span></div>
-        <div id="difficulty-buttons" aria-label="Difficulty buttons"></div>
-        <p id="difficulty-help">Slow single notes in a forgiving starter lane.</p>
-        <div class="mode-copy"><small>mode</small><span id="mode-label">Treble</span></div>
-        <div id="mode-buttons" aria-label="Mode buttons">Bass</div>
-        <div class="mode-copy"><small>speed</small><span id="speed-label">Speed 5</span></div>
-        <div class="speed-slider-row">
-          <span>slow</span>
-          <input id="speed-slider" type="range" min="1" max="10" step="1" value="5" aria-label="Speed slider" />
-          <span>fast</span>
+      <section class="settings-summary" aria-label="Current practice settings">
+        <div>
+          <small>Today’s Sprint</small>
+          <div id="settings-line">Treble · Beginner · Speed 5 · Notes</div>
         </div>
-        <p id="mode-help">Natural treble notes.</p>
+        <button id="open-settings" type="button">Settings</button>
       </section>
 
       <section class="stage" aria-label="Treble clef rush playfield">
@@ -392,19 +407,47 @@
 
       <section class="controls" aria-label="Game controls">
         <button id="start-round" type="button">Start 60s sprint</button>
-        <div id="input-mode-buttons" class="input-mode-row" aria-label="Input mode buttons">
-          <button class="input-mode-button" type="button" data-input-mode="buttons" data-active="true">Notes</button>
-          <button class="input-mode-button" type="button" data-input-mode="piano">Piano</button>
-          <button class="input-mode-button" type="button" data-input-mode="calibration">Calibrate</button>
-        </div>
         <div id="note-buttons" aria-label="Answer buttons"></div>
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
-        <div id="calibration-panel" aria-label="Vocal calibration" hidden>
+        <p class="microcopy">Slice 10: clean playfield, settings tucked away</p>
+      </section>
+
+      <dialog id="settings-dialog" aria-label="ClefHanger settings">
+        <div class="settings-header">
+          <h2>Settings</h2>
+          <button id="close-settings" type="button">Done</button>
+        </div>
+        <section class="settings-section" aria-label="Difficulty setting">
+          <div class="mode-copy"><small>difficulty</small><span id="difficulty-label">Beginner</span></div>
+          <div id="difficulty-buttons" aria-label="Difficulty buttons"></div>
+          <p id="difficulty-help">Slow single notes in a forgiving starter lane.</p>
+        </section>
+        <section class="settings-section" aria-label="Mode setting">
+          <div class="mode-copy"><small>mode</small><span id="mode-label">Treble</span></div>
+          <div id="mode-buttons" aria-label="Mode buttons">Bass</div>
+          <p id="mode-help">Natural treble notes.</p>
+        </section>
+        <section class="settings-section" aria-label="Speed setting">
+          <div class="mode-copy"><small>speed</small><span id="speed-label">Speed 5</span></div>
+          <div class="speed-slider-row">
+            <span>slow</span>
+            <input id="speed-slider" type="range" min="1" max="10" step="1" value="5" aria-label="Speed slider" />
+            <span>fast</span>
+          </div>
+        </section>
+        <section class="settings-section" aria-label="Input setting">
+          <h3>Input</h3>
+          <div id="input-mode-buttons" class="input-mode-row" aria-label="Input mode buttons">
+            <button class="input-mode-button" type="button" data-input-mode="buttons" data-active="true">Notes</button>
+            <button class="input-mode-button" type="button" data-input-mode="piano">Piano</button>
+          </div>
+        </section>
+        <section id="calibration-panel" class="settings-section" aria-label="Vocal calibration">
+          <h3>Vocal calibration</h3>
           <p><strong>Sing A</strong><br />Listen, then sing it back.</p>
           <button id="play-calibration-tone" type="button">Play A</button>
-        </div>
-        <p class="microcopy">Slice 9: note buttons, piano strip, or A calibration tone</p>
-      </section>
+        </section>
+      </dialog>
     </main>
     <script type="module" src="./src/app.js"></script>
     <script>

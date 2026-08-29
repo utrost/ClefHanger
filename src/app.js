@@ -23,12 +23,16 @@ import {
 } from './core/game.js';
 import { getCalibrationTone, playPianoVoice } from './core/audio.js';
 
-const appVersion = 'clefhanger-slice9-calibration-a-2026-08-28';
+const appVersion = 'clefhanger-slice10-settings-dialog-2026-08-28';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
 const calibrationPanel = document.querySelector('#calibration-panel');
 const playCalibrationToneButton = document.querySelector('#play-calibration-tone');
+const settingsLineEl = document.querySelector('#settings-line');
+const openSettingsButton = document.querySelector('#open-settings');
+const closeSettingsButton = document.querySelector('#close-settings');
+const settingsDialog = document.querySelector('#settings-dialog');
 const inputModeButtons = document.querySelector('#input-mode-buttons');
 const modeButtons = document.querySelector('#mode-buttons');
 const speedSlider = document.querySelector('#speed-slider');
@@ -49,7 +53,7 @@ const difficultyHelpEl = document.querySelector('#difficulty-help');
 let selectedModeId = localStorage.getItem('clefhanger.selectedMode.v3') || 'basics';
 let selectedSpeedId = getSpeed(localStorage.getItem('clefhanger.selectedSpeed.v6') || localStorage.getItem('clefhanger.selectedSpeed.v3') || '5').id;
 let selectedDifficultyId = localStorage.getItem('clefhanger.selectedDifficulty.v4') || 'beginner';
-let selectedInputMode = localStorage.getItem('clefhanger.selectedInputMode.v7') || localStorage.getItem('clefhanger.selectedInputMode.v5') || 'buttons';
+let selectedInputMode = normalizeInputMode(localStorage.getItem('clefhanger.selectedInputMode.v7') || localStorage.getItem('clefhanger.selectedInputMode.v5') || 'buttons');
 let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId });
 let rafId = null;
 let audioContext = null;
@@ -60,6 +64,10 @@ function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, diffic
 
 function setBestScore(score, modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   if (score > getBestScore(modeId, speedId, difficultyId)) localStorage.setItem(getHighScoreKey(modeId, speedId, difficultyId), String(score));
+}
+
+function normalizeInputMode(inputMode) {
+  return inputMode === 'piano' ? 'piano' : 'buttons';
 }
 
 function yForStaffStep(step) {
@@ -150,13 +158,13 @@ function renderHud(nowMs) {
   speedSlider.value = speed.id;
   difficultyLabelEl.textContent = difficulty.label;
   difficultyHelpEl.textContent = difficulty.help;
+  settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${selectedInputMode === 'piano' ? 'Piano' : 'Notes'}`;
   startButton.textContent = state.phase === 'running' ? 'Restart sprint' : 'Start 60s sprint';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
   for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
   buttons.hidden = selectedInputMode !== 'buttons';
   pianoStrip.hidden = selectedInputMode !== 'piano';
-  calibrationPanel.hidden = selectedInputMode !== 'calibration';
 
   if (state.phase === 'ended') {
     const summary = getRoundSummary(state);
@@ -290,11 +298,21 @@ function installPiano() {
 function installInputModes() {
   for (const button of inputModeButtons.querySelectorAll('button')) {
     button.addEventListener('click', () => {
-      selectedInputMode = ['buttons', 'piano', 'calibration'].includes(button.dataset.inputMode) ? button.dataset.inputMode : 'buttons';
+      selectedInputMode = normalizeInputMode(button.dataset.inputMode);
       localStorage.setItem('clefhanger.selectedInputMode.v7', selectedInputMode);
       render();
     });
   }
+}
+
+function openSettings() {
+  if (typeof settingsDialog.showModal === 'function') settingsDialog.showModal();
+  else settingsDialog.setAttribute('open', '');
+}
+
+function closeSettings() {
+  if (typeof settingsDialog.close === 'function') settingsDialog.close();
+  else settingsDialog.removeAttribute('open');
 }
 
 function installModes() {
@@ -341,6 +359,8 @@ function installDifficulties() {
 
 startButton.addEventListener('click', beginRound);
 playCalibrationToneButton.addEventListener('click', playCalibrationTone);
+openSettingsButton.addEventListener('click', openSettings);
+closeSettingsButton.addEventListener('click', closeSettings);
 installInputModes();
 installModes();
 installSpeedSlider();
@@ -375,9 +395,11 @@ window.__clefHanger = {
     resetIdleState();
   },
   selectInputMode: (inputMode) => {
-    selectedInputMode = ['buttons', 'piano', 'calibration'].includes(inputMode) ? inputMode : 'buttons';
+    selectedInputMode = normalizeInputMode(inputMode);
     render();
   },
   playPromptAudio,
   playCalibrationTone,
+  openSettings,
+  closeSettings,
 };
