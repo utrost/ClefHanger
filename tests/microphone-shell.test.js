@@ -18,8 +18,11 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing A/);
-  assert.match(html, /data-app-version="clefhanger-slice15-chrome-mic-diagnostics/);
+  assert.match(html, /data-app-version="clefhanger-slice16-chrome-mic-permission-help/);
 
+  assert.match(app, /Microphone permission denied/);
+  assert.match(app, /tap the lock/);
+  assert.match(app, /formatMicrophoneError/);
   assert.match(app, /Requesting mic/);
   assert.match(app, /calibrationReadingText/);
   assert.match(app, /withMicrophoneRequestTimeout/);

@@ -32,7 +32,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice15-chrome-mic-diagnostics-2026-08-29';
+const appVersion = 'clefhanger-slice16-chrome-mic-permission-help-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -273,6 +273,16 @@ function playCalibrationTone() {
   feedbackEl.textContent = `${tone.label}: ${tone.help}`;
 }
 
+function formatMicrophoneError(error) {
+  const message = error?.message || String(error || 'permission denied');
+  const name = error?.name || '';
+  const lower = `${name} ${message}`.toLowerCase();
+  if (lower.includes('denied') || lower.includes('notallowed') || lower.includes('permission')) {
+    return 'Microphone permission denied. In Chrome, tap the lock/site icon in the address bar → Permissions → Microphone → Allow, then reload.';
+  }
+  return message;
+}
+
 function microphoneStatusText() {
   if (microphoneState.permission === 'requesting') return 'Requesting mic… check the browser permission prompt.';
   if (microphoneState.permission === 'blocked') return `Mic blocked: ${microphoneState.error || 'permission denied'}`;
@@ -335,7 +345,7 @@ async function startMicrophone() {
     microphoneStream = null;
     microphoneAnalyser = null;
     microphoneBuffer = null;
-    microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: error?.message || 'permission denied' };
+    microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: formatMicrophoneError(error) };
     render();
     return false;
   }
