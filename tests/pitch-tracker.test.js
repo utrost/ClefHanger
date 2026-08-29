@@ -5,9 +5,14 @@ import {
   centsBetween,
   classifyVocalMatch,
   createMicrophoneState,
+  detectPitchFromTimeDomain,
   frequencyToNearestPitch,
   normalizeMicrophoneInputMode,
 } from '../src/core/pitch.js';
+
+function sineSamples({ frequency, sampleRate = 44100, length = 2048, amplitude = 0.3 }) {
+  return Float32Array.from({ length }, (_, i) => Math.sin((2 * Math.PI * frequency * i) / sampleRate) * amplitude);
+}
 
 test('maps sung frequencies to nearest note names with cents offset', () => {
   assert.deepEqual(frequencyToNearestPitch(440), {
@@ -92,4 +97,14 @@ test('microphone mode is a first-class input option with permission state', () =
     error: null,
     lastAcceptedAtMs: 0,
   });
+});
+
+test('time-domain pitch detector ignores flat DC input instead of inventing one note', () => {
+  const flatOffset = Float32Array.from({ length: 2048 }, () => 0.05);
+  assert.equal(detectPitchFromTimeDomain(flatOffset, 44100), null);
+});
+
+test('time-domain pitch detector keeps a real steady sung tone', () => {
+  const detected = detectPitchFromTimeDomain(sineSamples({ frequency: 440 }), 44100);
+  assert.ok(Math.abs(detected - 440) < 8, `expected about 440 Hz, got ${detected}`);
 });

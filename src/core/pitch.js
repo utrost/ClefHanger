@@ -93,30 +93,46 @@ export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs 
 
 export function detectPitchFromTimeDomain(samples, sampleRate) {
   if (!samples || !samples.length || !sampleRate) return null;
+
+  let mean = 0;
+  for (const sample of samples) mean += sample;
+  mean /= samples.length;
+
   let rms = 0;
-  for (const sample of samples) rms += sample * sample;
-  rms = Math.sqrt(rms / samples.length);
+  const centered = new Float32Array(samples.length);
+  for (let i = 0; i < samples.length; i += 1) {
+    centered[i] = samples[i] - mean;
+    rms += centered[i] * centered[i];
+  }
+  rms = Math.sqrt(rms / centered.length);
   if (rms < 0.01) return null;
 
-  const minFrequency = 80;
-  const maxFrequency = 1000;
-  const minLag = Math.floor(sampleRate / maxFrequency);
-  const maxLag = Math.min(Math.floor(sampleRate / minFrequency), samples.length - 1);
-  let bestLag = -1;
-  let bestCorrelation = 0;
+  const minLag = Math.floor(sampleRate / MAX_PLAYABLE_MIC_FREQUENCY);
+  const maxLag = Math.min(Math.floor(sampleRate / MIN_PLAYABLE_MIC_FREQUENCY), centered.length - 1);
+  const correlations = [];
 
   for (let lag = minLag; lag <= maxLag; lag += 1) {
-    let correlation = 0;
-    for (let i = 0; i < samples.length - lag; i += 1) {
-      correlation += samples[i] * samples[i + lag];
+    let cross = 0;
+    let energyA = 0;
+    let energyB = 0;
+    for (let i = 0; i < centered.length - lag; i += 1) {
+      const a = centered[i];
+      const b = centered[i + lag];
+      cross += a * b;
+      energyA += a * a;
+      energyB += b * b;
     }
-    correlation /= samples.length - lag;
-    if (correlation > bestCorrelation) {
-      bestCorrelation = correlation;
-      bestLag = lag;
+    const denominator = Math.sqrt(energyA * energyB);
+    correlations[lag] = denominator > 0 ? cross / denominator : 0;
+  }
+
+  const minCorrelation = 0.72;
+  for (let lag = minLag + 1; lag < maxLag - 1; lag += 1) {
+    const current = correlations[lag] || 0;
+    if (current >= minCorrelation && current >= (correlations[lag - 1] || 0) && current > (correlations[lag + 1] || 0)) {
+      return sampleRate / lag;
     }
   }
 
-  if (bestLag <= 0 || bestCorrelation < 0.002) return null;
-  return sampleRate / bestLag;
+  return null;
 }

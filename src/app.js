@@ -32,7 +32,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice13-mic-noise-range-filter-2026-08-29';
+const appVersion = 'clefhanger-slice14-mic-permission-stability-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -266,6 +266,7 @@ function playCalibrationTone() {
 }
 
 function microphoneStatusText() {
+  if (microphoneState.permission === 'requesting') return 'Requesting mic… check the browser permission prompt.';
   if (microphoneState.permission === 'blocked') return `Mic blocked: ${microphoneState.error || 'permission denied'}`;
   if (microphoneState.listening && microphoneState.note) {
     const cents = microphoneState.cents === null ? '' : ` (${microphoneState.cents > 0 ? '+' : ''}${microphoneState.cents}¢)`;
@@ -296,9 +297,12 @@ async function startMicrophone() {
     return false;
   }
   try {
+    microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null };
+    render();
+    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
     const context = getAudioContext();
     if (!context) throw new Error('AudioContext unavailable');
-    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    if (context.state === 'suspended') await context.resume();
     const source = context.createMediaStreamSource(microphoneStream);
     microphoneAnalyser = context.createAnalyser();
     microphoneAnalyser.fftSize = 2048;
@@ -309,6 +313,12 @@ async function startMicrophone() {
     render();
     return true;
   } catch (error) {
+    if (microphoneStream) {
+      for (const track of microphoneStream.getTracks()) track.stop();
+    }
+    microphoneStream = null;
+    microphoneAnalyser = null;
+    microphoneBuffer = null;
     microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: error?.message || 'permission denied' };
     render();
     return false;
@@ -334,7 +344,7 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
       }
     }
   } else {
-    microphoneState = { ...microphoneState, frequency: null, note: null, cents: null };
+    microphoneState = { ...microphoneState, frequency: null, note: null, cents: null, calibration: buildCalibrationReading(null) };
   }
 
   render(nowMs);
