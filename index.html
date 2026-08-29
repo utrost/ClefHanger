@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice11-microphone-calibration-2026-08-29">
+<html lang="en" data-app-version="clefhanger-slice12-heard-note-display-2026-08-29">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -285,6 +285,12 @@
 
       #calibration-panel p, #microphone-panel p { margin: 0; color: var(--muted); font-size: 0.78rem; }
 
+      #heard-note {
+        color: var(--ink);
+        font-size: 1.05rem;
+        font-weight: 950;
+      }
+
       .mic-actions {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -417,9 +423,10 @@
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
         <div id="microphone-panel" aria-label="Microphone answer status" hidden>
           <p id="microphone-status">Mic off. Grant mic to calibrate and sing answers.</p>
+          <p id="heard-note" aria-live="polite">You played —</p>
           <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
         </div>
-        <p class="microcopy">Slice 11: microphone calibration and sung answers</p>
+        <p class="microcopy">Slice 12: shows the note the mic hears</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">

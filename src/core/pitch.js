@@ -66,6 +66,13 @@ export function buildCalibrationReading(frequency) {
   };
 }
 
+export function buildHeardNoteMessage(pitch) {
+  if (!pitch) return 'You played —';
+  const cents = pitch.cents || 0;
+  const tuning = cents === 0 ? 'in tune' : `${Math.abs(cents)}¢ ${cents > 0 ? 'sharp' : 'flat'}`;
+  return `You played ${pitch.answer}${pitch.octave} · ${Math.round(pitch.frequency)} Hz · ${tuning}`;
+}
+
 export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS } = {}) {
   const detected = frequencyToNearestPitch(frequency);
   if (!prompt || !detected) return { status: 'silent', answer: null, detected, cents: null };

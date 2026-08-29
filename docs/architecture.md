@@ -42,6 +42,7 @@ Current repository behavior:
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
 - Natural-note, accidental-button, chord-button, one-octave piano-strip, and microphone input.
 - Vocal calibration can play a concert A and show a live microphone readout with detected note, frequency, cents, and flat/sharp/in-tune status.
+- The main Mic panel shows the latest heard note as `You played ...` so calibration feedback remains visible outside the settings dialog.
 - Microphone mode can score sung natural-note prompts when the detected pitch is within tolerance and debounce. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
 - 60-second rush round.

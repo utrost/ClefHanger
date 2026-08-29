@@ -24,6 +24,7 @@ import {
 import { getCalibrationTone, playPianoVoice } from './core/audio.js';
 import {
   buildCalibrationReading,
+  buildHeardNoteMessage,
   classifyVocalMatch,
   createMicrophoneState,
   detectPitchFromTimeDomain,
@@ -31,7 +32,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice11-microphone-calibration-2026-08-29';
+const appVersion = 'clefhanger-slice12-heard-note-display-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -41,6 +42,7 @@ const startMicrophoneButton = document.querySelector('#start-microphone');
 const stopMicrophoneButton = document.querySelector('#stop-microphone');
 const microphonePanel = document.querySelector('#microphone-panel');
 const microphoneStatusEl = document.querySelector('#microphone-status');
+const heardNoteEl = document.querySelector('#heard-note');
 const calibrationReadingEl = document.querySelector('#calibration-reading');
 const settingsLineEl = document.querySelector('#settings-line');
 const openSettingsButton = document.querySelector('#open-settings');
@@ -186,6 +188,7 @@ function renderHud(nowMs) {
   pianoStrip.hidden = selectedInputMode !== 'piano';
   microphonePanel.hidden = selectedInputMode !== 'microphone';
   microphoneStatusEl.textContent = microphoneStatusText();
+  heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
   calibrationReadingEl.textContent = microphoneState.calibration?.message || 'Grant mic, tap Play A, then sing A for a live cents reading.';
   calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 

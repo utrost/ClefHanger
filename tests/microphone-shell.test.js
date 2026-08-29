@@ -18,7 +18,7 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing A/);
-  assert.match(html, /data-app-version="clefhanger-slice11-microphone-calibration/);
+  assert.match(html, /data-app-version="clefhanger-slice12-heard-note-display/);
 
   assert.match(app, /navigator\.mediaDevices\.getUserMedia/);
   assert.match(app, /selectInputMode: \(inputMode\)/);
