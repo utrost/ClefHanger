@@ -98,6 +98,7 @@ test('microphone mode is a first-class input option with permission state', () =
     cents: null,
     inputLevel: 0,
     silentFrameCount: 0,
+    trackState: 'none',
     calibration: null,
     error: null,
     lastAcceptedAtMs: 0,
@@ -139,5 +140,9 @@ test('microphone listening copy shows input level when no sung note is detected'
   assert.match(
     buildMicrophoneListeningMessage({ listening: true, inputLevel: 0.12, silentFrameCount: 60 }),
     /no steady pitch/i,
+  );
+  assert.match(
+    buildMicrophoneListeningMessage({ listening: true, trackState: 'muted', inputLevel: 0.12, silentFrameCount: 60 }),
+    /muted/i,
   );
 });

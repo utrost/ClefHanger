@@ -41,7 +41,7 @@ Current repository behavior:
 - Beginner, easy, normal, and hard difficulty presets.
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
 - Natural-note, accidental-button, chord-button, one-octave piano-strip, and microphone input.
-- Vocal calibration can play a concert A and show a live microphone readout with detected note, frequency, cents, input level, and flat/sharp/in-tune status. The DOM adapter retains the `MediaStreamAudioSourceNode` for Firefox mobile, where a local-only source node can go silent. If a browser grants microphone access but no pitch appears, the Mic panel reports whether the app is receiving no audio, too little level, or non-steady pitch.
+- Vocal calibration can play a concert A and show a live microphone readout with detected note, frequency, cents, input level, and flat/sharp/in-tune status. The DOM adapter retains the `MediaStreamAudioSourceNode` for Firefox mobile and connects the analyser through a zero-volume keepalive gain node to keep the Web Audio graph active. If a browser grants microphone access but no pitch appears, the Mic panel reports whether the app is receiving no audio, too little level, muted/ended track state, or non-steady pitch.
 - The main Mic panel shows the latest heard note as `You played ...` so calibration feedback remains visible outside the settings dialog.
 - Microphone mode can score sung natural-note prompts when the detected pitch is within tolerance and debounce. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.

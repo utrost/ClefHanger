@@ -34,7 +34,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice19-retain-firefox-mic-source-2026-08-29';
+const appVersion = 'clefhanger-slice20-firefox-mic-graph-keepalive-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -78,6 +78,7 @@ let microphoneState = createMicrophoneState();
 let microphoneStream = null;
 let microphoneSource = null;
 let microphoneAnalyser = null;
+let microphoneKeepAliveGain = null;
 let microphoneBuffer = null;
 let microphoneRafId = null;
 
@@ -305,6 +306,14 @@ function microphoneStatusText() {
   return 'Mic off. Grant mic to calibrate and sing answers.';
 }
 
+function getMicrophoneTrackState() {
+  const track = microphoneStream?.getAudioTracks?.()[0];
+  if (!track) return 'none';
+  if (track.readyState === 'ended') return 'ended';
+  if (track.muted) return 'muted';
+  return track.enabled === false ? 'disabled' : 'live';
+}
+
 function stopMicrophone() {
   if (microphoneRafId !== null) cancelAnimationFrame(microphoneRafId);
   microphoneRafId = null;
@@ -314,8 +323,9 @@ function stopMicrophone() {
   microphoneStream = null;
   microphoneSource = null;
   microphoneAnalyser = null;
+  microphoneKeepAliveGain = null;
   microphoneBuffer = null;
-  microphoneState = { ...microphoneState, listening: false };
+  microphoneState = { ...microphoneState, listening: false, trackState: 'none' };
   render();
 }
 
@@ -334,7 +344,7 @@ async function startMicrophone() {
     return false;
   }
   try {
-    microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null, inputLevel: 0, silentFrameCount: 0 };
+    microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null, inputLevel: 0, silentFrameCount: 0, trackState: 'none' };
     render();
     const permissionState = await checkMicrophonePermissionState();
     if (permissionState === 'denied') {
@@ -347,9 +357,13 @@ async function startMicrophone() {
     microphoneSource = context.createMediaStreamSource(microphoneStream);
     microphoneAnalyser = context.createAnalyser();
     microphoneAnalyser.fftSize = 4096;
+    microphoneKeepAliveGain = context.createGain();
+    microphoneKeepAliveGain.gain.value = 0;
     microphoneBuffer = new Float32Array(microphoneAnalyser.fftSize);
     microphoneSource.connect(microphoneAnalyser);
-    microphoneState = { ...microphoneState, permission: 'granted', listening: true, error: null };
+    microphoneAnalyser.connect(microphoneKeepAliveGain);
+    microphoneKeepAliveGain.connect(context.destination);
+    microphoneState = { ...microphoneState, permission: 'granted', listening: true, trackState: getMicrophoneTrackState(), error: null };
     processMicrophoneFrame();
     render();
     return true;
@@ -360,8 +374,9 @@ async function startMicrophone() {
     microphoneStream = null;
     microphoneSource = null;
     microphoneAnalyser = null;
+    microphoneKeepAliveGain = null;
     microphoneBuffer = null;
-    microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: formatMicrophoneError(error) };
+    microphoneState = { ...microphoneState, permission: 'blocked', listening: false, trackState: 'none', error: formatMicrophoneError(error) };
     render();
     return false;
   }
@@ -379,7 +394,7 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
   if (frequency) {
     const note = frequencyToNearestPitch(frequency);
     const calibration = buildCalibrationReading(frequency);
-    microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, inputLevel, silentFrameCount: 0, calibration };
+    microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, inputLevel, silentFrameCount: 0, trackState: getMicrophoneTrackState(), calibration };
     if (selectedInputMode === 'microphone' && state.phase === 'running') {
       const match = classifyVocalMatch({ prompt: state.activeNote, frequency, nowMs, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs });
       if (match.status === 'match') {
@@ -395,6 +410,7 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
       cents: null,
       inputLevel,
       silentFrameCount: (microphoneState.silentFrameCount || 0) + 1,
+      trackState: getMicrophoneTrackState(),
       calibration: buildCalibrationReading(null),
     };
   }

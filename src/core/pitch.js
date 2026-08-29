@@ -21,6 +21,7 @@ export function createMicrophoneState() {
     cents: null,
     inputLevel: 0,
     silentFrameCount: 0,
+    trackState: 'none',
     calibration: null,
     error: null,
     lastAcceptedAtMs: 0,
@@ -82,8 +83,10 @@ export function microphoneInputLevelPercent(inputLevel) {
   return Math.max(0, Math.min(100, Math.round(inputLevel * 100)));
 }
 
-export function buildMicrophoneListeningMessage({ listening, note, frequency, cents, inputLevel = 0, silentFrameCount = 0 } = {}) {
+export function buildMicrophoneListeningMessage({ listening, note, frequency, cents, inputLevel = 0, silentFrameCount = 0, trackState = 'live' } = {}) {
   const levelPercent = microphoneInputLevelPercent(inputLevel);
+  if (listening && trackState === 'muted') return 'Listening: microphone track is muted by the browser/OS.';
+  if (listening && trackState === 'ended') return 'Listening stopped: microphone track ended. Tap Stop mic, then Grant mic.';
   if (listening && note) {
     const centsText = cents === null ? '' : ` (${cents > 0 ? '+' : ''}${cents}¢)`;
     return `Listening: ${note.answer}${note.octave} ${Math.round(frequency)} Hz${centsText} · level ${levelPercent}%`;

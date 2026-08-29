@@ -18,7 +18,7 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing A/);
-  assert.match(html, /data-app-version="clefhanger-slice19-retain-firefox-mic-source/);
+  assert.match(html, /data-app-version="clefhanger-slice20-firefox-mic-graph-keepalive/);
 
   assert.match(app, /Microphone permission denied/);
   assert.match(app, /tap the lock/);
@@ -35,6 +35,10 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /silentFrameCount/);
   assert.match(app, /microphoneSource/);
   assert.match(app, /createMediaStreamSource\(microphoneStream\)/);
+  assert.match(app, /microphoneKeepAliveGain/);
+  assert.match(app, /createGain\(\)/);
+  assert.match(app, /connect\(context\.destination\)/);
+  assert.match(app, /getMicrophoneTrackState/);
   assert.match(app, /navigator\.mediaDevices\.getUserMedia/);
   assert.match(app, /selectInputMode: \(inputMode\)/);
   assert.match(app, /microphone/);
