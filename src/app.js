@@ -32,7 +32,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice14-mic-permission-stability-2026-08-29';
+const appVersion = 'clefhanger-slice15-chrome-mic-diagnostics-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -162,6 +162,14 @@ function renderStaff(nowMs) {
   `;
 }
 
+function calibrationReadingText() {
+  if (microphoneState.calibration?.message) return microphoneState.calibration.message;
+  if (microphoneState.permission === 'requesting' || microphoneState.permission === 'blocked' || microphoneState.permission === 'granted') {
+    return microphoneStatusText();
+  }
+  return 'Grant mic, tap Play A, then sing A for a live cents reading.';
+}
+
 function renderHud(nowMs) {
   const mode = getMode(selectedModeId);
   const speed = getSpeed(selectedSpeedId);
@@ -189,7 +197,7 @@ function renderHud(nowMs) {
   microphonePanel.hidden = selectedInputMode !== 'microphone';
   microphoneStatusEl.textContent = microphoneStatusText();
   heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
-  calibrationReadingEl.textContent = microphoneState.calibration?.message || 'Grant mic, tap Play A, then sing A for a live cents reading.';
+  calibrationReadingEl.textContent = calibrationReadingText();
   calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 
   if (state.phase === 'ended') {
@@ -290,6 +298,14 @@ function stopMicrophone() {
   render();
 }
 
+function withMicrophoneRequestTimeout(requestPromise, timeoutMs = 8000) {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('Microphone request timed out. In Chrome, check Site settings → Microphone for simiono.com.')), timeoutMs);
+  });
+  return Promise.race([requestPromise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+}
+
 async function startMicrophone() {
   if (!navigator.mediaDevices?.getUserMedia) {
     microphoneState = { ...microphoneState, permission: 'blocked', listening: false, error: 'getUserMedia unavailable' };
@@ -299,7 +315,7 @@ async function startMicrophone() {
   try {
     microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null };
     render();
-    microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    microphoneStream = await withMicrophoneRequestTimeout(navigator.mediaDevices.getUserMedia({ audio: true }));
     const context = getAudioContext();
     if (!context) throw new Error('AudioContext unavailable');
     if (context.state === 'suspended') await context.resume();
