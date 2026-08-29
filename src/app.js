@@ -32,7 +32,7 @@ import {
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
 
-const appVersion = 'clefhanger-slice12-heard-note-display-2026-08-29';
+const appVersion = 'clefhanger-slice13-mic-noise-range-filter-2026-08-29';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');

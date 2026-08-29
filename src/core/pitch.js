@@ -3,6 +3,8 @@ import { answerLabel, getPitchFrequency } from './game.js';
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 35;
 const DEFAULT_DEBOUNCE_MS = 650;
+const MIN_PLAYABLE_MIC_FREQUENCY = 80;
+const MAX_PLAYABLE_MIC_FREQUENCY = 1000;
 
 export function normalizeMicrophoneInputMode(inputMode) {
   if (inputMode === 'microphone') return 'microphone';
@@ -24,7 +26,7 @@ export function createMicrophoneState() {
 }
 
 export function frequencyToNearestPitch(frequency) {
-  if (!Number.isFinite(frequency) || frequency <= 0) return null;
+  if (!Number.isFinite(frequency) || frequency < MIN_PLAYABLE_MIC_FREQUENCY || frequency > MAX_PLAYABLE_MIC_FREQUENCY) return null;
   const midi = Math.round(69 + 12 * Math.log2(frequency / 440));
   const normalizedIndex = ((midi % 12) + 12) % 12;
   const noteName = NOTE_NAMES[normalizedIndex];

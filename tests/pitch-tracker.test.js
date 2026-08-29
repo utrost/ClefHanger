@@ -26,6 +26,21 @@ test('maps sung frequencies to nearest note names with cents offset', () => {
   assert.ok(Math.abs(c4.cents) <= 1);
 });
 
+test('rejects implausible microphone noise outside the playable vocal range', () => {
+  assert.equal(frequencyToNearestPitch(6569), null);
+
+  const calibration = buildCalibrationReading(6569);
+  assert.equal(calibration.status, 'silent');
+  assert.equal(calibration.detected, null);
+  assert.match(calibration.message, /steady pitch/i);
+
+  const prompt = { answer: 'G', noteName: 'G', octave: 4 };
+  const match = classifyVocalMatch({ prompt, frequency: 6569, nowMs: 1000, lastAcceptedAtMs: 0 });
+  assert.equal(match.status, 'silent');
+  assert.equal(match.detected, null);
+  assert.equal(match.answer, null);
+});
+
 test('reports cent distance between detected pitch and target prompt', () => {
   assert.equal(Math.round(centsBetween(440, 440)), 0);
   assert.equal(Math.round(centsBetween(466.16, 440)), 100);
