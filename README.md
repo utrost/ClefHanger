@@ -28,13 +28,15 @@ Slices through 25 are implemented as a dependency-free static PWA:
 
 - Beginner-first practice flow: the app now starts in untimed Practice mode instead of throwing a new player straight into a rush.
 - First-run tutorial card with three small tips and a dismiss action.
-- Four beginner lessons: First steps, Line notes, Space notes, and Mixed notes.
-- Adaptive beginner answer tray: First steps starts with only C, D, and E; later lessons widen the choices.
+- Four beginner lessons: First steps, Line notes, Space notes, Ledger lines, and Mixed notes.
+- Tiny lesson intro cards for line, space, and ledger-line lessons before practice starts.
+- Adaptive beginner answer tray: First steps starts with only C, D, and E; ledger-line practice uses only C and A notes just outside the treble staff.
 - Wrong answers teach instead of only rejecting: the app says what the note was and gives a short location hint such as `bottom line E`.
 - Visual correction overlay: after a wrong answer, the staff briefly labels the correct note and the correct answer button is highlighted.
 
 - Treble-clef and bass-clef note/chord rush.
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.
+- Ledger-line geometry renders short extra lines only for notes outside the staff, including middle C below and A above the treble staff.
 - 60-second sprint timer.
 - Five practice modes: Treble, Bass, Sharps #, Flats ♭, Chords.
 - Settings dialog keeps mode, speed, difficulty, input choice, and calibration out of the main play surface.

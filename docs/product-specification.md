@@ -53,7 +53,7 @@ Microphone mode using low-latency pitch detection so vocalists can sing the corr
 
 ### Beginner learning ramp
 
-Practice mode starts narrow: C, D, and E only. Later lessons introduce line notes, space notes, and then the full natural-note set. Wrong answers are treated as teaching moments: the app names the correct answer, labels the note on the staff, and highlights the right button.
+Practice mode starts narrow: C, D, and E only. Later lessons introduce line notes, space notes, the first ledger-line notes just outside the treble staff, and then the full natural-note set. Lesson intro cards give a tiny cue before practice starts. Wrong answers are treated as teaching moments: the app names the correct answer, labels the note on the staff, and highlights the right button.
 
 ### Level 1 — Treble Clef Basics
 

@@ -131,12 +131,41 @@ Verification:
 - The correct answer button is highlighted so the next tap is obvious.
 - The overlay contract is covered by tests in `tests/beginner-ux.test.js`.
 
-## Slice 8 — Learning depth
+## Slice 8a — Phone dogfood before broader content
 
-- Wider ledger-line range.
-- Ledger lines.
-- Accidentals.
-- Intervals and rapid jumps.
+- Run the current beginner flow on an actual phone.
+- Capture cramped or confusing states before adding many more prompts.
+- Keep screenshots as evidence for layout/readability fixes.
+
+## Slice 8b — Line/space intro cards — implemented
+
+- Add tiny intro cards for line-note and space-note lessons.
+- Keep the card before practice starts, with concrete examples and a hide action.
+- Selecting a different lesson reopens the lesson note.
+
+## Slice 8c — Ledger-line geometry — implemented
+
+- Add renderer-free ledger-line geometry helpers.
+- Draw ledger lines only on true ledger-line staff steps, not every note just outside the staff.
+- Include the first treble ledger notes around the current range: middle C below the staff and A above it.
+
+## Slice 8d — Ledger-line beginner lesson — implemented
+
+- Add a dedicated Ledger lines lesson in Practice.
+- Keep the answer tray small: only C and A for the first ledger drill.
+- Wrong-answer teaching copy names the concrete note location, e.g. middle C or A on the first ledger line above the staff.
+
+## Slice 8e — Accidentals as learning
+
+- Turn the existing sharp/flat mechanics into a beginner lesson.
+- Show how the same staff position changes answer with `♯` or `♭`.
+- Keep direct touch answers; no typed input.
+
+## Slice 8f — Intervals and rapid jumps
+
+- Teach small movement patterns: same note, step up/down, skip.
+- Keep it separate from chord theory.
+- Use Practice first, then Rush if it holds up.
 
 ## Product risks to validate early
 

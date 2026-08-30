@@ -20,7 +20,20 @@ export const STAFF_LAYOUT = {
   bottomLineY: 132,
   lineGap: 20,
   halfStep: 10,
+  ledgerXOffset: 22,
 };
+
+export function getLedgerLinesForStaffStep(staffStep = 0) {
+  const lines = [];
+  if (staffStep <= -2) {
+    for (let step = -2; step >= staffStep; step -= 2) lines.push({ staffStep: step, y: STAFF_LAYOUT.bottomLineY - step * STAFF_LAYOUT.halfStep });
+    return lines.reverse();
+  }
+  if (staffStep >= 10) {
+    for (let step = 10; step <= staffStep; step += 2) lines.push({ staffStep: step, y: STAFF_LAYOUT.bottomLineY - step * STAFF_LAYOUT.halfStep });
+  }
+  return lines;
+}
 
 export function getClefPresentation(clef = 'treble') {
   if (clef === 'bass') {
@@ -66,6 +79,8 @@ export const LEVEL_ONE_NOTES = [
   { clef: 'treble', noteName: 'D', octave: 5, staffStep: 6, label: 'D5' },
   { clef: 'treble', noteName: 'E', octave: 5, staffStep: 7, label: 'top space E' },
   { clef: 'treble', noteName: 'F', octave: 5, staffStep: 8, label: 'top line F' },
+  { clef: 'treble', noteName: 'G', octave: 5, staffStep: 9, label: 'G just above the staff' },
+  { clef: 'treble', noteName: 'A', octave: 5, staffStep: 10, label: 'A on the first ledger line above the staff' },
 ];
 
 export const BASS_NOTES = [

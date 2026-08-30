@@ -3,10 +3,12 @@ import test from 'node:test';
 import {
   BASS_NOTES,
   GAME_MODES,
+  LEVEL_ONE_NOTES,
   SPEED_SETTINGS,
   STAFF_LAYOUT,
   createInitialState,
   getClefPresentation,
+  getLedgerLinesForStaffStep,
   getSpeed,
   spawnNextNote,
 } from '../src/core/game.js';
@@ -28,6 +30,19 @@ test('staff layout anchors treble and bass clefs on their correct staff lines', 
     y: STAFF_LAYOUT.bassClefY,
     anchorLine: 'F3 line',
   });
+});
+
+test('ledger-line geometry only draws short lines for notes outside the staff', () => {
+  assert.deepEqual(getLedgerLinesForStaffStep(-1), []);
+  assert.deepEqual(getLedgerLinesForStaffStep(9), []);
+  assert.deepEqual(getLedgerLinesForStaffStep(-2), [{ staffStep: -2, y: 152 }]);
+  assert.deepEqual(getLedgerLinesForStaffStep(10), [{ staffStep: 10, y: 32 }]);
+  assert.deepEqual(getLedgerLinesForStaffStep(12), [{ staffStep: 10, y: 32 }, { staffStep: 12, y: 12 }]);
+});
+
+test('treble basics includes the first ledger-line notes just outside the staff', () => {
+  assert.ok(LEVEL_ONE_NOTES.some((note) => note.noteName === 'C' && note.octave === 4 && note.staffStep === -2));
+  assert.ok(LEVEL_ONE_NOTES.some((note) => note.noteName === 'A' && note.octave === 5 && note.staffStep === 10));
 });
 
 test('ships a bass-clef basics mode with lower-register natural notes', () => {

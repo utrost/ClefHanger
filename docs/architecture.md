@@ -18,9 +18,9 @@ Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested
 Current boundaries:
 
 - `src/core/game.js`
-  - Note names, Level 1 treble note pool, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef layout anchors, beginner practice lifecycle, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
+  - Note names, Level 1 treble note pool including first ledger-line notes, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef/ledger-line layout anchors, beginner practice lifecycle, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/core/learning.js`
-  - First-run tutorial text, beginner lesson definitions, scaffolded answer options, teaching feedback, visual correction overlay data, and beginner-friendly microphone messages.
+  - First-run tutorial text, beginner lesson definitions, lesson intro cards, scaffolded answer options, teaching feedback, visual correction overlay data, and beginner-friendly microphone messages.
 - `src/core/pitch.js`
   - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
 - `src/app.js`
@@ -37,11 +37,13 @@ Current repository behavior:
 - Static PWA shell.
 - Default Practice mode for beginners, with an alternate Rush mode for timed play.
 - Three-step first-run tutorial.
-- Beginner lesson sequence: First steps, Line notes, Space notes, Mixed notes.
-- Scaffolded beginner answer tray, starting with only C/D/E.
+- Beginner lesson sequence: First steps, Line notes, Space notes, Ledger lines, Mixed notes.
+- Tiny lesson intro cards for line, space, and ledger-line practice.
+- Scaffolded beginner answer tray, starting with only C/D/E and narrowing ledger-line practice to C/A.
 - Teaching feedback plus a visual correction overlay after wrong answers: the note is labelled on the staff and the correct button is highlighted.
 - Treble and bass clef.
 - Corrected SVG clef anchors for treble and bass.
+- Renderer-free ledger-line geometry for the first notes outside the treble staff.
 - Treble, bass, sharps, flats, and chord modes.
 - Compact main screen with mode, speed, difficulty, input choice, and calibration moved into a settings dialog.
 - A 1–10 speed slider.
@@ -58,7 +60,7 @@ Current repository behavior:
 
 Planned later implementation:
 
-- Ledger lines.
+- Accidentals as beginner learning cards, not only drill modes.
 - Intervals and rapid jumps.
 - Pitchy/noise-hardening if real phones need more robust pitch detection than the dependency-free first pass.
 - VexFlow notation rendering upgrade once richer notation needs it.

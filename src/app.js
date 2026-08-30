@@ -20,6 +20,7 @@ import {
   getSpeed,
   getDifficulty,
   getClefPresentation,
+  getLedgerLinesForStaffStep,
   getAnswerOptions,
   getPromptFrequencies,
 } from './core/game.js';
@@ -36,9 +37,9 @@ import {
   getCenteredRms,
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getScaffoldedAnswerOptions } from './core/learning.js';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js';
 
-const appVersion = 'clefhanger-slice25-visual-correction-overlay-2026-08-30';
+const appVersion = 'clefhanger-slice28-ledger-lessons-2026-08-30';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -67,6 +68,11 @@ const tutorialNextButton = document.querySelector('#tutorial-next');
 const tutorialDismissButton = document.querySelector('#tutorial-dismiss');
 const playStyleButtons = document.querySelectorAll('[data-play-style]');
 const lessonSelect = document.querySelector('#lesson-select');
+const lessonIntro = document.querySelector('#lesson-intro');
+const lessonIntroTitle = document.querySelector('#lesson-intro-title');
+const lessonIntroBody = document.querySelector('#lesson-intro-body');
+const lessonIntroExamples = document.querySelector('#lesson-intro-examples');
+const lessonIntroDismissButton = document.querySelector('#lesson-intro-dismiss');
 const hintToggle = document.querySelector('#hint-toggle');
 const microphoneDebugTextEl = document.querySelector('#microphone-debug-text');
 const scoreEl = document.querySelector('#score');
@@ -88,6 +94,7 @@ let selectedInputMode = normalizeInputMode(localStorage.getItem('clefhanger.sele
 let selectedPlayStyle = localStorage.getItem('clefhanger.selectedPlayStyle.v1') || 'practice';
 let selectedLessonId = getBeginnerLesson(localStorage.getItem('clefhanger.selectedLesson.v1') || 'first-steps').id;
 let showHints = localStorage.getItem('clefhanger.showHints.v1') !== 'false';
+let lessonIntroHidden = localStorage.getItem('clefhanger.lessonIntroHidden.v1') === 'true';
 let tutorialStepIndex = 0;
 let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId });
 let rafId = null;
@@ -128,6 +135,12 @@ function escapeSvgText(value) {
   return String(value ?? '').replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char]);
 }
 
+function renderLedgerLines(note, x) {
+  return getLedgerLinesForStaffStep(note.staffStep ?? 0)
+    .map((line) => `<line x1="${(x - STAFF_LAYOUT.ledgerXOffset).toFixed(1)}" y1="${line.y}" x2="${(x + STAFF_LAYOUT.ledgerXOffset).toFixed(1)}" y2="${line.y}" class="ledger" data-ledger-step="${line.staffStep}" />`)
+    .join('');
+}
+
 function renderSingleNote(note, x, y, correction = null) {
   const accidental = accidentalGlyph(note);
   const correctionMarkup = correction ? `
@@ -140,7 +153,7 @@ function renderSingleNote(note, x, y, correction = null) {
       ${accidental ? `<text x="${(x - 31).toFixed(1)}" y="${(y + 9).toFixed(1)}" class="accidental">${accidental}</text>` : ''}
       <ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="13" ry="9" transform="rotate(-18 ${x.toFixed(1)} ${y.toFixed(1)})" />
       <line x1="${(x + 12).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x + 12).toFixed(1)}" y2="${(y - 48).toFixed(1)}" />
-      ${note.staffStep < 0 ? `<line x1="${(x - 22).toFixed(1)}" y1="152" x2="${(x + 22).toFixed(1)}" y2="152" class="ledger" />` : ''}
+      ${renderLedgerLines(note, x)}
       ${correctionMarkup}
     </g>
   `;
@@ -208,6 +221,14 @@ function calibrationReadingText() {
   return 'Grant mic, then sing any steady comfortable note; Play A is only a reference.';
 }
 
+function renderLessonIntro() {
+  const intro = getLessonIntroCard(selectedLessonId);
+  lessonIntro.hidden = lessonIntroHidden;
+  lessonIntroTitle.textContent = intro.title;
+  lessonIntroBody.textContent = intro.body;
+  lessonIntroExamples.textContent = intro.examples.join(' · ');
+}
+
 function renderHud(nowMs) {
   const mode = getMode(selectedModeId);
   const speed = getSpeed(selectedSpeedId);
@@ -258,6 +279,7 @@ function renderHud(nowMs) {
 
 function render(nowMs = performance.now()) {
   renderStaff(nowMs);
+  renderLessonIntro();
   renderHud(nowMs);
 }
 
@@ -667,8 +689,15 @@ function installBeginnerControls() {
   }
   lessonSelect.addEventListener('change', () => {
     selectedLessonId = getBeginnerLesson(lessonSelect.value).id;
+    lessonIntroHidden = false;
     localStorage.setItem('clefhanger.selectedLesson.v1', selectedLessonId);
+    localStorage.setItem('clefhanger.lessonIntroHidden.v1', 'false');
     resetIdleState();
+  });
+  lessonIntroDismissButton.addEventListener('click', () => {
+    lessonIntroHidden = true;
+    localStorage.setItem('clefhanger.lessonIntroHidden.v1', 'true');
+    render();
   });
   hintToggle.addEventListener('change', () => {
     showHints = hintToggle.checked;
@@ -738,6 +767,7 @@ window.__clefHanger = {
   },
   selectLesson: (lessonId) => {
     selectedLessonId = getBeginnerLesson(lessonId).id;
+    lessonIntroHidden = false;
     resetIdleState();
   },
   selectPlayStyle: (playStyle) => {

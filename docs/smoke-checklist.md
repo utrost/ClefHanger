@@ -13,6 +13,8 @@ Use this checklist before calling a build ready for actual testing.
 - Treble mode shows the treble-clef loop anchored on the G line rather than floating above it.
 - Bass mode shows a bass clef and lower-register natural notes.
 - The beginner default shows Practice selected, First steps selected, and only C/D/E answer buttons.
+- Select Line notes, Space notes, and Ledger lines; each should show a small lesson intro card with concrete examples.
+- Ledger lines practice should show only C/A answer buttons and notes on the first ledger lines below/above the treble staff.
 - Tap **Start practice**. The timer should show `∞`, the note should stay in place long enough to study it, and no sprint summary should appear.
 - Tap a wrong note in Practice. The feedback should name the correct answer, the staff should show a small correction label on the note, and the correct answer button should be highlighted.
 - Switch to **Rush** and tap **Start 60s sprint**.
@@ -35,7 +37,7 @@ Use this checklist before calling a build ready for actual testing.
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice25-visual-correction-overlay`.
+- Verify the HTML contains `clefhanger-slice28-ledger-lessons`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/audio.js`, `src/core/pitch.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

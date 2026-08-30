@@ -8,6 +8,7 @@ import {
   buildCorrectionOverlay,
   buildTutorialSteps,
   getBeginnerLesson,
+  getLessonIntroCard,
   getScaffoldedAnswerOptions,
 } from '../src/core/learning.js';
 import { answerActiveNote, createInitialState, getAnswerOptions, startPractice, startRound } from '../src/core/game.js';
@@ -25,11 +26,29 @@ test('first-run tutorial is tiny, concrete, and beginner-safe', () => {
 });
 
 test('beginner lessons start narrow before full seven-note quiz', () => {
-  assert.deepEqual(BEGINNER_LESSONS.map((lesson) => lesson.id), ['first-steps', 'line-notes', 'space-notes', 'mixed']);
+  assert.deepEqual(BEGINNER_LESSONS.map((lesson) => lesson.id), ['first-steps', 'line-notes', 'space-notes', 'ledger-notes', 'mixed']);
   assert.deepEqual(getBeginnerLesson('first-steps').answers, ['C', 'D', 'E']);
   assert.deepEqual(getBeginnerLesson('line-notes').answers, ['E', 'G', 'B', 'D', 'F']);
   assert.deepEqual(getBeginnerLesson('space-notes').answers, ['F', 'A', 'C', 'E']);
+  assert.deepEqual(getBeginnerLesson('ledger-notes').staffSteps, [-2, 10]);
   assert.deepEqual(getBeginnerLesson('missing').answers, ['C', 'D', 'E']);
+});
+
+test('line, space, and ledger lessons have tiny intro cards before practice starts', () => {
+  const lineIntro = getLessonIntroCard('line-notes');
+  assert.equal(lineIntro.title, 'Line notes');
+  assert.match(lineIntro.body, /sit on the staff lines/i);
+  assert.deepEqual(lineIntro.examples, ['E', 'G', 'B', 'D', 'F']);
+
+  const spaceIntro = getLessonIntroCard('space-notes');
+  assert.equal(spaceIntro.title, 'Space notes');
+  assert.match(spaceIntro.body, /between the lines/i);
+  assert.deepEqual(spaceIntro.examples, ['F', 'A', 'C', 'E']);
+
+  const ledgerIntro = getLessonIntroCard('ledger-notes');
+  assert.equal(ledgerIntro.title, 'Ledger lines');
+  assert.match(ledgerIntro.body, /short extra lines/i);
+  assert.deepEqual(ledgerIntro.examples, ['C', 'A']);
 });
 
 test('scaffolded answer tray narrows buttons only for beginner treble lessons', () => {
@@ -49,6 +68,15 @@ test('practice mode creates an untimed single-note lesson instead of a sprint', 
   assert.equal(practice.noteQueue.length, 1);
   assert.match(practice.feedback.text, /Practice/i);
   assert.equal(rush.phase, 'running');
+});
+
+test('ledger-line practice only drills notes that need short extra staff lines', () => {
+  const seen = new Set();
+  for (const seed of [1, 2, 3, 4]) {
+    const state = startPractice(createInitialState({ nowMs: 1000, seed }), 2000, 'basics', 'ledger-notes');
+    seen.add(`${state.activeNote.noteName}${state.activeNote.octave}:${state.activeNote.staffStep}`);
+  }
+  assert.deepEqual([...seen].sort(), ['A5:10', 'C4:-2']);
 });
 
 test('wrong answers teach the correct note and why it was correct', () => {
@@ -91,9 +119,14 @@ test('shell exposes beginner-friendly tutorial, practice, lesson, hint, and mic 
   assert.match(html, /Start with a lesson/);
   assert.match(html, /data-play-style="practice"/);
   assert.match(html, /id="lesson-select"/);
+  assert.match(html, /id="lesson-intro"/);
+  assert.match(html, /id="lesson-intro-title"/);
+  assert.match(html, /id="lesson-intro-examples"/);
+  assert.match(html, /id="lesson-intro-dismiss"/);
   assert.match(html, /id="hint-toggle"/);
   assert.match(html, /<details id="microphone-debug"/);
   assert.match(app, /buildTutorialSteps/);
+  assert.match(app, /getLessonIntroCard/);
   assert.match(app, /startPractice/);
   assert.match(app, /getScaffoldedAnswerOptions/);
   assert.match(app, /data-correct-answer/);
