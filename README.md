@@ -8,7 +8,7 @@ Notes move horizontally across a musical staff toward a cliff edge. The player m
 
 ## MVP focus
 
-The first playable slice should prove the simplest complete loop:
+The first playable slices proved the simplest complete loop:
 
 1. Show one treble-clef note on a staff.
 2. Move it toward the cliff edge.
@@ -24,7 +24,14 @@ The first playable slice should prove the simplest complete loop:
 
 ## Current playable slice
 
-Slices 1–7 are implemented as a dependency-free static PWA:
+Slices through 25 are implemented as a dependency-free static PWA:
+
+- Beginner-first practice flow: the app now starts in untimed Practice mode instead of throwing a new player straight into a rush.
+- First-run tutorial card with three small tips and a dismiss action.
+- Four beginner lessons: First steps, Line notes, Space notes, and Mixed notes.
+- Adaptive beginner answer tray: First steps starts with only C, D, and E; later lessons widen the choices.
+- Wrong answers teach instead of only rejecting: the app says what the note was and gives a short location hint such as `bottom line E`.
+- Visual correction overlay: after a wrong answer, the staff briefly labels the correct note and the correct answer button is highlighted.
 
 - Treble-clef and bass-clef note/chord rush.
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.
@@ -45,7 +52,7 @@ Slices 1–7 are implemented as a dependency-free static PWA:
 - Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play a small piano-like Web Audio voice instead of a plain beep; chords play as short arpeggios.
 - The optional typed-answer row has been removed to keep the mobile controls thumb-first.
-- Correct / wrong / missed feedback.
+- Correct / wrong / missed feedback, with beginner teaching feedback in Practice mode.
 - Mode-weighted points with speed/difficulty/streak bonuses.
 - Per-mode, per-slider-speed, per-difficulty high scores via LocalStorage.
 - Installable PWA shell: manifest id/scope, portrait standalone mode, PNG/SVG maskable icons, iOS home-screen tags, mode shortcuts, and offline service-worker cache.

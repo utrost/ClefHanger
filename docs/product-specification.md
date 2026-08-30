@@ -20,9 +20,9 @@ Notes scroll horizontally across the staff toward a cliff edge. Players identify
 
 Designed for standard phone screen aspect ratios, enabling single-handed phone use.
 
-### Bite-Sized Sprints
+### Bite-Sized Sprints and Practice
 
-60-second game rounds engineered for quick practice sessions on the go.
+The original rush remains a 60-second game round for quick practice. New users start in untimed Practice mode first, so they can learn one small note group without a cliff timer.
 
 ## 4. Mobile Input Modes — No Hardware Required
 
@@ -50,6 +50,10 @@ Microphone mode using low-latency pitch detection so vocalists can sing the corr
   - Offline mobile play and local progression.
 
 ## 6. MVP Roadmap & Progression
+
+### Beginner learning ramp
+
+Practice mode starts narrow: C, D, and E only. Later lessons introduce line notes, space notes, and then the full natural-note set. Wrong answers are treated as teaching moments: the app names the correct answer, labels the note on the staff, and highlights the right button.
 
 ### Level 1 — Treble Clef Basics
 

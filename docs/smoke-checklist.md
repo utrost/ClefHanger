@@ -5,14 +5,17 @@ Use this checklist before calling a build ready for actual testing.
 ## Local browser smoke
 
 - Open the app in a phone-sized viewport around 390 × 844.
-- The title, timer, score, compact settings summary, staff, feedback, start button, and answer controls are visible without horizontal scrolling.
+- The title, timer, score, compact settings summary, beginner tutorial, practice/rush controls, lesson selector, staff, feedback, start button, and answer controls are visible without horizontal scrolling.
 - Open Settings.
 - Switch through Beginner, Easy, Normal, and Hard.
 - Switch through Treble, Bass, Sharps #, Flats ♭, and Chords.
 - Drag the speed slider from slow to fast and verify the speed label and compact settings summary change.
 - Treble mode shows the treble-clef loop anchored on the G line rather than floating above it.
 - Bass mode shows a bass clef and lower-register natural notes.
-- Tap **Start 60s sprint**.
+- The beginner default shows Practice selected, First steps selected, and only C/D/E answer buttons.
+- Tap **Start practice**. The timer should show `∞`, the note should stay in place long enough to study it, and no sprint summary should appear.
+- Tap a wrong note in Practice. The feedback should name the correct answer, the staff should show a small correction label on the note, and the correct answer button should be highlighted.
+- Switch to **Rush** and tap **Start 60s sprint**.
 - A treble note or triad appears and moves toward the red cliff edge.
 - On Normal or Hard, extra upcoming notes appear as fainter previews; the front note remains the only answerable note.
 - In Treble, tapping the correct natural note clears it, increases score, and shows positive feedback.
@@ -32,7 +35,7 @@ Use this checklist before calling a build ready for actual testing.
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice22-recorded-audio-pitch-diagnostic`.
+- Verify the HTML contains `clefhanger-slice25-visual-correction-overlay`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/audio.js`, `src/core/pitch.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

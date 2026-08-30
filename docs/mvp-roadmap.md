@@ -115,6 +115,22 @@ Verification:
 - Add actual A4 calibration/debug readout: detected note, frequency, cents, and flat/sharp/in-tune status.
 - Add Mic as an answer input mode. Sung natural-note answers score when the detected pitch is within tolerance and debounce; chord singing is explicitly not scored yet.
 
+## Slice 7a — Beginner learning flow — implemented
+
+- Default new sessions toward untimed Practice mode instead of the 60-second rush.
+- Add a tiny first-run tutorial with three concrete staff-reading tips.
+- Add beginner lessons for First steps, Line notes, Space notes, and Mixed notes.
+- Start First steps with only C, D, and E answer buttons; widen the tray for later lessons.
+- Keep Rush mode available for the original timed cliff game.
+
+## Slice 7b — Visual correction overlay — implemented
+
+- Wrong answers now produce teaching feedback with the correct note and its simple staff location.
+- Practice mode keeps the current note active after a wrong answer.
+- The staff briefly labels the correct note directly beside the note head.
+- The correct answer button is highlighted so the next tap is obvious.
+- The overlay contract is covered by tests in `tests/beginner-ux.test.js`.
+
 ## Slice 8 — Learning depth
 
 - Wider ledger-line range.
