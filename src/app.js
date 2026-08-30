@@ -40,7 +40,7 @@ import {
 import { buildMicDiagnosticReport, buildMicDiagnosticTextFile } from './core/mic-diagnostics.js';
 import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js';
 
-const appVersion = 'clefhanger-slice30-mic-lab-2026-08-30';
+const appVersion = 'clefhanger-slice31-live-mic-raf-2026-08-30';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -605,7 +605,7 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
   }
 
   render(nowMs);
-  if (microphoneState.listening && frequencyOverride === null) microphoneRafId = requestAnimationFrame(processMicrophoneFrame);
+  if (microphoneState.listening && frequencyOverride === null) microphoneRafId = requestAnimationFrame((timestamp) => processMicrophoneFrame(null, timestamp));
   return microphoneState;
 }
 
