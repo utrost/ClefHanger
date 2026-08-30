@@ -37,7 +37,7 @@ Slices through 25 are implemented as a dependency-free static PWA:
 - Treble-clef and bass-clef note/chord rush.
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.
 - Ledger-line geometry renders short extra lines only for notes outside the staff, including middle C below and A above the treble staff.
-- 60-second sprint timer.
+- 60-second sprint timer with a centered ending splash at time-up showing score, accuracy, correct/wrong/missed counts, best streak, and a one-tap replay button.
 - Five practice modes: Treble, Bass, Sharps #, Flats ♭, Chords.
 - Settings dialog keeps mode, speed, difficulty, input choice, and calibration out of the main play surface.
 - Speed slider: 1–10, from slow practice to fast rush.
@@ -45,7 +45,7 @@ Slices through 25 are implemented as a dependency-free static PWA:
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
 - Toggleable input: large note buttons, a one-octave on-screen piano strip, or microphone input.
 - Actual vocal calibration: grant mic access, sing any steady comfortable note to see detected note/frequency/cents; concert A is only an optional reference tone.
-- Mic input shows a plain `You played A4 · 440 Hz · in tune` style readout so the singer can see what the phone heard even before it scores.
+- Mic input shows a plain `You played A4 · 440 Hz · in tune` style readout so the singer can see what the phone heard even before it scores. Real-device recognition is still under active testing when a phone/browser hears a piano or voice but does not lock a steady pitch.
 - Implausible microphone spikes outside the playable vocal range are ignored instead of being shown as absurd octave readings such as `G♯8`.
 - Mic startup shows immediate visible progress in both the main Mic panel and the settings calibration line, uses a simpler Chrome-friendly mic request, checks the browser permission state before requesting, and turns permission denials/timeouts into explicit Chrome + Android system permission instructions.
 - Firefox/mobile mic debugging now shows input level while listening, so a granted-but-silent stream can be distinguished from a pitch-detection failure; the detector also keeps quieter phone/browser analyser signals, retains the Web Audio media-stream source, and connects the analyser through a muted keepalive gain node so Firefox keeps pulling the input graph.

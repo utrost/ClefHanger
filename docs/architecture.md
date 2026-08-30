@@ -35,7 +35,7 @@ Current boundaries:
 Current repository behavior:
 
 - Static PWA shell.
-- Default Practice mode for beginners, with an alternate Rush mode for timed play.
+- Default Practice mode for beginners, with an alternate Rush mode for timed play and a terminal ending splash after the 60-second timer expires.
 - Three-step first-run tutorial.
 - Beginner lesson sequence: First steps, Line notes, Space notes, Ledger lines, Mixed notes.
 - Tiny lesson intro cards for line, space, and ledger-line practice.

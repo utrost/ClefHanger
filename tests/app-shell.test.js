@@ -18,6 +18,14 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /navigator\.serviceWorker\.register\('\.\/sw\.js'\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
+  assert.match(html, /id="feedback"/);
+  assert.match(html, /id="summary"/);
+  assert.match(html, /id="summary-title"/);
+  assert.match(html, /id="summary-headline"/);
+  assert.match(html, /id="summary-detail"/);
+  assert.match(html, /id="summary-restart"/);
+  assert.match(html, /class="ending-splash"/);
+  assert.match(html, /aria-label="Rush result"/);
   assert.match(html, /id="note-buttons"/);
   assert.match(html, /id="open-settings"/);
   assert.match(html, /<dialog id="settings-dialog"/);
@@ -45,7 +53,7 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice28-ledger-lessons/);
+  assert.match(html, /data-app-version="clefhanger-slice29-rush-ending/);
 });
 
 test('manifest and service worker describe an installable subpath-safe app shell', () => {

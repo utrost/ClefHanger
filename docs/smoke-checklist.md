@@ -32,12 +32,13 @@ Use this checklist before calling a build ready for actual testing.
 - In Chords, direct triad buttons such as C, Dm, and Am are accepted.
 - Tapping a wrong note leaves the note active and shows wrong-answer feedback.
 - Letting a note reach the cliff records a miss.
+- Let the Rush timer reach `0`; the playfield should show a centered **Time! Sprint complete** splash with points, accuracy, correct/wrong/missed counts, best streak, and a **Play another 60s rush** button.
 - Browser console has no errors.
 
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice28-ledger-lessons`.
+- Verify the HTML contains `clefhanger-slice29-rush-ending`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/audio.js`, `src/core/pitch.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

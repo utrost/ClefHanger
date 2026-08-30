@@ -39,7 +39,7 @@ import {
 } from './core/pitch.js';
 import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js';
 
-const appVersion = 'clefhanger-slice28-ledger-lessons-2026-08-30';
+const appVersion = 'clefhanger-slice29-rush-ending-2026-08-30';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -80,6 +80,11 @@ const streakEl = document.querySelector('#streak');
 const timerEl = document.querySelector('#timer');
 const feedbackEl = document.querySelector('#feedback');
 const summaryEl = document.querySelector('#summary');
+const summaryTitleEl = document.querySelector('#summary-title');
+const summaryContextEl = document.querySelector('#summary-context');
+const summaryHeadlineEl = document.querySelector('#summary-headline');
+const summaryDetailEl = document.querySelector('#summary-detail');
+const summaryRestartButton = document.querySelector('#summary-restart');
 const bestEl = document.querySelector('#best-score');
 const modeLabelEl = document.querySelector('#mode-label');
 const modeHelpEl = document.querySelector('#mode-help');
@@ -248,16 +253,17 @@ function renderHud(nowMs) {
   const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Mic' : 'Notes';
   const lesson = getBeginnerLesson(selectedLessonId);
   settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel} · ${selectedPlayStyle === 'practice' ? lesson.label : 'Rush'}`;
-  startButton.textContent = state.phase === 'running' ? 'Restart sprint' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint';
+  startButton.textContent = state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
   for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
   for (const button of playStyleButtons) button.dataset.active = button.dataset.playStyle === selectedPlayStyle ? 'true' : 'false';
   lessonSelect.value = selectedLessonId;
   hintToggle.checked = showHints;
-  buttons.hidden = selectedInputMode !== 'buttons';
-  pianoStrip.hidden = selectedInputMode !== 'piano';
-  microphonePanel.hidden = selectedInputMode !== 'microphone';
+  const roundEnded = state.phase === 'ended';
+  buttons.hidden = roundEnded || selectedInputMode !== 'buttons';
+  pianoStrip.hidden = roundEnded || selectedInputMode !== 'piano';
+  microphonePanel.hidden = roundEnded || selectedInputMode !== 'microphone';
   microphoneStatusEl.textContent = microphoneStatusText();
   heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
   microphoneRecordingDiagnosticEl.textContent = microphoneRecordingDiagnostic;
@@ -271,7 +277,11 @@ function renderHud(nowMs) {
   if (state.phase === 'ended') {
     const summary = getRoundSummary(state);
     summaryEl.hidden = false;
-    summaryEl.innerHTML = `<h2>${summary.title}</h2><p>${summary.mode} · ${summary.speed} · ${summary.difficulty} · <strong>${summary.score}</strong> points · ${summary.accuracy}% accuracy</p><p>${summary.correct} correct · ${summary.wrong} wrong · ${summary.missed} missed · best streak ${summary.bestStreak}</p>`;
+    summaryTitleEl.textContent = summary.title;
+    summaryContextEl.textContent = `${summary.mode} · ${summary.speed} · ${summary.difficulty}`;
+    summaryHeadlineEl.textContent = summary.headline;
+    summaryDetailEl.textContent = summary.detail;
+    summaryRestartButton.textContent = summary.primaryAction;
   } else {
     summaryEl.hidden = true;
   }
@@ -724,6 +734,7 @@ function installDifficulties() {
 }
 
 startButton.addEventListener('click', beginRound);
+summaryRestartButton.addEventListener('click', beginRound);
 playCalibrationToneButton.addEventListener('click', playCalibrationTone);
 startMicrophoneButton.addEventListener('click', startMicrophone);
 stopMicrophoneButton.addEventListener('click', stopMicrophone);

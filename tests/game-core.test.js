@@ -10,6 +10,8 @@ import {
   answerLabel,
   answerActiveNote,
   missExpiredNotes,
+  updateRound,
+  startRound,
   getRoundSummary,
   getHighScoreKey,
   getPromptFrequencies,
@@ -76,6 +78,45 @@ test('round summary reports readiness for actual testing', () => {
   assert.match(summary.title, /Sprint complete/);
   assert.equal(summary.score, 300);
   assert.equal(summary.accuracy, 50);
+});
+
+test('60-second rush ends with a splash-ready terminal summary', () => {
+  const idle = createInitialState({ roundLengthMs: 60000, nowMs: 1000, seed: 7 });
+  const running = startRound(idle, 1000, 'basics', '5', 'beginner');
+  const scored = {
+    ...running,
+    activeNote: null,
+    noteQueue: [],
+    score: 420,
+    correct: 4,
+    wrong: 1,
+    missed: 2,
+    bestStreak: 3,
+  };
+
+  const ended = updateRound(scored, 61000);
+  const summary = getRoundSummary(ended);
+
+  assert.equal(ended.phase, 'ended');
+  assert.equal(ended.activeNote, null);
+  assert.deepEqual(ended.noteQueue, []);
+  assert.equal(ended.feedback.kind, 'ended');
+  assert.equal(summary.title, 'Time! Sprint complete');
+  assert.equal(summary.primaryAction, 'Play another 60s rush');
+  assert.match(summary.headline, /420 points/);
+  assert.match(summary.detail, /4 correct · 1 wrong · 2 missed/);
+});
+
+test('ended rush ignores late answers after the splash appears', () => {
+  const idle = createInitialState({ roundLengthMs: 60000, nowMs: 0, seed: 7 });
+  const ended = updateRound(startRound(idle, 0, 'basics', '5', 'beginner'), 60000);
+
+  const afterLateAnswer = answerActiveNote(ended, 'C', 61000);
+
+  assert.equal(afterLateAnswer.phase, 'ended');
+  assert.equal(afterLateAnswer.score, ended.score);
+  assert.equal(afterLateAnswer.correct, ended.correct);
+  assert.deepEqual(afterLateAnswer.noteQueue, []);
 });
 
 test('maps answered prompts to audible equal-tempered pitches', () => {

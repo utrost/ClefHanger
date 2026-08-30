@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice28-ledger-lessons-2026-08-30">
+<html lang="en" data-app-version="clefhanger-slice29-rush-ending-2026-08-30">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -210,6 +210,35 @@
 
       #feedback[data-kind="correct"] { color: var(--good); }
       #feedback[data-kind="wrong"], #feedback[data-kind="missed"] { color: var(--danger); }
+      #feedback[data-kind="ended"] { color: var(--accent); }
+
+      #summary.ending-splash {
+        position: absolute;
+        inset: 12px;
+        z-index: 3;
+        display: grid;
+        place-items: center;
+        padding: 14px;
+        text-align: center;
+        color: var(--ink);
+        background: linear-gradient(180deg, #211842, #17112b);
+        box-shadow: 0 18px 45px rgba(0,0,0,0.34);
+      }
+
+      #summary.ending-splash[hidden] { display: none; }
+      #summary.ending-splash h2 { margin: 0; font-size: clamp(1.5rem, 8vw, 2.4rem); }
+      #summary.ending-splash p { margin: 6px 0; color: var(--muted); }
+      #summary.ending-splash strong { color: var(--accent); font-size: 1.3rem; }
+      #summary-restart {
+        min-height: 46px;
+        width: 100%;
+        margin-top: 8px;
+        border: 0;
+        border-radius: 16px;
+        background: var(--accent);
+        color: #1d1300;
+        font-weight: 950;
+      }
 
       #tutorial-card, #lesson-panel {
         padding: 9px;
@@ -467,7 +496,15 @@
       <section class="stage" aria-label="Treble clef rush playfield">
         <div id="staff"></div>
         <div id="feedback" aria-live="polite">Tap Start when ready.</div>
-        <aside id="summary" hidden></aside>
+        <aside id="summary" class="ending-splash" aria-label="Rush result" hidden>
+          <div>
+            <h2 id="summary-title">Time! Sprint complete</h2>
+            <p id="summary-context">Treble · Speed 5 · Beginner</p>
+            <p><strong id="summary-headline">0 points · 0% accuracy</strong></p>
+            <p id="summary-detail">0 correct · 0 wrong · 0 missed · best streak 0</p>
+            <button id="summary-restart" type="button">Play another 60s rush</button>
+          </div>
+        </aside>
       </section>
 
       <section class="controls" aria-label="Game controls">
@@ -480,7 +517,7 @@
           <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 28: lesson intros and ledger lines</p>
+        <p class="microcopy">Slice 29: 60s rush ending splash</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">

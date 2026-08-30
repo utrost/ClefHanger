@@ -408,5 +408,25 @@ export function getRemainingSeconds(state, nowMs) {
 export function getRoundSummary(state) {
   const attempts = state.correct + state.wrong + state.missed;
   const accuracy = attempts === 0 ? 0 : Math.round((state.correct / attempts) * 100);
-  return { title: 'Sprint complete', mode: getMode(state.modeId).label, speed: getSpeed(state.speedId).label, difficulty: getDifficulty(state.difficultyId).label, score: state.score, correct: state.correct, wrong: state.wrong, missed: state.missed, bestStreak: state.bestStreak, accuracy };
+  const mode = getMode(state.modeId).label;
+  const speed = getSpeed(state.speedId).label;
+  const difficulty = getDifficulty(state.difficultyId).label;
+  const title = 'Time! Sprint complete';
+  const headline = `${state.score} points · ${accuracy}% accuracy`;
+  const detail = `${state.correct} correct · ${state.wrong} wrong · ${state.missed} missed · best streak ${state.bestStreak}`;
+  return {
+    title,
+    mode,
+    speed,
+    difficulty,
+    score: state.score,
+    correct: state.correct,
+    wrong: state.wrong,
+    missed: state.missed,
+    bestStreak: state.bestStreak,
+    accuracy,
+    headline,
+    detail,
+    primaryAction: 'Play another 60s rush',
+  };
 }
