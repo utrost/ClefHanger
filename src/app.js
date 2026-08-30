@@ -36,9 +36,9 @@ import {
   getCenteredRms,
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildTutorialSteps, getBeginnerLesson, getScaffoldedAnswerOptions } from './core/learning.js';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getScaffoldedAnswerOptions } from './core/learning.js';
 
-const appVersion = 'clefhanger-slice24-beginner-friendly-learning-2026-08-29';
+const appVersion = 'clefhanger-slice25-visual-correction-overlay-2026-08-30';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -124,14 +124,24 @@ function accidentalGlyph(note) {
   return '';
 }
 
-function renderSingleNote(note, x, y) {
+function escapeSvgText(value) {
+  return String(value ?? '').replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char]);
+}
+
+function renderSingleNote(note, x, y, correction = null) {
   const accidental = accidentalGlyph(note);
+  const correctionMarkup = correction ? `
+      <g class="correction-label" role="img" aria-label="${escapeSvgText(correction.ariaLabel)}">
+        <rect x="${(x - 17).toFixed(1)}" y="${(y - 68).toFixed(1)}" width="34" height="30" rx="10" />
+        <text x="${x.toFixed(1)}" y="${(y - 52).toFixed(1)}">${escapeSvgText(correction.label)}</text>
+      </g>` : '';
   return `
     <g class="active-note" aria-label="Current note">
       ${accidental ? `<text x="${(x - 31).toFixed(1)}" y="${(y + 9).toFixed(1)}" class="accidental">${accidental}</text>` : ''}
       <ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="13" ry="9" transform="rotate(-18 ${x.toFixed(1)} ${y.toFixed(1)})" />
       <line x1="${(x + 12).toFixed(1)}" y1="${y.toFixed(1)}" x2="${(x + 12).toFixed(1)}" y2="${(y - 48).toFixed(1)}" />
       ${note.staffStep < 0 ? `<line x1="${(x - 22).toFixed(1)}" y1="152" x2="${(x + 22).toFixed(1)}" y2="152" class="ledger" />` : ''}
+      ${correctionMarkup}
     </g>
   `;
 }
@@ -167,13 +177,17 @@ function renderStaff(nowMs) {
     ...queue.slice(0, 1).map((queuedNote) => ({ queuedNote, index: 0 })),
   ]
     .map(({ queuedNote, index }) => {
-      const progress = Math.min(1, Math.max(0, (nowMs - queuedNote.spawnedAtMs) / (queuedNote.deadlineMs - queuedNote.spawnedAtMs)));
+      const isLeadNote = index === 0;
+      const storedCorrection = isLeadNote && state.correction?.answer === queuedNote.answer && (!state.correction.frozenUntilMs || nowMs <= state.correction.frozenUntilMs) ? state.correction : null;
+      const correction = storedCorrection;
+      const progressNowMs = correction?.shouldFreezeNote && correction.frozenAtMs ? Math.min(nowMs, correction.frozenAtMs) : nowMs;
+      const progress = Math.min(1, Math.max(0, (progressNowMs - queuedNote.spawnedAtMs) / (queuedNote.deadlineMs - queuedNote.spawnedAtMs)));
       const x = 72 + progress * 202;
       const noteMarkup = queuedNote.kind === 'chord'
         ? renderChord(queuedNote, x)
-        : renderSingleNote(queuedNote, x, yForStaffStep(queuedNote.staffStep ?? 0));
-      const previewClass = index === 0 ? 'lead-note' : 'preview-note';
-      return `<g class="queue-note ${previewClass}" data-queue-index="${index}">${noteMarkup}</g>`;
+        : renderSingleNote(queuedNote, x, yForStaffStep(queuedNote.staffStep ?? 0), correction);
+      const previewClass = isLeadNote ? 'lead-note' : 'preview-note';
+      return `<g class="queue-note ${previewClass}" data-queue-index="${index}" data-correction-active="${correction ? 'true' : 'false'}">${noteMarkup}</g>`;
     })
     .join('');
 

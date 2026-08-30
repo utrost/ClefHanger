@@ -78,6 +78,19 @@ export function buildBeginnerFeedback({ prompt, givenAnswer, kind = 'wrong', poi
   return { kind: 'wrong', text: `${givenAnswer || 'That'} is not it. That was ${correctAnswer}: ${explainPrompt(prompt)}.`, correctAnswer };
 }
 
+export function buildCorrectionOverlay({ prompt, feedback } = {}) {
+  if (!prompt || feedback?.kind !== 'wrong') return null;
+  const answer = feedback.correctAnswer || prompt.answer;
+  const location = explainPrompt(prompt);
+  return {
+    answer,
+    label: answer,
+    location,
+    shouldFreezeNote: true,
+    ariaLabel: `Correction: ${answer}, ${location}`,
+  };
+}
+
 export function buildBeginnerMicMessage({ pitchLabel, frequency, decodedLevel, bytes, advanced = false } = {}) {
   if (!pitchLabel || !frequency) return 'Sing one steady comfortable note.';
   const simple = `I heard ${pitchLabel} · ${Math.round(frequency)} Hz. Nice steady note.`;

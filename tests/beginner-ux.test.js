@@ -5,6 +5,7 @@ import {
   BEGINNER_LESSONS,
   buildBeginnerFeedback,
   buildBeginnerMicMessage,
+  buildCorrectionOverlay,
   buildTutorialSteps,
   getBeginnerLesson,
   getScaffoldedAnswerOptions,
@@ -63,6 +64,18 @@ test('wrong answers teach the correct note and why it was correct', () => {
   assert.match(answered.feedback.text, /That was G/i);
 });
 
+test('wrong answers expose a visual correction overlay contract', () => {
+  const note = { answer: 'E', noteName: 'E', octave: 4, label: 'bottom line E', staffStep: 0 };
+  const feedback = buildBeginnerFeedback({ prompt: note, givenAnswer: 'C', kind: 'wrong' });
+  const overlay = buildCorrectionOverlay({ prompt: note, feedback });
+
+  assert.equal(overlay.answer, 'E');
+  assert.equal(overlay.label, 'E');
+  assert.match(overlay.location, /bottom line/i);
+  assert.equal(overlay.shouldFreezeNote, true);
+  assert.equal(overlay.ariaLabel, 'Correction: E, bottom line E');
+});
+
 test('beginner microphone message hides debug details unless expanded', () => {
   const simple = buildBeginnerMicMessage({ pitchLabel: 'A2', frequency: 112, decodedLevel: 0.05, bytes: 17033, advanced: false });
   assert.equal(simple, 'I heard A2 · 112 Hz. Nice steady note.');
@@ -84,4 +97,6 @@ test('shell exposes beginner-friendly tutorial, practice, lesson, hint, and mic 
   assert.match(app, /startPractice/);
   assert.match(app, /getScaffoldedAnswerOptions/);
   assert.match(app, /data-correct-answer/);
+  assert.match(app, /correction-label/);
+  assert.match(app, /data-correction-active/);
 });

@@ -1,4 +1,4 @@
-import { buildBeginnerFeedback, getBeginnerLesson, getLessonPool } from './learning.js';
+import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js';
 
 export const NOTE_BUTTONS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 export const ACCIDENTAL_BUTTONS = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯', 'D♭', 'E♭', 'G♭', 'A♭', 'B♭'];
@@ -220,6 +220,7 @@ export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Da
     noteCounter: 0,
     activeNote: null,
     noteQueue: [],
+    correction: null,
     score: 0,
     pointsEarned: 0,
     streak: 0,
@@ -339,6 +340,7 @@ export function answerActiveNote(state, answer, nowMs) {
     next.feedback = next.phase === 'practice'
       ? buildBeginnerFeedback({ prompt: next.activeNote, kind: 'correct', points })
       : { kind: 'correct', text: `${normalized} — held on! +${points}` };
+    next.correction = null;
     next.noteQueue = (next.noteQueue || []).slice(1);
     next.activeNote = next.noteQueue[0] || null;
   } else {
@@ -346,6 +348,7 @@ export function answerActiveNote(state, answer, nowMs) {
     next.streak = 0;
     next.pointsEarned = 0;
     next.feedback = buildBeginnerFeedback({ prompt: next.activeNote, givenAnswer: normalized || answer, kind: 'wrong' });
+    next.correction = { ...buildCorrectionOverlay({ prompt: next.activeNote, feedback: next.feedback }), frozenUntilMs: nowMs + 1400, frozenAtMs: nowMs };
   }
   next.lastInputAtMs = nowMs;
   return next;
