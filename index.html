@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice29-rush-ending-2026-08-30">
+<html lang="en" data-app-version="clefhanger-slice30-mic-lab-2026-08-30">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -152,7 +152,7 @@
       .mode-button, .speed-button, .difficulty-button, #open-settings, #close-settings {
         border: 1px solid rgba(255,255,255,0.16);
         border-radius: 13px;
-        min-height: 38px;
+        min-height: 34px;
         background: rgba(255,255,255,0.10);
         color: var(--ink);
         font-weight: 850;
@@ -278,7 +278,7 @@
         width: min(calc(100vw - 24px), 430px);
         max-height: min(96svh, 760px);
         overflow: auto;
-        padding: 12px;
+        padding: 10px;
         color: var(--ink);
         background: #211842;
         border: 1px solid rgba(255,255,255,0.22);
@@ -288,8 +288,8 @@
       #settings-dialog::backdrop { background: rgba(0, 0, 0, 0.58); }
       #settings-dialog h2, #settings-dialog h3 { margin: 0; }
       #settings-dialog h3 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-      .settings-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
-      .settings-section { display: grid; gap: 6px; margin-top: 9px; }
+      .settings-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 5px; }
+      .settings-section { display: grid; gap: 5px; margin-top: 6px; }
 
       .controls { display: grid; gap: 8px; }
 
@@ -353,14 +353,18 @@
         gap: 7px;
       }
 
-      #play-calibration-tone, #start-microphone, #stop-microphone {
-        min-height: 38px;
+      #play-calibration-tone, #start-microphone, #stop-microphone, #record-microphone-diagnostic, #export-mic-report {
+        min-height: 34px;
         border: 0;
         border-radius: 14px;
         background: var(--accent);
         color: #1d1300;
         font-weight: 950;
+        font-size: 0.78rem;
       }
+
+      #mic-lab-label { width: 100%; }
+      #mic-report-preview { font-size: 0.72rem; }
 
       .note-button {
         min-height: 52px;
@@ -517,7 +521,7 @@
           <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 29: 60s rush ending splash</p>
+        <p class="microcopy">Slice 30: Mic Lab reports</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -552,14 +556,24 @@
           </div>
         </section>
         <section id="calibration-panel" class="settings-section" aria-label="Vocal calibration">
-          <h3>Actual calibration</h3>
+          <h3>Actual calibration / Mic Lab</h3>
           <p><strong>Sing any comfortable note</strong><br />Use Play A only as an optional reference; the recorder should decode low voices too.</p>
+          <label class="hint-row" for="mic-lab-label">Capture label
+            <select id="mic-lab-label" aria-label="Mic Lab capture label">
+              <option value="silence">Silence</option>
+              <option value="voice">Voice</option>
+              <option value="piano">Piano</option>
+              <option value="app-a-tone">App A tone</option>
+            </select>
+          </label>
           <div class="mic-actions">
             <button id="start-microphone" type="button">Grant mic</button>
             <button id="stop-microphone" type="button">Stop mic</button>
             <button id="play-calibration-tone" type="button">Play A</button>
             <button id="record-microphone-diagnostic" type="button">Record 1s test</button>
+            <button id="export-mic-report" type="button">Export mic report</button>
           </div>
+          <p id="mic-report-preview" aria-live="polite">No exported report yet.</p>
           <p id="microphone-recording-diagnostic" aria-live="polite">Recording test: not run yet.</p>
           <p id="calibration-reading" aria-live="polite">Grant mic, then sing any steady comfortable note; Play A is only a reference.</p>
         </section>

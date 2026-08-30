@@ -23,8 +23,10 @@ Current boundaries:
   - First-run tutorial text, beginner lesson definitions, lesson intro cards, scaffolded answer options, teaching feedback, visual correction overlay data, and beginner-friendly microphone messages.
 - `src/core/pitch.js`
   - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
+- `src/core/mic-diagnostics.js`
+  - Renderer-free Mic Lab report contracts: live analyser summaries, decoded recording level/peak, pitch-window candidates, environment/track metadata, interpretation strings, and Telegram-friendly `.txt` JSON export metadata.
 - `src/app.js`
-  - DOM adapter, SVG staff/chord rendering, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, microphone permission/listening UI, vocal calibration tone/readout UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
+  - DOM adapter, SVG staff/chord rendering, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, microphone permission/listening UI, Mic Lab recording/report export UI, vocal calibration tone/readout UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration, iOS home-screen meta tags, and Apple touch icon link.
 - `manifest.webmanifest` and `sw.js`
@@ -51,7 +53,8 @@ Current repository behavior:
 - One-, two-, and three-note queues. Only the front note is answerable; later notes are previews.
 - Natural-note, accidental-button, chord-button, one-octave piano-strip, and microphone input.
 - Vocal calibration can play a concert A and show a live microphone readout with detected note, frequency, cents, input level, and flat/sharp/in-tune status. The DOM adapter retains the `MediaStreamAudioSourceNode` for Firefox mobile and connects the analyser through a zero-volume keepalive gain node to keep the Web Audio graph active. If a browser grants microphone access but no pitch appears, the Mic panel reports whether the app is receiving no audio, too little level, muted/ended track state, or non-steady pitch. A 1-second `MediaRecorder` diagnostic checks whether the browser can capture microphone bytes outside the analyser path, attempts to decode them for an independent RMS level, and scans the decoded recording for a detected pitch.
-- The main Mic panel shows the latest heard note as `You played ...` so calibration feedback remains visible outside the settings dialog.
+- A 1-second microphone recording diagnostic can compare MediaRecorder capture against the Web Audio analyser path when a browser still reports `mic level 0%`, and it attempts to detect any steady recorded pitch from low male range through A4 rather than requiring the singer to hit concert A.
+- Mic Lab reports are exported as `.txt` JSON so phone/browser evidence can be sent back from Telegram and preserved as regression fixtures before changing pitch thresholds.
 - Microphone mode can score sung natural-note prompts when the detected pitch is within tolerance and debounce. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
 - 60-second rush round.

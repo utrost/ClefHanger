@@ -37,9 +37,10 @@ import {
   getCenteredRms,
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile } from './core/mic-diagnostics.js';
 import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js';
 
-const appVersion = 'clefhanger-slice29-rush-ending-2026-08-30';
+const appVersion = 'clefhanger-slice30-mic-lab-2026-08-30';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -48,6 +49,9 @@ const playCalibrationToneButton = document.querySelector('#play-calibration-tone
 const startMicrophoneButton = document.querySelector('#start-microphone');
 const stopMicrophoneButton = document.querySelector('#stop-microphone');
 const recordMicrophoneDiagnosticButton = document.querySelector('#record-microphone-diagnostic');
+const exportMicReportButton = document.querySelector('#export-mic-report');
+const micLabLabelEl = document.querySelector('#mic-lab-label');
+const micReportPreviewEl = document.querySelector('#mic-report-preview');
 const microphonePanel = document.querySelector('#microphone-panel');
 const microphoneStatusEl = document.querySelector('#microphone-status');
 const heardNoteEl = document.querySelector('#heard-note');
@@ -113,6 +117,8 @@ let microphoneBuffer = null;
 let microphoneRafId = null;
 let microphoneRecordingDiagnostic = 'Recording test: not run yet.';
 let microphoneDebugText = 'No recording details yet.';
+let lastMicRecordingEvidence = null;
+let lastMicReport = null;
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId, difficultyId)) || '0', 10) || 0;
@@ -268,6 +274,7 @@ function renderHud(nowMs) {
   heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
   microphoneRecordingDiagnosticEl.textContent = microphoneRecordingDiagnostic;
   microphoneDebugTextEl.textContent = microphoneDebugText;
+  micReportPreviewEl.textContent = lastMicReport ? `Last report: ${lastMicReport.capture.label} · ${lastMicReport.interpretation}` : 'No exported report yet.';
   for (const button of buttons.querySelectorAll('button')) {
     button.setAttribute('data-correct-answer', state.activeNote?.answer === button.textContent ? 'true' : 'false');
   }
@@ -496,11 +503,14 @@ async function recordMicrophoneDiagnostic() {
     let decodedRms = null;
     let recordedFrequency = null;
     let recordedPitch = null;
+    let decodedSamples = null;
+    let decodedSampleRate = null;
     if (blob.size > 0) {
       try {
         const arrayBuffer = await blob.arrayBuffer();
         const decoded = await getAudioContext().decodeAudioData(arrayBuffer.slice(0));
-        const decodedSamples = decoded.getChannelData(0);
+        decodedSamples = decoded.getChannelData(0);
+        decodedSampleRate = decoded.sampleRate;
         decodedRms = getCenteredRms(decodedSamples);
         recordedFrequency = detectPitchFromRecordedAudio(decodedSamples, decoded.sampleRate);
         recordedPitch = frequencyToNearestPitch(recordedFrequency);
@@ -518,6 +528,7 @@ async function recordMicrophoneDiagnostic() {
     }
     if (blob.size === 0) message = 'Recording test: captured 0 bytes — Firefox/Android is not delivering microphone audio.';
     else if (decodedRms === 0) message += ' Decoded audio is silent.';
+    lastMicRecordingEvidence = { bytes: blob.size, mimeType: blob.type, samples: decodedSamples, sampleRate: decodedSampleRate };
     microphoneRecordingDiagnostic = message;
     render();
     return { status: 'ok', bytes: blob.size, decodedRms, recordedFrequency, recordedPitch, message };
@@ -526,6 +537,38 @@ async function recordMicrophoneDiagnostic() {
     render();
     return { status: 'error', message: microphoneRecordingDiagnostic };
   }
+}
+
+function buildCurrentMicReport() {
+  const track = microphoneStream?.getAudioTracks?.()[0];
+  lastMicReport = buildMicDiagnosticReport({
+    appVersion,
+    label: micLabLabelEl.value || 'capture',
+    userAgent: navigator.userAgent,
+    url: window.location.href,
+    audioContext: audioContext ? { sampleRate: audioContext.sampleRate, state: audioContext.state } : {},
+    live: { inputLevel: microphoneState.inputLevel, frequency: microphoneState.frequency, trackState: microphoneState.trackState },
+    recording: lastMicRecordingEvidence,
+    track: track ? { readyState: track.readyState, muted: track.muted, enabled: track.enabled, settings: track.getSettings?.() || {} } : {},
+  });
+  return lastMicReport;
+}
+
+function downloadMicReport() {
+  const report = buildCurrentMicReport();
+  const file = buildMicDiagnosticTextFile(report);
+  const blob = new Blob([file.text], { type: file.mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = file.filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  microphoneDebugText = `Exported ${file.filename}. Send that .txt file back for fixture-based mic debugging.`;
+  render();
+  return file;
 }
 
 function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.now()) {
@@ -739,6 +782,7 @@ playCalibrationToneButton.addEventListener('click', playCalibrationTone);
 startMicrophoneButton.addEventListener('click', startMicrophone);
 stopMicrophoneButton.addEventListener('click', stopMicrophone);
 recordMicrophoneDiagnosticButton.addEventListener('click', recordMicrophoneDiagnostic);
+exportMicReportButton.addEventListener('click', downloadMicReport);
 openSettingsButton.addEventListener('click', openSettings);
 closeSettingsButton.addEventListener('click', closeSettings);
 installInputModes();
@@ -794,6 +838,8 @@ window.__clefHanger = {
   startMicrophone,
   stopMicrophone,
   recordMicrophoneDiagnostic,
+  buildCurrentMicReport,
+  downloadMicReport,
   processMicrophoneFrame,
   getMicrophoneState: () => microphoneState,
   getMicrophoneRecordingDiagnostic: () => microphoneRecordingDiagnostic,
