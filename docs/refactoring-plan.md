@@ -556,9 +556,11 @@ export async function startMicrophoneSession({ navigator, audioContext, analyser
 
 ## Phase 4 — Refactor support tooling
 
-### Slice 4.1 — Add version consistency check
+### Slice 4.1 — Add version consistency check — implemented
 
 **Objective:** reduce cache-busting mistakes in the buildless native-module PWA.
+
+**Implementation note:** landed in Slice 47 as `scripts/check-version-consistency.js` with `tests/version-consistency.test.js`. `npm run check` now syntax-checks and runs the version consistency script after the test suite.
 
 **Create:**
 
@@ -573,7 +575,7 @@ export async function startMicrophoneSession({ navigator, audioContext, analyser
 - `const appVersion` in `src/app.js`
 - local module import query strings
 - `CACHE_NAME` in `sw.js`
-- docs/smoke checklist marker references where intentionally duplicated
+- service-worker precache coverage for app-imported ES modules
 
 **Exit criteria:**
 

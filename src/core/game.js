@@ -1,15 +1,15 @@
-import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice47-version-consistency-2026-09-01';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice47-version-consistency-2026-09-01';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+} from './content.js?v=clefhanger-slice47-version-consistency-2026-09-01';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice47-version-consistency-2026-09-01';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice47-version-consistency-2026-09-01';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice47-version-consistency-2026-09-01';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+} from './content.js?v=clefhanger-slice47-version-consistency-2026-09-01';
 
 
 export const STAFF_LAYOUT = {

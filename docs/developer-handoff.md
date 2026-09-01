@@ -92,11 +92,13 @@ When changing JS behavior or import/export contracts, update all of these togeth
 - Tests that assert the current marker/cache name.
 - Docs and smoke checklist markers.
 
+`npm run check` now runs `node scripts/check-version-consistency.js`; if a future slice misses one query string or forgets to precache a new app-imported ES module, the gate should fail with an exact message before deploy.
+
 Current marker set:
 
-- App version: `clefhanger-slice46-learning-boundary-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v40`.
-- Visible marker: `Slice 46: learning boundary`.
+- App version: `clefhanger-slice47-version-consistency-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v41`.
+- Visible marker: `Slice 47: version consistency`.
 
 ## State ownership
 
@@ -267,10 +269,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice46-learning-boundary'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice47-version-consistency'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v40'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v41'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

@@ -249,7 +249,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 46: learning boundary`.
+2. Confirm the page shows `Slice 47: version consistency`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus highlighted correct answer.
 5. Tap the correct answer and verify score increases and a pitch plays.
