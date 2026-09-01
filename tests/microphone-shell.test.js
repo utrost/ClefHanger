@@ -9,6 +9,7 @@ function read(path) {
 test('settings expose microphone input and live calibration controls', () => {
   const html = read('index.html');
   const app = read('src/app.js');
+  const staffRenderer = read('src/ui/staff-renderer.js');
 
   assert.match(html, /data-input-mode="microphone"/);
   assert.match(html, />Sing\/Play<\/button>/);
@@ -19,9 +20,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice41-interval-jumps/);
-  assert.match(app, /const appVersion = 'clefhanger-slice41-interval-jumps-2026-09-01'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice41-interval-jumps-2026-09-01/);
+  assert.match(html, /data-app-version="clefhanger-slice42-staff-renderer/);
+  assert.match(app, /const appVersion = 'clefhanger-slice42-staff-renderer-2026-09-01'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice42-staff-renderer-2026-09-01/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -76,8 +77,8 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /evaluateVocalMatchFrame/);
   assert.match(app, /vocalCandidate/);
   assert.match(app, /pending-stable/);
-  assert.match(app, /createGhostNoteFromPitch/);
-  assert.match(app, /class=\"ghost-note\"/);
-  assert.match(app, /Ghost note you played/);
+  assert.match(staffRenderer, /createGhostNoteFromPitch/);
+  assert.match(staffRenderer, /class=\"ghost-note\"/);
+  assert.match(staffRenderer, /Ghost note you played/);
   assert.match(app, /\['running', 'practice'\]\.includes\(state\.phase\)/);
 });

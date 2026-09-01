@@ -207,6 +207,7 @@ test('shell exposes a non-blocking learning coach line', () => {
 test('shell exposes beginner-friendly tutorial, practice, lesson, hint, and mic details controls', () => {
   const html = read('index.html');
   const app = read('src/app.js');
+  const staffRenderer = read('src/ui/staff-renderer.js');
   assert.match(html, /id="tutorial-card"/);
   assert.match(html, /Start with a lesson/);
   assert.match(html, /data-play-style="practice"/);
@@ -222,6 +223,6 @@ test('shell exposes beginner-friendly tutorial, practice, lesson, hint, and mic 
   assert.match(app, /startPractice/);
   assert.match(app, /getScaffoldedAnswerOptions/);
   assert.match(app, /data-correct-answer/);
-  assert.match(app, /correction-label/);
-  assert.match(app, /data-correction-active/);
+  assert.match(staffRenderer, /correction-label/);
+  assert.match(staffRenderer, /data-correction-active/);
 });

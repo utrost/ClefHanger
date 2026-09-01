@@ -90,9 +90,11 @@ Planned response: add a version consistency check before bigger file moves so fu
 
 ## Phase 1 — Low-risk UI extraction
 
-### Slice 1.1 — Extract staff SVG renderer
+### Slice 1.1 — Extract staff SVG renderer — implemented
 
 **Objective:** move staff, note, chord, ledger-line, and ghost-note SVG construction out of `src/app.js` without changing player behavior.
+
+**Implementation note:** landed in Slice 42 as `src/ui/staff-renderer.js` with `tests/staff-renderer.test.js`. `src/app.js` now delegates staff markup to `renderStaffSvg(...)` and keeps only the DOM assignment.
 
 **Create:**
 

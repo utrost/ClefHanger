@@ -13,7 +13,7 @@ ClefHanger should stay mobile-first and renderer-light. The first implementation
 
 ## Initial app shape
 
-Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested core. This keeps the app deployable under `https://simiono.com/clefhanger/` without a build step. A later Vite/TypeScript migration is still reasonable once the app needs bundled dependencies such as VexFlow and Pitchy.
+Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested core and one focused UI renderer. This keeps the app deployable under `https://simiono.com/clefhanger/` without a build step. A later Vite/TypeScript migration is still reasonable once the app needs bundled dependencies such as VexFlow and Pitchy.
 
 Current boundaries:
 
@@ -25,8 +25,10 @@ Current boundaries:
   - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
 - `src/core/mic-diagnostics.js`
   - Renderer-free Mic Lab report contracts: live analyser summaries, decoded recording level/peak, pitch-window candidates, environment/track metadata, interpretation strings, and Telegram-friendly `.txt` JSON export metadata.
+- `src/ui/staff-renderer.js`
+  - Renderer-only SVG staff/chord/note/ledger-line/correction-label/ghost-note markup. It consumes core state and microphone state and returns SVG markup without touching the DOM.
 - `src/app.js`
-  - DOM adapter, SVG staff/chord rendering, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, fainter upcoming-note previews, note-button input, piano-strip input, microphone permission/listening UI, Mic Lab recording/report export UI, vocal calibration tone/readout UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores.
+  - DOM adapter, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, note-button input, piano-strip input, microphone permission/listening UI, Mic Lab recording/report export UI, vocal calibration tone/readout UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores, and browser smoke hooks.
 - `index.html`
   - Mobile-first layout, app shell, inline CSS, service-worker registration, iOS home-screen meta tags, and Apple touch icon link.
 - `manifest.webmanifest` and `sw.js`

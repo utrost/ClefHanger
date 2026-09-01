@@ -10,6 +10,7 @@ Important files:
 
 - `index.html`: markup, embedded CSS, service-worker registration, root module import.
 - `src/app.js`: DOM adapter and browser runtime orchestration.
+- `src/ui/staff-renderer.js`: pure SVG staff/note/chord/correction/ghost-note renderer.
 - `src/core/game.js`: renderer-free game model and scoring reducer.
 - `src/core/learning.js`: beginner learning layer.
 - `src/core/pitch.js`: microphone and pitch logic.
@@ -86,9 +87,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice41-interval-jumps-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v35`.
-- Visible marker: `Slice 41: interval jumps`.
+- App version: `clefhanger-slice42-staff-renderer-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v36`.
+- Visible marker: `Slice 42: staff renderer`.
 
 ## State ownership
 
@@ -112,7 +113,12 @@ Main state fields:
 - `AudioContext`;
 - microphone stream/source/analyser/keepalive gain/buffer;
 - `localStorage` preference persistence;
-- DOM rendering and event listeners.
+- DOM event listeners and assignments.
+
+`src/ui/staff-renderer.js` owns SVG staff presentation:
+
+- staff lines, clef glyphs, noteheads/stems, chord stacks, ledger lines, correction labels, and microphone ghost-note markup;
+- it returns SVG strings and must not mutate global DOM or app state.
 
 `src/core/pitch.js` owns microphone state shape via `createMicrophoneState`.
 
@@ -253,10 +259,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice41-interval-jumps'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice42-staff-renderer'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v35'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v36'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 
