@@ -79,6 +79,7 @@ Then open `http://localhost:4173/`.
 - [Player and tester guide](docs/player-tester-guide.md) — how to play, test, troubleshoot microphone mode, and send useful reports.
 - [Current state reference](docs/current-state-reference.md) — exact implemented behavior, constants, scoring, mic rules, persistence, and known limits.
 - [Developer handoff](docs/developer-handoff.md) — code ownership, TDD/deploy workflow, ES-module cache rules, and continuation notes.
+- [Refactoring plan](docs/refactoring-plan.md) — architecture cleanup sequence to prevent god files while preserving the current teaching prototype.
 - [Product specification](docs/product-specification.md)
 - [MVP implementation roadmap](docs/mvp-roadmap.md)
 - [Architecture notes](docs/architecture.md)

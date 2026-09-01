@@ -21,6 +21,7 @@ Important files:
 - `docs/current-state-reference.md`: exact current implementation reference.
 - `docs/player-tester-guide.md`: first-time player/tester guide.
 - `docs/smoke-checklist.md`: manual local/live smoke checklist.
+- `docs/refactoring-plan.md`: architecture cleanup plan for extracting renderers/core catalogs/platform adapters while avoiding god files.
 
 ## Commands
 
