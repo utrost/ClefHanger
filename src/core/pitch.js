@@ -1,4 +1,4 @@
-import { answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice36-android-recorder-2026-09-01';
+import { SEMITONES_FROM_C, answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 35;
@@ -134,11 +134,14 @@ export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs 
   const targetFrequency = getPitchFrequency(prompt.noteName, prompt.octave, prompt.accidental);
   const cents = targetFrequency ? Math.round(centsBetween(frequency, targetFrequency)) : null;
   const targetAnswer = answerLabel(prompt.noteName, prompt.accidental);
-  const sameAnswer = detected.answer === targetAnswer;
-  if (sameAnswer && Math.abs(cents) <= toleranceCents) {
+  const targetSemitone = SEMITONES_FROM_C[targetAnswer];
+  const detectedSemitone = SEMITONES_FROM_C[detected.answer];
+  const samePitchClass = targetSemitone !== undefined && targetSemitone === detectedSemitone;
+  const inTune = cents !== null && Math.abs(cents) <= toleranceCents;
+  if (samePitchClass && inTune) {
     return { status: 'match', answer: targetAnswer, detected, cents };
   }
-  return { status: sameAnswer ? 'out-of-tune' : 'wrong-note', answer: null, detected, cents };
+  return { status: samePitchClass ? 'out-of-tune' : 'wrong-note', answer: null, detected, cents };
 }
 
 export function detectPitchFromTimeDomain(samples, sampleRate) {

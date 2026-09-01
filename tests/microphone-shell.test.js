@@ -11,6 +11,7 @@ test('settings expose microphone input and live calibration controls', () => {
   const app = read('src/app.js');
 
   assert.match(html, /data-input-mode="microphone"/);
+  assert.match(html, />Sing\/Play<\/button>/);
   assert.match(html, /id="start-microphone"/);
   assert.match(html, /id="stop-microphone"/);
   assert.match(html, /id="microphone-status"/);
@@ -18,9 +19,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice36-android-recorder/);
-  assert.match(app, /const appVersion = 'clefhanger-slice36-android-recorder-2026-09-01'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice36-android-recorder-2026-09-01/);
+  assert.match(html, /data-app-version="clefhanger-slice37-singplay-ghost/);
+  assert.match(app, /const appVersion = 'clefhanger-slice37-singplay-ghost-2026-09-01'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice37-singplay-ghost-2026-09-01/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -71,4 +72,8 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /selectInputMode: \(inputMode\)/);
   assert.match(app, /microphone/);
   assert.match(app, /processMicrophoneFrame/);
+  assert.match(app, /createGhostNoteFromPitch/);
+  assert.match(app, /class=\"ghost-note\"/);
+  assert.match(app, /Ghost note you played/);
+  assert.match(app, /\['running', 'practice'\]\.includes\(state\.phase\)/);
 });

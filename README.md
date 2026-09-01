@@ -20,7 +20,7 @@ The first playable slices proved the simplest complete loop:
 
 - Oversized note buttons for thumb-first play.
 - A one-octave touch piano strip.
-- Microphone pitch detection for singers.
+- Microphone pitch detection for singers and acoustic instruments, with a staff ghost note showing what the app thinks was played.
 
 ## Current playable slice
 
@@ -43,7 +43,8 @@ Slices through 25 are implemented as a dependency-free static PWA:
 - Speed slider: 1–10, from slow practice to fast rush.
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
-- Toggleable input: large note buttons, a one-octave on-screen piano strip, or microphone input.
+- Toggleable input: large note buttons, a one-octave on-screen piano strip, or Sing/Play microphone input for humming, singing, violin, guitar, or other steady monophonic instruments.
+- Sing/Play input draws a translucent green ghost note on the staff at the detected pitch, plus a `You played A4 · 440 Hz · in tune` style readout. When the ghost note matches the front staff note's exact pitch class and octave within tolerance, the game treats the note as hit. Enharmonic flat prompts such as `D♭` can be scored from a detector readout named `C♯` when the frequency is correct.
 - Actual vocal calibration: grant mic access, sing any steady comfortable note to see detected note/frequency/cents; concert A is only an optional reference tone.
 - Mic input shows a plain `You played A4 · 440 Hz · in tune` style readout so the singer can see what the phone heard even before it scores. Real-device recognition is still under active testing when a phone/browser hears a piano or voice but does not lock a steady pitch.
 - Implausible microphone spikes outside the playable vocal range are ignored instead of being shown as absurd octave readings such as `G♯8`.

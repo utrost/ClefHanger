@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice36-android-recorder-2026-09-01">
+<html lang="en" data-app-version="clefhanger-slice37-singplay-ghost-2026-09-01">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -197,6 +197,10 @@
       .cliff-line { stroke: var(--danger); stroke-width: 4; stroke-dasharray: 8 7; }
       .cliff-rock { fill: #4b342d; }
       .active-note { fill: #17112b; stroke: #17112b; stroke-width: 4; }
+      .ghost-note { opacity: 0.78; pointer-events: none; }
+      .ghost-note .active-note { fill: rgba(98, 230, 167, 0.34); stroke: #118f62; stroke-width: 3; filter: drop-shadow(0 0 5px rgba(98,230,167,0.55)); }
+      .ghost-note .accidental { fill: #118f62; }
+      .ghost-label { fill: #118f62; stroke: none; text-anchor: middle; font-size: 10px; font-weight: 950; }
       .preview-note { opacity: 0.42; transform-box: fill-box; transform-origin: center; transform: scale(0.82); }
       .accidental { fill: #17112b; stroke: none; font-size: 27px; font-weight: 900; }
       .chord-note { stroke-width: 4; }
@@ -521,7 +525,7 @@
           <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 36: Android recorder nudge + vocal gain</p>
+        <p class="microcopy">Slice 37: Sing/Play ghost note</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -552,7 +556,7 @@
           <div id="input-mode-buttons" class="input-mode-row" aria-label="Input mode buttons">
             <button class="input-mode-button" type="button" data-input-mode="buttons" data-active="true">Notes</button>
             <button class="input-mode-button" type="button" data-input-mode="piano">Piano</button>
-            <button class="input-mode-button" type="button" data-input-mode="microphone">Mic</button>
+            <button class="input-mode-button" type="button" data-input-mode="microphone">Sing/Play</button>
           </div>
         </section>
         <section id="calibration-panel" class="settings-section" aria-label="Vocal calibration">
@@ -579,12 +583,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice36-android-recorder-2026-09-01"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice37-singplay-ghost-2026-09-01"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice36-android-recorder-2026-09-01')
+            .register('./sw.js?v=clefhanger-slice37-singplay-ghost-2026-09-01')
             .then((registration) => registration.update())
             .catch(() => {});
         });

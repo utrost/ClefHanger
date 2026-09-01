@@ -34,18 +34,18 @@ Seven large touch targets — C, D, E, F, G, A, B — placed at the bottom of th
 
 A 1-octave mini keyboard docked at the screen's bottom for users wanting to connect visual staff notes to piano key locations.
 
-### Mobile Vocal Tracking
+### Sing/Play Microphone Tracking
 
-Microphone mode using low-latency pitch detection so vocalists can sing the correct pitch directly into their phone.
+Microphone input listens for a steady monophonic pitch from humming, singing, violin, guitar, or another acoustic instrument. The detected pitch appears as a translucent green ghost note on the same staff, while the moving prompt remains the target. If the ghost note matches the prompt's exact pitch class and octave within tolerance, the note is cleared; wrong pitches are visible but not spam-scored every animation frame.
 
 ## 5. Tech Stack & Architecture
 
-- **Frontend:** HTML5, Tailwind CSS, JavaScript
+- **Frontend:** dependency-free HTML, CSS, and JavaScript
   - Mobile-responsive design and touch controls.
-- **Notation rendering:** VexFlow using SVG or Canvas
-  - Dynamic, lightweight mobile sheet music display.
-- **Audio engine:** Web Audio API plus Pitchy library
-  - Web-native microphone frequency tracking for voice input.
+- **Notation rendering:** inline SVG helpers
+  - Lightweight staff, clef, note, chord, ledger-line, correction-label, and Sing/Play ghost-note rendering.
+- **Audio engine:** Web Audio API plus dependency-free autocorrelation pitch detection
+  - Web-native microphone frequency tracking for voice and simple monophonic acoustic-instrument input.
 - **State and storage:** LocalStorage / PWA
   - Offline mobile play and local progression.
 

@@ -90,6 +90,27 @@ test('classifies a sung note as an answer only inside tolerance and after deboun
   assert.equal(wrong.answer, null);
 });
 
+test('scores exact sung pitch for flat prompts even when detection names the enharmonic sharp', () => {
+  const prompt = { answer: 'D♭', noteName: 'D', accidental: 'flat', octave: 4 };
+  const match = classifyVocalMatch({ prompt, frequency: 277.18, nowMs: 1000, lastAcceptedAtMs: 0 });
+
+  assert.equal(match.status, 'match');
+  assert.equal(match.answer, 'D♭');
+  assert.equal(match.detected.answer, 'C♯');
+  assert.ok(Math.abs(match.cents) <= 2);
+});
+
+test('requires the exact octave, not just the same note letter, for sung answers', () => {
+  const prompt = { answer: 'C', noteName: 'C', octave: 4 };
+  const match = classifyVocalMatch({ prompt, frequency: 523.25, nowMs: 1000, lastAcceptedAtMs: 0 });
+
+  assert.equal(match.status, 'out-of-tune');
+  assert.equal(match.answer, null);
+  assert.equal(match.detected.answer, 'C');
+  assert.equal(match.detected.octave, 5);
+  assert.ok(match.cents > 1100);
+});
+
 test('microphone mode is a first-class input option with permission state', () => {
   assert.equal(normalizeMicrophoneInputMode('microphone'), 'microphone');
   assert.equal(normalizeMicrophoneInputMode('calibration'), 'buttons');

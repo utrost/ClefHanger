@@ -8,6 +8,8 @@ import {
   getHighScoreKey,
   getMode,
   getAnswerOptions,
+  getStaffStepForPitch,
+  createGhostNoteFromPitch,
   normalizeAnswer,
   spawnNextNote,
 } from '../src/core/game.js';
@@ -34,6 +36,30 @@ test('creates accidental notes with symbol answers and labels', () => {
   assert.equal(note.answer, 'F♯');
   assert.equal(note.displayName, 'F♯4');
   assert.equal(note.accidental, 'sharp');
+});
+
+test('maps detected sung pitches back onto the visible staff as a ghost note', () => {
+  assert.equal(getStaffStepForPitch({ noteName: 'C', octave: 4 }, 'treble'), -2);
+  assert.equal(getStaffStepForPitch({ noteName: 'E', octave: 4 }, 'treble'), 0);
+  assert.equal(getStaffStepForPitch({ noteName: 'A', octave: 5 }, 'treble'), 10);
+  assert.equal(getStaffStepForPitch({ noteName: 'E', octave: 2 }, 'bass'), -2);
+  assert.equal(getStaffStepForPitch({ noteName: 'C', octave: 3 }, 'bass'), 3);
+
+  const ghost = createGhostNoteFromPitch({ noteName: 'C', accidental: 'sharp', answer: 'C♯', octave: 4, frequency: 277.18, cents: 2 }, 'treble');
+  assert.deepEqual(ghost, {
+    id: 'ghost-note',
+    kind: 'note',
+    clef: 'treble',
+    noteName: 'C',
+    accidental: 'sharp',
+    octave: 4,
+    answer: 'C♯',
+    displayName: 'C♯4',
+    staffStep: -2,
+    frequency: 277.18,
+    cents: 2,
+    status: 'ghost',
+  });
 });
 
 test('creates chord prompts with multi-note answers', () => {

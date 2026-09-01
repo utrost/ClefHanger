@@ -23,8 +23,9 @@ import {
   getLedgerLinesForStaffStep,
   getAnswerOptions,
   getPromptFrequencies,
-} from './core/game.js?v=clefhanger-slice36-android-recorder-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice36-android-recorder-2026-09-01';
+  createGhostNoteFromPitch,
+} from './core/game.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -37,11 +38,11 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice36-android-recorder-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice36-android-recorder-2026-09-01';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice36-android-recorder-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
 
-const appVersion = 'clefhanger-slice36-android-recorder-2026-09-01';
+const appVersion = 'clefhanger-slice37-singplay-ghost-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -181,6 +182,19 @@ function renderChord(note, x) {
     .join('') + `<line x1="${(x + 21).toFixed(1)}" y1="36" x2="${(x + 21).toFixed(1)}" y2="136" />`;
 }
 
+function renderGhostNote(clef, x = 98) {
+  if (selectedInputMode !== 'microphone' || !microphoneState.note) return '';
+  const ghost = createGhostNoteFromPitch(microphoneState.note, clef);
+  if (!ghost) return '';
+  const y = yForStaffStep(ghost.staffStep);
+  return `
+    <g class="ghost-note" aria-label="Ghost note you played: ${escapeSvgText(ghost.displayName)}">
+      ${renderSingleNote(ghost, x, y)}
+      <text x="${x.toFixed(1)}" y="166" class="ghost-label">you played ${escapeSvgText(ghost.displayName)}</text>
+    </g>
+  `;
+}
+
 function renderStaff(nowMs) {
   const note = state.activeNote;
   const mode = getMode(state.modeId);
@@ -216,10 +230,14 @@ function renderStaff(nowMs) {
     })
     .join('');
 
+  const ghostX = note
+    ? Math.max(98, 72 + Math.min(1, Math.max(0, (nowMs - note.spawnedAtMs) / (note.deadlineMs - note.spawnedAtMs))) * 202)
+    : 98;
   staff.innerHTML = `
     <svg viewBox="0 0 330 180" role="img" aria-label="${clef.clef} staff with cliff edge">
       ${lines}
       ${cliff}
+      ${renderGhostNote(clef.clef, ghostX)}
       ${active}
     </svg>
   `;
@@ -257,7 +275,7 @@ function renderHud(nowMs) {
   speedSlider.value = speed.id;
   difficultyLabelEl.textContent = difficulty.label;
   difficultyHelpEl.textContent = difficulty.help;
-  const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Mic' : 'Notes';
+  const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Sing/Play' : 'Notes';
   const lesson = getBeginnerLesson(selectedLessonId);
   settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel} · ${selectedPlayStyle === 'practice' ? lesson.label : 'Rush'}`;
   startButton.textContent = state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint';
@@ -589,7 +607,7 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
     const note = frequencyToNearestPitch(frequency);
     const calibration = buildCalibrationReading(frequency);
     microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, inputLevel, silentFrameCount: 0, trackState: getMicrophoneTrackState(), calibration };
-    if (selectedInputMode === 'microphone' && state.phase === 'running') {
+    if (selectedInputMode === 'microphone' && ['running', 'practice'].includes(state.phase)) {
       const match = classifyVocalMatch({ prompt: state.activeNote, frequency, nowMs, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs });
       if (match.status === 'match') {
         microphoneState = { ...microphoneState, lastAcceptedAtMs: nowMs };
