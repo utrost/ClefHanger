@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './game.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
+import { SEMITONES_FROM_C, answerLabel } from './game.js?v=clefhanger-slice39-learning-coach-2026-09-01';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;

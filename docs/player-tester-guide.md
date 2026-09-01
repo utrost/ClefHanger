@@ -41,6 +41,7 @@ Practice has no timer. The timer shows `∞`.
 - **Staff**: where the prompt appears.
 - **Cliff**: red line on the right. In Rush, a note is missed when it reaches the cliff.
 - **Feedback**: tells you whether the answer was correct, wrong, missed, or whether a round ended.
+- **Learning suggestion**: a small non-blocking hint below feedback. It may suggest repeating Practice, trying Rush, moving to the next lesson, lowering speed, or changing only one setting.
 
 ## Practice vs Rush
 
@@ -241,7 +242,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 38: forgiving mic scoring`.
+2. Confirm the page shows `Slice 39: learning coach`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus highlighted correct answer.
 5. Tap the correct answer and verify score increases and a pitch plays.

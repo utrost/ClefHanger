@@ -180,11 +180,11 @@ Verification:
 - Add a developer handoff with module ownership, TDD rules, ES-module cache pitfalls, and deploy workflow.
 - Cross-link the documentation spine from README, architecture, product spec, roadmap, and smoke checklist.
 
-## Slice 8d.4 — Learning contract and next-step coach
+## Slice 8d.4 — Learning contract and next-step coach — implemented
 
 Goal: make the user journey concrete enough that a beginner knows when to repeat, when to switch lesson, and when to try Rush.
 
-Documentation/guideline work:
+Documentation/guideline work — implemented:
 
 - Add a "golden path" near the top of `docs/user-journey.md`:
   - First steps / Practice / Notes.
@@ -203,7 +203,7 @@ Documentation/guideline work:
 - Add mistake-review guidance: pause, read the correction, name line/space/ledger, then answer again.
 - Add a first-three-sessions learning path for people who do not yet know how to practice sight reading.
 
-App behavior candidate:
+App behavior — implemented:
 
 - Add a small recommendation line after Practice and Rush events.
 - Use current run evidence to suggest one next action:
@@ -215,11 +215,11 @@ App behavior candidate:
 - Keep recommendations gentle and optional; avoid locking lesson progression behind scores.
 - Keep it deterministic and testable from reducer/run summary data.
 
-Verification:
+Verification — implemented:
 
 - Unit-test recommendation selection from summary/progress inputs.
 - Browser-smoke that the recommendation appears after relevant user actions and never blocks the main controls.
-- Update `docs/user-journey.md`, `docs/player-tester-guide.md`, and `docs/current-state-reference.md` with the actual recommendation wording and thresholds when implemented.
+- Update `docs/user-journey.md`, `docs/player-tester-guide.md`, and `docs/current-state-reference.md` with the actual recommendation wording and thresholds.
 
 ## Slice 8e — Accidentals as learning
 

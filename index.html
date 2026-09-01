@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice38-mic-scoring-2026-09-01">
+<html lang="en" data-app-version="clefhanger-slice39-learning-coach-2026-09-01">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -77,7 +77,7 @@
 
       .site-link:focus-visible, .site-link:hover { text-decoration: underline; }
 
-      .timer-card, .mode-panel, .stat, #feedback, #summary, .input-mode-row, #calibration-panel, #microphone-panel, .settings-summary, #settings-dialog, #tutorial-card, #lesson-panel, .play-style-row, #lesson-intro {
+      .timer-card, .mode-panel, .stat, #feedback, #learning-coach, #summary, .input-mode-row, #calibration-panel, #microphone-panel, .settings-summary, #settings-dialog, #tutorial-card, #lesson-panel, .play-style-row, #lesson-intro {
         border: 1px solid rgba(255,255,255,0.14);
         border-radius: 18px;
         background: var(--panel);
@@ -210,6 +210,16 @@
         font-weight: 850;
         text-align: center;
         padding: 9px;
+      }
+
+      #learning-coach {
+        margin: 0;
+        padding: 8px 10px;
+        background: rgba(23, 17, 43, 0.08);
+        color: #3f2c00;
+        font-size: 0.78rem;
+        font-weight: 850;
+        text-align: center;
       }
 
       #feedback[data-kind="correct"] { color: var(--good); }
@@ -504,6 +514,7 @@
       <section class="stage" aria-label="Treble clef rush playfield">
         <div id="staff"></div>
         <div id="feedback" aria-live="polite">Tap Start when ready.</div>
+        <p id="learning-coach" aria-label="Learning suggestion" aria-live="polite">Golden path: Practice · Beginner · Notes. Change one thing at a time.</p>
         <aside id="summary" class="ending-splash" aria-label="Rush result" hidden>
           <div>
             <h2 id="summary-title">Time! Sprint complete</h2>
@@ -525,7 +536,7 @@
           <p>Sing the front note. ClefHanger accepts a steady matching pitch class within 50 cents, in any octave for now.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 38: forgiving mic scoring</p>
+        <p class="microcopy">Slice 39: learning coach</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -583,12 +594,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice38-mic-scoring-2026-09-01"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice39-learning-coach-2026-09-01"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice38-mic-scoring-2026-09-01')
+            .register('./sw.js?v=clefhanger-slice39-learning-coach-2026-09-01')
             .then((registration) => registration.update())
             .catch(() => {});
         });

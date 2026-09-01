@@ -59,6 +59,61 @@ The app should make the next useful action obvious:
 - if the lesson feels easy, switch lesson or try Rush;
 - if using microphone mode, watch what note the phone thinks it heard.
 
+## The golden path
+
+Start simple and add only one challenge at a time:
+
+1. **First steps / Practice / Notes**.
+2. **Line notes / Practice / Notes**.
+3. **Space notes / Practice / Notes**.
+4. **Ledger lines / Practice / Notes**.
+5. **Mixed notes / Practice / Notes**.
+6. Try the same lessons in **Rush**.
+7. Try **Piano** or **Sing/Play** only after the written-note loop is understood.
+
+This path keeps the question clear: first learn the staff position, then add speed, then add a different input style.
+
+## When to move on
+
+Use this loose learning contract:
+
+- Stay in Practice until about **8 out of 10** answers feel easy.
+- Then try one Rush round on the same lesson.
+- If Rush is below about **70% accuracy**, repeat that lesson in Practice.
+- If Rush is above about **80% accuracy**, try the next lesson.
+- If one note keeps causing mistakes, return to the lesson that isolates that note group.
+- Do not increase lesson breadth, speed, and difficulty at the same time.
+
+These numbers are guide rails, not exams. The app now shows a small learning suggestion after answers and Rush summaries to help choose the next useful step without making progress feel locked.
+
+## Change one thing at a time
+
+Settings can change several things at once: lesson, mode, speed, difficulty, and input mode. A beginner should change only one knob between attempts.
+
+Good changes:
+
+- New lesson? Keep Beginner + Notes.
+- Trying Rush? Keep the same lesson.
+- Trying Piano? Keep the same lesson and difficulty.
+- Trying Sing/Play? First prove the same lesson with Notes.
+- Raising speed? Do not also raise difficulty.
+
+If the app suddenly feels too hard, return to Practice + Beginner + Notes input.
+
+## How to use mistakes
+
+A wrong answer is part of the lesson.
+
+When the app shows a correction:
+
+1. Pause on the correction for a moment.
+2. Read the note name.
+3. Notice whether it is on a line, space, or ledger line.
+4. Look at the highlighted answer button.
+5. Answer again before changing settings.
+
+Do not tap randomly through corrections. The small pause is where the learning happens.
+
 ## What the user should do in Practice
 
 Practice is the default learning mode.
@@ -206,6 +261,16 @@ The current build does not expect the user to:
 - get a full music-theory course.
 
 Those can become future features, but they are not part of the current user journey.
+
+## First three sessions
+
+If the user does not know how to practice sight reading yet, use this simple three-session path:
+
+1. **Session 1:** First steps in Practice until C/D/E feel predictable, then one Rush on First steps.
+2. **Session 2:** Line notes and Space notes separately in Practice. Do not mix them too early.
+3. **Session 3:** Mixed notes in Practice, then Rush if accuracy is around 80% or better.
+
+After that, the user can cycle weak lessons, try Piano, or try Sing/Play.
 
 ## A good 5-minute practice session
 

@@ -1,18 +1,18 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice38-mic-scoring-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
+This document describes what exists in code today in `clefhanger-slice39-learning-coach-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
 
 ## Runtime shape
 
 - App type: dependency-free static PWA.
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
-- Current app marker: `clefhanger-slice38-mic-scoring-2026-09-01`.
-- Current visible slice marker: `Slice 38: forgiving mic scoring`.
-- Current service-worker cache: `clefhanger-pwa-v32`.
+- Current app marker: `clefhanger-slice39-learning-coach-2026-09-01`.
+- Current visible slice marker: `Slice 39: learning coach`.
+- Current service-worker cache: `clefhanger-pwa-v33`.
 - Core modules:
   - `src/core/game.js`: game state, note pools, scoring, queues, pitch-frequency helpers, ghost-note geometry.
-  - `src/core/learning.js`: beginner lessons, first-run tutorial, teaching feedback, correction overlay, friendly mic messages.
+  - `src/core/learning.js`: beginner lessons, first-run tutorial, teaching feedback, correction overlay, friendly mic messages, and next-step learning recommendations.
   - `src/core/pitch.js`: microphone constraints, frequency-to-note conversion, cents math, calibration readouts, pitch detection, vocal match/scoring debounce.
   - `src/core/mic-diagnostics.js`: decoded-audio summaries, recorded pitch windows, Mic Lab report JSON and `.txt` export.
   - `src/core/audio.js`: synthetic piano-like Web Audio voice and A4 reference tone.
@@ -39,6 +39,7 @@ The main page contains:
 - beginner lesson selector and lesson intro card;
 - staff playfield with cliff edge;
 - selected input panel: note buttons, piano strip, or microphone status panel;
+- non-blocking learning suggestion line below the feedback;
 - centered time-up summary for ended Rush rounds.
 
 ## Modes and prompt pools
@@ -185,6 +186,23 @@ The reducer uses these phases:
 - Expired notes count as missed if they reach their deadline before answer.
 - On timeout, phase becomes `ended`, active notes/queue are cleared, and the time-up summary appears.
 - Late answers after `ended` do not mutate the result.
+
+## Learning recommendations
+
+`buildLearningRecommendation(...)` turns simple progress evidence into one gentle, optional next step. It is deliberately deterministic and does not lock progression.
+
+Current thresholds and messages:
+
+- Practice with at least 8 correct, 0 wrong/missed, and best streak at least 8: suggest Rush on the same lesson.
+- Practice with mistakes: suggest pausing on the correction and naming line/space/ledger before answering again.
+- Practice before readiness: suggest practicing the current lesson until about 8 out of 10 feel easy.
+- Rush below 70% accuracy: suggest repeating the current lesson in Practice.
+- Rush at or above 80% accuracy with another beginner lesson available: suggest the next lesson.
+- Rush at or above 80% accuracy with no next lesson: suggest changing only one setting for more challenge.
+- Rush with many misses at higher speed: suggest lowering speed on the same lesson.
+- Microphone mode without stable pitch: suggest using Notes first and troubleshooting Sing/Play separately.
+
+The line renders under the main feedback as `#learning-coach` with `aria-label="Learning suggestion"`. The ending splash repeats the recommendation in its detail text.
 
 ## Difficulty and speed
 

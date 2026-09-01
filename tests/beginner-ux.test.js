@@ -6,6 +6,7 @@ import {
   buildBeginnerFeedback,
   buildBeginnerMicMessage,
   buildCorrectionOverlay,
+  buildLearningRecommendation,
   buildTutorialSteps,
   getBeginnerLesson,
   getLessonIntroCard,
@@ -110,6 +111,46 @@ test('beginner microphone message hides debug details unless expanded', () => {
   const advanced = buildBeginnerMicMessage({ pitchLabel: 'A2', frequency: 112, decodedLevel: 0.05, bytes: 17033, advanced: true });
   assert.match(advanced, /captured 17033 bytes/i);
   assert.match(advanced, /decoded level 5%/i);
+});
+
+test('learning coach recommends repeat, rush, or next lesson from simple progress evidence', () => {
+  const practiceReady = buildLearningRecommendation({ playStyle: 'practice', lessonId: 'first-steps', correct: 8, wrong: 0, missed: 0, bestStreak: 8 });
+  assert.equal(practiceReady.kind, 'try-rush');
+  assert.match(practiceReady.text, /Try Rush/i);
+  assert.match(practiceReady.text, /same lesson/i);
+
+  const rushRepeat = buildLearningRecommendation({ playStyle: 'rush', lessonId: 'line-notes', correct: 6, wrong: 3, missed: 2, accuracy: 55 });
+  assert.equal(rushRepeat.kind, 'repeat-practice');
+  assert.match(rushRepeat.text, /repeat Line notes in Practice/i);
+
+  const rushAdvance = buildLearningRecommendation({ playStyle: 'rush', lessonId: 'line-notes', correct: 9, wrong: 1, missed: 0, accuracy: 90 });
+  assert.equal(rushAdvance.kind, 'next-lesson');
+  assert.equal(rushAdvance.nextLessonId, 'space-notes');
+  assert.match(rushAdvance.text, /Try Space notes next/i);
+
+  const tooManyMisses = buildLearningRecommendation({ playStyle: 'rush', lessonId: 'mixed', correct: 4, wrong: 0, missed: 5, accuracy: 44, speedId: '8' });
+  assert.equal(tooManyMisses.kind, 'lower-speed');
+  assert.match(tooManyMisses.text, /lower speed/i);
+});
+
+test('user journey documents the learning contract before adding more notation', () => {
+  const journey = read('docs/user-journey.md');
+  assert.match(journey, /golden path/i);
+  assert.match(journey, /8 out of 10/i);
+  assert.match(journey, /70% accuracy/i);
+  assert.match(journey, /80% accuracy/i);
+  assert.match(journey, /Change one thing at a time/i);
+  assert.match(journey, /First three sessions/i);
+  assert.match(journey, /Pause.*correction/);
+});
+
+test('shell exposes a non-blocking learning coach line', () => {
+  const html = read('index.html');
+  const app = read('src/app.js');
+  assert.match(html, /id="learning-coach"/);
+  assert.match(html, /aria-label="Learning suggestion"/);
+  assert.match(app, /buildLearningRecommendation/);
+  assert.match(app, /learningCoachEl/);
 });
 
 test('shell exposes beginner-friendly tutorial, practice, lesson, hint, and mic details controls', () => {

@@ -85,9 +85,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice38-mic-scoring-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v32`.
-- Visible marker: `Slice 38: forgiving mic scoring`.
+- App version: `clefhanger-slice39-learning-coach-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v33`.
+- Visible marker: `Slice 39: learning coach`.
 
 ## State ownership
 
@@ -252,10 +252,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice38-mic-scoring'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice39-learning-coach'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v32'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v33'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

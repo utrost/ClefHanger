@@ -133,3 +133,97 @@ export function buildBeginnerMicMessage({ pitchLabel, frequency, decodedLevel, b
   if (Number.isFinite(decodedLevel)) parts.push(`decoded level ${Math.round(decodedLevel * 100)}%`);
   return parts.join(' · ');
 }
+
+export function getNextBeginnerLesson(lessonId = 'first-steps') {
+  const index = BEGINNER_LESSONS.findIndex((lesson) => lesson.id === getBeginnerLesson(lessonId).id);
+  return BEGINNER_LESSONS[index + 1] || null;
+}
+
+export function buildLearningRecommendation({
+  playStyle = 'practice',
+  lessonId = 'first-steps',
+  correct = 0,
+  wrong = 0,
+  missed = 0,
+  bestStreak = 0,
+  accuracy,
+  speedId = '5',
+  inputMode = 'buttons',
+  microphoneStable = true,
+} = {}) {
+  const lesson = getBeginnerLesson(lessonId);
+  const nextLesson = getNextBeginnerLesson(lesson.id);
+  const attempts = correct + wrong + missed;
+  const computedAccuracy = attempts > 0 ? Math.round((correct / attempts) * 100) : 0;
+  const scoreAccuracy = Number.isFinite(accuracy) ? accuracy : computedAccuracy;
+  const speed = Number.parseInt(speedId, 10) || 5;
+
+  if (inputMode === 'microphone' && !microphoneStable) {
+    return {
+      kind: 'mic-fallback',
+      text: 'Mic is not steady yet. Use Notes first, then troubleshoot Sing/Play separately.',
+      action: 'switch-to-notes',
+    };
+  }
+
+  if (playStyle === 'practice') {
+    if (correct >= 8 && wrong === 0 && missed === 0 && bestStreak >= 8) {
+      return {
+        kind: 'try-rush',
+        text: `${lesson.label} looks comfortable. Try Rush on the same lesson.`,
+        action: 'try-rush',
+      };
+    }
+    if (wrong > 0) {
+      return {
+        kind: 'review-mistake',
+        text: 'Pause on the correction, name line/space/ledger, then answer again.',
+        action: 'repeat-practice',
+      };
+    }
+    return {
+      kind: 'keep-practicing',
+      text: `Practice ${lesson.label} until about 8 out of 10 feel easy.`,
+      action: 'continue',
+    };
+  }
+
+  if (missed >= Math.max(3, correct + wrong) && speed >= 6) {
+    return {
+      kind: 'lower-speed',
+      text: 'Most misses are timing misses. Try the same lesson again at lower speed.',
+      action: 'lower-speed',
+    };
+  }
+
+  if (scoreAccuracy < 70) {
+    return {
+      kind: 'repeat-practice',
+      text: `${scoreAccuracy}% accuracy: repeat ${lesson.label} in Practice before another Rush.`,
+      action: 'repeat-practice',
+    };
+  }
+
+  if (scoreAccuracy >= 80 && nextLesson) {
+    return {
+      kind: 'next-lesson',
+      text: `${scoreAccuracy}% accuracy. Try ${nextLesson.label} next.`,
+      action: 'next-lesson',
+      nextLessonId: nextLesson.id,
+    };
+  }
+
+  if (scoreAccuracy >= 80) {
+    return {
+      kind: 'widen-challenge',
+      text: `${scoreAccuracy}% accuracy. Keep the lesson, then change one setting if you want more challenge.`,
+      action: 'increase-one-knob',
+    };
+  }
+
+  return {
+    kind: 'repeat-rush',
+    text: `${scoreAccuracy}% accuracy. Repeat the same Rush once before changing settings.`,
+    action: 'repeat-rush',
+  };
+}

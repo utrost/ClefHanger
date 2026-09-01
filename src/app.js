@@ -24,8 +24,8 @@ import {
   getAnswerOptions,
   getPromptFrequencies,
   createGhostNoteFromPitch,
-} from './core/game.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
+} from './core/game.js?v=clefhanger-slice39-learning-coach-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice39-learning-coach-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -38,11 +38,11 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice39-learning-coach-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice39-learning-coach-2026-09-01';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice39-learning-coach-2026-09-01';
 
-const appVersion = 'clefhanger-slice38-mic-scoring-2026-09-01';
+const appVersion = 'clefhanger-slice39-learning-coach-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -85,6 +85,7 @@ const scoreEl = document.querySelector('#score');
 const streakEl = document.querySelector('#streak');
 const timerEl = document.querySelector('#timer');
 const feedbackEl = document.querySelector('#feedback');
+const learningCoachEl = document.querySelector('#learning-coach');
 const summaryEl = document.querySelector('#summary');
 const summaryTitleEl = document.querySelector('#summary-title');
 const summaryContextEl = document.querySelector('#summary-context');
@@ -259,6 +260,24 @@ function renderLessonIntro() {
   lessonIntroExamples.textContent = intro.examples.join(' · ');
 }
 
+function currentLearningRecommendation() {
+  const attempts = state.correct + state.wrong + state.missed;
+  const accuracy = attempts > 0 ? Math.round((state.correct / attempts) * 100) : 0;
+  const microphoneStable = selectedInputMode !== 'microphone' || Boolean(microphoneState.note && microphoneState.frequency);
+  return buildLearningRecommendation({
+    playStyle: state.phase === 'running' || state.phase === 'ended' ? 'rush' : 'practice',
+    lessonId: selectedLessonId,
+    correct: state.correct,
+    wrong: state.wrong,
+    missed: state.missed,
+    bestStreak: state.bestStreak,
+    accuracy,
+    speedId: selectedSpeedId,
+    inputMode: selectedInputMode,
+    microphoneStable,
+  });
+}
+
 function renderHud(nowMs) {
   const mode = getMode(selectedModeId);
   const speed = getSpeed(selectedSpeedId);
@@ -268,6 +287,9 @@ function renderHud(nowMs) {
   timerEl.textContent = String(getRemainingSeconds(state, nowMs));
   feedbackEl.textContent = state.feedback.text;
   feedbackEl.dataset.kind = state.feedback.kind;
+  const learningRecommendation = currentLearningRecommendation();
+  learningCoachEl.textContent = learningRecommendation.text;
+  learningCoachEl.dataset.kind = learningRecommendation.kind;
   bestEl.textContent = String(getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
   modeLabelEl.textContent = mode.label;
   modeHelpEl.textContent = mode.help;
@@ -306,7 +328,7 @@ function renderHud(nowMs) {
     summaryTitleEl.textContent = summary.title;
     summaryContextEl.textContent = `${summary.mode} · ${summary.speed} · ${summary.difficulty}`;
     summaryHeadlineEl.textContent = summary.headline;
-    summaryDetailEl.textContent = summary.detail;
+    summaryDetailEl.textContent = `${summary.detail} · ${learningRecommendation.text}`;
     summaryRestartButton.textContent = summary.primaryAction;
   } else {
     summaryEl.hidden = true;
