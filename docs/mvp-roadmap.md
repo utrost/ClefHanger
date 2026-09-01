@@ -176,14 +176,57 @@ Verification:
 
 - Add a full current-state reference for exact modes, lessons, scoring, mic rules, diagnostics, rendering, persistence, gates, deploy expectations, and limitations.
 - Add a player/tester guide for first-run play, microphone troubleshooting, Mic Lab reports, and manual smoke tests.
+- Add a user journey document for what a normal player is supposed to do: first session, Practice/Rush behavior, input-mode choice, singing/playing expectations, success signals, and fallback path.
 - Add a developer handoff with module ownership, TDD rules, ES-module cache pitfalls, and deploy workflow.
 - Cross-link the documentation spine from README, architecture, product spec, roadmap, and smoke checklist.
+
+## Slice 8d.4 — Learning contract and next-step coach
+
+Goal: make the user journey concrete enough that a beginner knows when to repeat, when to switch lesson, and when to try Rush.
+
+Documentation/guideline work:
+
+- Add a "golden path" near the top of `docs/user-journey.md`:
+  - First steps / Practice / Notes.
+  - Line notes / Practice / Notes.
+  - Space notes / Practice / Notes.
+  - Mixed notes / Practice / Notes.
+  - The same material in Rush.
+  - Piano or Sing/Play only after the written-note loop is understood.
+- Add a "when to move on" rule:
+  - stay in Practice until roughly 8 of 10 feel easy;
+  - try one Rush on the same lesson;
+  - below roughly 70% accuracy means repeat Practice;
+  - above roughly 80% accuracy means try the next lesson;
+  - do not increase lesson breadth, speed, and difficulty at the same time.
+- Add a "change one thing at a time" guideline for settings.
+- Add mistake-review guidance: pause, read the correction, name line/space/ledger, then answer again.
+- Add a first-three-sessions learning path for people who do not yet know how to practice sight reading.
+
+App behavior candidate:
+
+- Add a small recommendation line after Practice and Rush events.
+- Use current run evidence to suggest one next action:
+  - high Practice streak: try Rush on the same lesson;
+  - low Rush accuracy: repeat in Practice;
+  - high Rush accuracy: try the next lesson;
+  - repeated misses: lower speed or return to a narrower lesson;
+  - microphone unstable: switch to Notes first, then troubleshoot Sing/Play separately.
+- Keep recommendations gentle and optional; avoid locking lesson progression behind scores.
+- Keep it deterministic and testable from reducer/run summary data.
+
+Verification:
+
+- Unit-test recommendation selection from summary/progress inputs.
+- Browser-smoke that the recommendation appears after relevant user actions and never blocks the main controls.
+- Update `docs/user-journey.md`, `docs/player-tester-guide.md`, and `docs/current-state-reference.md` with the actual recommendation wording and thresholds when implemented.
 
 ## Slice 8e — Accidentals as learning
 
 - Turn the existing sharp/flat mechanics into a beginner lesson.
 - Show how the same staff position changes answer with `♯` or `♭`.
 - Keep direct touch answers; no typed input.
+- Start this after Slice 8d.4 or keep its first pass documentation-only; beginners need a clear progression contract before more notation variants are added.
 
 ## Slice 8f — Intervals and rapid jumps
 
@@ -193,6 +236,8 @@ Verification:
 
 ## Product risks to validate early
 
+- Whether the app gives beginners enough progression guidance, not just controls and lessons.
+- Whether the suggested 70%/80% readiness thresholds feel motivating or too school-like in real use.
 - VexFlow mobile performance and animation ergonomics.
 - Whether moving notation is readable on small screens.
 - Whether seven note buttons are faster and less frustrating than a piano strip for beginners.
