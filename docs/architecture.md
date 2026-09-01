@@ -32,11 +32,11 @@ Current boundaries:
 - `manifest.webmanifest` and `sw.js`
   - Installable/offline PWA shell with subpath-safe id/scope/start URL, portrait standalone mode, PNG/SVG maskable icons, mode shortcuts, and navigation fallback.
 
-## Current vs planned behavior
+## Current repository behavior
 
-Current repository behavior:
+For the exhaustive implementation contract, see [Current State Reference](./current-state-reference.md). For first-time playtesting and mic troubleshooting, see [Player and Tester Guide](./player-tester-guide.md). For continuation/deploy rules, see [Developer Handoff](./developer-handoff.md).
 
-- Static PWA shell.
+- Mobile-first static app with no bundler/runtime dependencies.
 - Default Practice mode for beginners, with an alternate Rush mode for timed play and a terminal ending splash after the 60-second timer expires.
 - Three-step first-run tutorial.
 - Beginner lesson sequence: First steps, Line notes, Space notes, Ledger lines, Mixed notes.

@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap
 
-This roadmap separates the first shippable game loop from later learning depth. Features below are planned unless explicitly marked as implemented in code.
+This roadmap separates the first shippable game loop from later learning depth. Features below are planned unless explicitly marked as implemented in code. For the exact current implementation contract, see [Current State Reference](./current-state-reference.md); for tester instructions, see [Player and Tester Guide](./player-tester-guide.md); for continuation/deploy rules, see [Developer Handoff](./developer-handoff.md).
 
 ## Slice 0 — Repo foundation — implemented
 
@@ -154,6 +154,30 @@ Verification:
 - Add a dedicated Ledger lines lesson in Practice.
 - Keep the answer tray small: only C and A for the first ledger drill.
 - Wrong-answer teaching copy names the concrete note location, e.g. middle C or A on the first ledger line above the staff.
+
+## Slice 8d.1 — Android/Firefox Mic Lab evidence — implemented
+
+- Add live analyser input-level copy so a granted-but-silent browser can be distinguished from a detector failure.
+- Retain the `MediaStreamAudioSourceNode` and connect the analyser through a muted keepalive gain node so Firefox keeps the input graph active.
+- Add a 1-second MediaRecorder diagnostic that captures bytes, decodes audio when possible, reports RMS/peak, and scans chunked pitch windows.
+- Export Telegram-friendly `.txt` JSON reports with browser, URL, track settings, live analyser, recording, decoded-level, and pitch-candidate evidence.
+- Use built-in-vocal constraints for phone/laptop voice testing: `echoCancellation: false`, `noiseSuppression: false`, `autoGainControl: true`, mono.
+
+## Slice 8d.2 — Forgiving mic scoring — implemented
+
+- Score microphone single-note prompts by pitch class instead of exact octave.
+- Use a forgiving 50-cent vocal tolerance.
+- Require a short same-note stability window before scoring.
+- Keep a post-hit debounce so one held note cannot clear several prompts.
+- Expose `window.clefhangerInjectPitch(frequency, nowMs?)` for deterministic browser smoke without a physical microphone.
+- Update docs and smoke checks so testers know chord singing is still out of scope.
+
+## Slice 8d.3 — Documentation consolidation — implemented
+
+- Add a full current-state reference for exact modes, lessons, scoring, mic rules, diagnostics, rendering, persistence, gates, deploy expectations, and limitations.
+- Add a player/tester guide for first-run play, microphone troubleshooting, Mic Lab reports, and manual smoke tests.
+- Add a developer handoff with module ownership, TDD rules, ES-module cache pitfalls, and deploy workflow.
+- Cross-link the documentation spine from README, architecture, product spec, roadmap, and smoke checklist.
 
 ## Slice 8e — Accidentals as learning
 
