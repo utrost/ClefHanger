@@ -17,8 +17,10 @@ Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested
 
 Current boundaries:
 
+- `src/core/music-theory.js`
+  - Accidental symbols, pitch-class semitone map, equal-tempered note/chord prompt frequencies, staff-step mapping, and ghost-note data.
 - `src/core/game.js`
-  - Note names, Level 1 treble note pool including first ledger-line notes, bass-note pool, accidental pools, chord pools, piano key definitions, prompt-to-frequency helpers, mode definitions, speed definitions, difficulty definitions, staff/clef/ledger-line layout anchors, beginner practice lifecycle, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
+  - Note names, Level 1 treble note pool including first ledger-line notes, bass-note pool, accidental pools, chord pools, piano key definitions, mode definitions, speed definitions, difficulty definitions, staff/clef/ledger-line layout anchors, beginner practice lifecycle, note queue state, round lifecycle, scoring, misses, timer helpers, high-score keys, and summary view data.
 - `src/core/learning.js`
   - First-run tutorial text, beginner lesson definitions, lesson intro cards, scaffolded answer options, teaching feedback, visual correction overlay data, and beginner-friendly microphone messages.
 - `src/core/pitch.js`

@@ -201,9 +201,11 @@ export function buildStatusViewModel({ state, selectedMode, selectedSpeed, selec
 
 ## Phase 2 — Core boundary cleanup
 
-### Slice 2.1 — Extract music theory helpers
+### Slice 2.1 — Extract music theory helpers — implemented
 
 **Objective:** make pitch/game/renderer modules depend on a small theory module instead of using `game.js` as the shared bucket.
+
+**Implementation note:** landed in Slice 43 as `src/core/music-theory.js` with `tests/music-theory.test.js`. `src/core/pitch.js` and `src/ui/staff-renderer.js` now import theory helpers directly; `src/core/game.js` re-exports the moved helpers for compatibility while using the theory module internally.
 
 **Create:**
 

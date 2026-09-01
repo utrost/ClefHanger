@@ -1,10 +1,10 @@
 import {
   STAFF_LAYOUT,
-  createGhostNoteFromPitch,
   getClefPresentation,
   getLedgerLinesForStaffStep,
   getMode,
-} from '../core/game.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
+} from '../core/game.js?v=clefhanger-slice43-music-theory-2026-09-01';
+import { createGhostNoteFromPitch } from '../core/music-theory.js?v=clefhanger-slice43-music-theory-2026-09-01';
 
 export function yForStaffStep(step) {
   return STAFF_LAYOUT.bottomLineY - step * STAFF_LAYOUT.halfStep;

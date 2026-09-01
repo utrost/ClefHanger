@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './game.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
+import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice43-music-theory-2026-09-01';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;

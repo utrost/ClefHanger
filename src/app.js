@@ -20,9 +20,9 @@ import {
   getSpeed,
   getDifficulty,
   getAnswerOptions,
-  getPromptFrequencies,
-} from './core/game.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
+} from './core/game.js?v=clefhanger-slice43-music-theory-2026-09-01';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice43-music-theory-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice43-music-theory-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -35,12 +35,12 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
-import { BEGINNER_LESSONS, buildAccidentalLearningHint, buildBeginnerMicMessage, buildCorrectionOverlay, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice42-staff-renderer-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice43-music-theory-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice43-music-theory-2026-09-01';
+import { BEGINNER_LESSONS, buildAccidentalLearningHint, buildBeginnerMicMessage, buildCorrectionOverlay, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice43-music-theory-2026-09-01';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice43-music-theory-2026-09-01';
 
-const appVersion = 'clefhanger-slice42-staff-renderer-2026-09-01';
+const appVersion = 'clefhanger-slice43-music-theory-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
