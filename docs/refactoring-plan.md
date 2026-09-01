@@ -261,9 +261,11 @@ npm run check
 - `src/core/pitch.js` no longer imports `src/core/game.js`.
 - Existing scoring/audio behavior is unchanged.
 
-### Slice 2.2 — Extract content and mode catalog
+### Slice 2.2 — Extract content and mode catalog — implemented
 
 **Objective:** separate static drill/catalog definitions from game state transitions.
+
+**Implementation note:** landed in Slice 44 as `src/core/content.js` with `tests/content.test.js`. `src/app.js` imports selectable UI/catalog data directly from `content.js`; `src/core/game.js` imports the catalogs it needs for prompt creation and re-exports the public content helpers for compatibility.
 
 **Create:**
 

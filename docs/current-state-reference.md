@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice43-music-theory-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
+This document describes what exists in code today in `clefhanger-slice44-content-catalog-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
 
 ## Runtime shape
 
@@ -8,11 +8,12 @@ This document describes what exists in code today in `clefhanger-slice43-music-t
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice43-music-theory-2026-09-01`.
-- Current visible slice marker: `Slice 43: music theory`.
-- Current service-worker cache: `clefhanger-pwa-v37`.
+- Current app marker: `clefhanger-slice44-content-catalog-2026-09-01`.
+- Current visible slice marker: `Slice 44: content catalog`.
+- Current service-worker cache: `clefhanger-pwa-v38`.
 - Core/UI modules:
-  - `src/core/game.js`: game state, note pools, scoring, and queues.
+  - `src/core/content.js`: note/chord pools, selectable modes, speed/difficulty catalogs, answer-button definitions, and safe catalog lookups.
+  - `src/core/game.js`: game state, scoring, queues, reducer-style round/practice transitions, and compatibility re-exports for existing importers.
   - `src/core/music-theory.js`: accidentals, pitch-class semitones, equal-tempered prompt frequencies, staff-step mapping, and ghost-note data.
   - `src/core/learning.js`: beginner lessons, first-run tutorial, teaching feedback, correction overlay, friendly mic messages, next-step learning recommendations, accidental learning hints, and interval/jump hints.
   - `src/core/pitch.js`: microphone constraints, frequency-to-note conversion, cents math, calibration readouts, pitch detection, vocal match/scoring debounce.

@@ -24,7 +24,7 @@ The first playable slices proved the simplest complete loop:
 
 ## Current playable slice
 
-Slices through 43 are implemented as a dependency-free static PWA:
+Slices through 44 are implemented as a dependency-free static PWA:
 
 - Beginner-first practice flow: the app now starts in untimed Practice mode instead of throwing a new player straight into a rush.
 - First-run tutorial card with three small tips and a dismiss action.

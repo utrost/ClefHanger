@@ -88,9 +88,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice43-music-theory-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v37`.
-- Visible marker: `Slice 43: music theory`.
+- App version: `clefhanger-slice44-content-catalog-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v38`.
+- Visible marker: `Slice 44: content catalog`.
 
 ## State ownership
 
@@ -125,12 +125,12 @@ Main state fields:
 
 ## Adding or changing notes/modes
 
-Change `src/core/game.js` first:
+Change `src/core/content.js` first:
 
 - Add or edit the relevant pool (`LEVEL_ONE_NOTES`, `BASS_NOTES`, `SHARP_NOTES`, `FLAT_NOTES`, `CHORDS`).
 - Add or edit `GAME_MODES`.
 - Update `getAnswerOptions` if the answer shape changes.
-- Update `getPromptFrequencies` if audio playback needs different frequencies.
+- Update `getPromptFrequencies` in `src/core/music-theory.js` if audio playback needs different frequencies.
 - Update staff-step or ledger tests if geometry changes.
 - Update `docs/current-state-reference.md` and `docs/player-tester-guide.md`.
 
@@ -139,6 +139,7 @@ Watch for:
 - `answerLabel` and `normalizeAnswer` behavior for accidentals.
 - Flat prompts vs sharp detector names.
 - High-score key comparability when a new mode affects scoring.
+- `src/core/game.js` re-exports catalog helpers for compatibility, but new catalog edits should land in `content.js`.
 
 ## Adding beginner lessons
 
@@ -260,10 +261,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice43-music-theory'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice44-content-catalog'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v37'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v38'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

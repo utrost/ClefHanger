@@ -1,11 +1,17 @@
 import {
-  NOTE_BUTTONS,
   ACCIDENTAL_BUTTONS,
-  PIANO_WHITE_KEYS,
-  PIANO_BLACK_KEYS,
-  GAME_MODES,
-  SPEED_SETTINGS,
   DIFFICULTY_LEVELS,
+  GAME_MODES,
+  NOTE_BUTTONS,
+  PIANO_BLACK_KEYS,
+  PIANO_WHITE_KEYS,
+  SPEED_SETTINGS,
+  getAnswerOptions,
+  getDifficulty,
+  getMode,
+  getSpeed,
+} from './core/content.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+import {
   STAFF_LAYOUT,
   createInitialState,
   startRound,
@@ -16,13 +22,9 @@ import {
   getRemainingSeconds,
   getRoundSummary,
   getHighScoreKey,
-  getMode,
-  getSpeed,
-  getDifficulty,
-  getAnswerOptions,
-} from './core/game.js?v=clefhanger-slice43-music-theory-2026-09-01';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice43-music-theory-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice43-music-theory-2026-09-01';
+} from './core/game.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice44-content-catalog-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -35,12 +37,12 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice43-music-theory-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice43-music-theory-2026-09-01';
-import { BEGINNER_LESSONS, buildAccidentalLearningHint, buildBeginnerMicMessage, buildCorrectionOverlay, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice43-music-theory-2026-09-01';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice43-music-theory-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+import { BEGINNER_LESSONS, buildAccidentalLearningHint, buildBeginnerMicMessage, buildCorrectionOverlay, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice44-content-catalog-2026-09-01';
 
-const appVersion = 'clefhanger-slice43-music-theory-2026-09-01';
+const appVersion = 'clefhanger-slice44-content-catalog-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
