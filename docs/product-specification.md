@@ -40,7 +40,7 @@ Microphone input listens for a steady monophonic pitch from humming, singing, vi
 
 ## 5. Tech Stack & Architecture
 
-The exact shipped implementation is documented in [Current State Reference](./current-state-reference.md). Player/tester instructions are in [Player and Tester Guide](./player-tester-guide.md); continuation notes are in [Developer Handoff](./developer-handoff.md).
+The intended player behavior is described in [User Journey](./user-journey.md). The exact shipped implementation is documented in [Current State Reference](./current-state-reference.md). Player/tester instructions are in [Player and Tester Guide](./player-tester-guide.md); continuation notes are in [Developer Handoff](./developer-handoff.md).
 
 - **Frontend:** dependency-free HTML, CSS, and JavaScript
   - Mobile-responsive design and touch controls.

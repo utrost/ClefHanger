@@ -17,6 +17,7 @@ Important files:
 - `src/core/audio.js`: Web Audio note playback.
 - `sw.js`: service-worker app shell cache.
 - `tests/*.test.js`: Node test suite using `node:test`.
+- `docs/user-journey.md`: product-level player journey and intended user actions.
 - `docs/current-state-reference.md`: exact current implementation reference.
 - `docs/player-tester-guide.md`: first-time player/tester guide.
 - `docs/smoke-checklist.md`: manual local/live smoke checklist.
@@ -268,6 +269,7 @@ Keep these docs aligned:
 - `docs/product-specification.md`: product intent and implemented capability summary.
 - `docs/mvp-roadmap.md`: implemented slices vs future candidates.
 - `docs/architecture.md`: module architecture and current behavior summary.
+- `docs/user-journey.md`: what a normal player is supposed to do.
 - `docs/current-state-reference.md`: exact current facts and constants.
 - `docs/player-tester-guide.md`: user/tester operating guide.
 - `docs/smoke-checklist.md`: local/live verification steps.

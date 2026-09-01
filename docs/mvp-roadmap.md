@@ -1,6 +1,6 @@
 # MVP Implementation Roadmap
 
-This roadmap separates the first shippable game loop from later learning depth. Features below are planned unless explicitly marked as implemented in code. For the exact current implementation contract, see [Current State Reference](./current-state-reference.md); for tester instructions, see [Player and Tester Guide](./player-tester-guide.md); for continuation/deploy rules, see [Developer Handoff](./developer-handoff.md).
+This roadmap separates the first shippable game loop from later learning depth. Features below are planned unless explicitly marked as implemented in code. For the intended player behavior, see [User Journey](./user-journey.md); for the exact current implementation contract, see [Current State Reference](./current-state-reference.md); for tester instructions, see [Player and Tester Guide](./player-tester-guide.md); for continuation/deploy rules, see [Developer Handoff](./developer-handoff.md).
 
 ## Slice 0 — Repo foundation — implemented
 

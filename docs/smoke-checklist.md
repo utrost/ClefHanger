@@ -2,7 +2,7 @@
 
 Use this checklist before calling a build ready for actual testing.
 
-For exact current rules and constants, see [Current State Reference](./current-state-reference.md). For a first-time tester walkthrough, see [Player and Tester Guide](./player-tester-guide.md).
+For exact current rules and constants, see [Current State Reference](./current-state-reference.md). For what a normal player is supposed to do, see [User Journey](./user-journey.md). For a first-time tester walkthrough, see [Player and Tester Guide](./player-tester-guide.md).
 
 ## Local browser smoke
 

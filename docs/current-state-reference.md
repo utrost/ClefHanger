@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice38-mic-scoring-2026-09-01`. It is an implementation reference, not a future roadmap.
+This document describes what exists in code today in `clefhanger-slice38-mic-scoring-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
 
 ## Runtime shape
 
