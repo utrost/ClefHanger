@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice35-built-in-mics-2026-09-01">
+<html lang="en" data-app-version="clefhanger-slice36-android-recorder-2026-09-01">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -521,7 +521,7 @@
           <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 35: built-in mics + vocal gain</p>
+        <p class="microcopy">Slice 36: Android recorder nudge + vocal gain</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -579,12 +579,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice35-built-in-mics-2026-09-01"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice36-android-recorder-2026-09-01"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice35-built-in-mics-2026-09-01')
+            .register('./sw.js?v=clefhanger-slice36-android-recorder-2026-09-01')
             .then((registration) => registration.update())
             .catch(() => {});
         });

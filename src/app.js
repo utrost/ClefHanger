@@ -23,8 +23,8 @@ import {
   getLedgerLinesForStaffStep,
   getAnswerOptions,
   getPromptFrequencies,
-} from './core/game.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
+} from './core/game.js?v=clefhanger-slice36-android-recorder-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice36-android-recorder-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -37,11 +37,11 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice36-android-recorder-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice36-android-recorder-2026-09-01';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice36-android-recorder-2026-09-01';
 
-const appVersion = 'clefhanger-slice35-built-in-mics-2026-09-01';
+const appVersion = 'clefhanger-slice36-android-recorder-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -495,8 +495,9 @@ async function recordMicrophoneDiagnostic() {
       recorder.addEventListener('stop', resolve, { once: true });
       recorder.addEventListener('error', () => reject(recorder.error || new Error('MediaRecorder failed')), { once: true });
     });
-    recorder.start();
+    recorder.start(250);
     await new Promise((resolve) => setTimeout(resolve, 1000));
+    recorder.requestData?.();
     if (recorder.state !== 'inactive') recorder.stop();
     await stopped;
     const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
@@ -527,7 +528,10 @@ async function recordMicrophoneDiagnostic() {
         message += ' Browser recorded data, but Web Audio could not decode it here.';
       }
     }
-    if (blob.size === 0) message = 'Recording test: captured 0 bytes — Firefox/Android is not delivering microphone audio.';
+    if (blob.size === 0) {
+      const liveLevel = formatDiagnosticLevelPercent(microphoneState.inputLevel);
+      message = `Recording test: MediaRecorder returned 0 bytes. live mic level ${liveLevel}; try live Mic play anyway, or retest in Chrome/Safari if export stays empty.`;
+    }
     else if (decodedRms === 0) message += ' Decoded audio is silent.';
     lastMicRecordingEvidence = { bytes: blob.size, mimeType: blob.type, samples: decodedSamples, sampleRate: decodedSampleRate };
     microphoneRecordingDiagnostic = message;

@@ -1,4 +1,4 @@
-import { answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
+import { answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice36-android-recorder-2026-09-01';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 35;
