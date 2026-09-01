@@ -311,9 +311,11 @@ npm run check
 - Adding a future mode mostly touches `content.js` plus tests/docs, not reducer internals.
 - `game.js` reads catalogs but does not define large prompt arrays inline.
 
-### Slice 2.3 — Extract scoring helpers
+### Slice 2.3 — Extract scoring helpers — implemented
 
 **Objective:** isolate scoring arithmetic and high-score comparability rules from reducer flow.
+
+**Implementation note:** landed in Slice 45 as `src/core/scoring.js` with `tests/scoring.test.js`. `src/core/game.js` now delegates correct-answer point calculation and round-summary construction to scoring helpers, while re-exporting scoring helpers for existing imports.
 
 **Create:**
 

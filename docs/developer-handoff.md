@@ -12,7 +12,8 @@ Important files:
 - `src/app.js`: DOM adapter and browser runtime orchestration.
 - `src/ui/staff-renderer.js`: pure SVG staff/note/chord/correction/ghost-note renderer.
 - `src/core/music-theory.js`: pure accidentals, semitone, frequency, staff-step, and ghost-note helpers.
-- `src/core/game.js`: renderer-free game model and scoring reducer.
+- `src/core/scoring.js`: pure score, accuracy, high-score-key, and round-summary helpers.
+- `src/core/game.js`: renderer-free game model and round/practice reducer.
 - `src/core/learning.js`: beginner learning layer.
 - `src/core/pitch.js`: microphone and pitch logic.
 - `src/core/mic-diagnostics.js`: Mic Lab reporting.
@@ -69,6 +70,8 @@ Good seam order:
 
 Do not make microphone, scoring, notation, lesson, or persistence changes only in `src/app.js`. Put the rule in a core module first.
 
+Scoring changes should start in `src/core/scoring.js` with focused coverage in `tests/scoring.test.js`; `src/core/game.js` should call those helpers from reducer flow rather than embedding point arithmetic.
+
 ## Native ES-module versioning
 
 This project does not bundle files into content-hashed assets. That means browser and service-worker caches can serve mixed old/new modules unless every marker is bumped together.
@@ -88,9 +91,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice44-content-catalog-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v38`.
-- Visible marker: `Slice 44: content catalog`.
+- App version: `clefhanger-slice45-scoring-helpers-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v39`.
+- Visible marker: `Slice 45: scoring helpers`.
 
 ## State ownership
 
@@ -261,10 +264,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice44-content-catalog'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice45-scoring-helpers'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v38'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v39'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

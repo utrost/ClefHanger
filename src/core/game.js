@@ -1,13 +1,15 @@
-import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js?v=clefhanger-slice44-content-catalog-2026-09-01';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice44-content-catalog-2026-09-01';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+} from './content.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -25,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice44-content-catalog-2026-09-01';
+} from './content.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
 
 
 export const STAFF_LAYOUT = {
@@ -71,10 +73,6 @@ export function normalizeAnswer(answer) {
     .replace(/^([A-G])#$/, '$1♯')
     .replace(/^([A-G])B$/, '$1♭')
     .replace(/^[A-G]{3}$/, (value) => value.split('').join('-'));
-}
-
-export function getHighScoreKey(modeId = 'basics', speedId = '5', difficultyId = 'beginner') {
-  return `clefhanger.highScore.${getMode(modeId).id}.speed${getSpeed(speedId).id}.${getDifficulty(difficultyId).id}.v5`;
 }
 
 export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Date.now(), modeId = 'basics', speedId = '5', difficultyId = 'beginner', lessonId = 'first-steps' } = {}) {
@@ -205,9 +203,7 @@ export function answerActiveNote(state, answer, nowMs) {
     const mode = getMode(next.modeId);
     const speed = getSpeed(next.speedId);
     const difficulty = getDifficulty(next.difficultyId);
-    const streakBonus = Math.min(80, Math.max(0, next.streak) * 20);
-    const speedBonus = speed.value >= 8 ? 40 : speed.value >= 6 ? 20 : 0;
-    const points = Math.round((mode.basePoints + speedBonus + streakBonus) * difficulty.scoreMultiplier);
+    const points = calculatePoints({ mode, speed, difficulty, streak: next.streak });
     next.correct += 1;
     next.streak += 1;
     next.bestStreak = Math.max(next.bestStreak, next.streak);
@@ -269,27 +265,5 @@ export function getRemainingSeconds(state, nowMs) {
 }
 
 export function getRoundSummary(state) {
-  const attempts = state.correct + state.wrong + state.missed;
-  const accuracy = attempts === 0 ? 0 : Math.round((state.correct / attempts) * 100);
-  const mode = getMode(state.modeId).label;
-  const speed = getSpeed(state.speedId).label;
-  const difficulty = getDifficulty(state.difficultyId).label;
-  const title = 'Time! Sprint complete';
-  const headline = `${state.score} points · ${accuracy}% accuracy`;
-  const detail = `${state.correct} correct · ${state.wrong} wrong · ${state.missed} missed · best streak ${state.bestStreak}`;
-  return {
-    title,
-    mode,
-    speed,
-    difficulty,
-    score: state.score,
-    correct: state.correct,
-    wrong: state.wrong,
-    missed: state.missed,
-    bestStreak: state.bestStreak,
-    accuracy,
-    headline,
-    detail,
-    primaryAction: 'Play another 60s rush',
-  };
+  return buildRoundSummary(state);
 }
