@@ -24,7 +24,7 @@ The first playable slices proved the simplest complete loop:
 
 ## Current playable slice
 
-Slices through 25 are implemented as a dependency-free static PWA:
+Slices through 38 are implemented as a dependency-free static PWA:
 
 - Beginner-first practice flow: the app now starts in untimed Practice mode instead of throwing a new player straight into a rush.
 - First-run tutorial card with three small tips and a dismiss action.
@@ -44,7 +44,7 @@ Slices through 25 are implemented as a dependency-free static PWA:
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
 - Toggleable input: large note buttons, a one-octave on-screen piano strip, or Sing/Play microphone input for humming, singing, violin, guitar, or other steady monophonic instruments.
-- Sing/Play input draws a translucent green ghost note on the staff at the detected pitch, plus a `You played A4 · 440 Hz · in tune` style readout. When the ghost note matches the front staff note's exact pitch class and octave within tolerance, the game treats the note as hit. Enharmonic flat prompts such as `D♭` can be scored from a detector readout named `C♯` when the frequency is correct.
+- Sing/Play input draws a translucent green ghost note on the staff at the detected pitch, plus a `You played A4 · 440 Hz · in tune` style readout. When the detected pitch class matches the front staff note and stays inside the forgiving vocal tolerance for a short stability window, the game treats the note as hit; any octave is accepted for now. Enharmonic flat prompts such as `D♭` can be scored from a detector readout named `C♯` when the frequency is correct.
 - Actual vocal calibration: grant mic access, sing any steady comfortable note to see detected note/frequency/cents; concert A is only an optional reference tone.
 - Mic input shows a plain `You played A4 · 440 Hz · in tune` style readout so the singer can see what the phone heard even before it scores. Real-device recognition is still under active testing when a phone/browser hears a piano or voice but does not lock a steady pitch.
 - Implausible microphone spikes outside the playable vocal range are ignored instead of being shown as absurd octave readings such as `G♯8`.
@@ -53,8 +53,8 @@ Slices through 25 are implemented as a dependency-free static PWA:
 - A 1-second microphone recording diagnostic can compare MediaRecorder capture against the Web Audio analyser path when a browser still reports `mic level 0%`, and it attempts to detect any steady recorded pitch from low male range through A4 rather than requiring the singer to hit concert A.
 - Mic Lab can label a silence/voice/piano/app-tone capture and export a Telegram-friendly `.txt` JSON report with browser, track, live analyser, recording, decoded-level, and pitch-window evidence for fixture-based debugging.
 - Real-device Mic Lab reports guard a regression where the browser's animation-frame timestamp could be mistaken for a live pitch value; the live analyser loop now passes that timestamp as time only.
-- Mic capture now requests raw-ish instrument audio (`echoCancellation`, `noiseSuppression`, and `autoGainControl` off) because browser speech cleanup can suppress speaker/YouTube piano tones before pitch detection sees them. Browsers may ignore the request, so Mic Lab reports still include the actual track settings.
-- Microphone mode can score sung natural-note answers when the detected pitch is within tolerance; chord singing is not scored yet.
+- Mic capture now requests a built-in-vocal profile (`echoCancellation` and `noiseSuppression` off, `autoGainControl` on) because Android Firefox needed gain for usable voice levels while still avoiding speech cleanup that suppresses steady tones. Mic Lab reports still include the actual track settings because browsers may ignore parts of the request.
+- Microphone mode can score sung natural-note answers by pitch class with a forgiving 50-cent tolerance, short steady-note debounce, and a `window.clefhangerInjectPitch(frequency)` smoke hook for regression testing without a physical microphone; chord singing is not scored yet.
 - Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play a small piano-like Web Audio voice instead of a plain beep; chords play as short arpeggios.
 - The optional typed-answer row has been removed to keep the mobile controls thumb-first.

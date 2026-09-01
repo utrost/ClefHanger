@@ -56,8 +56,8 @@ Current repository behavior:
 - A 1-second microphone recording diagnostic can compare MediaRecorder capture against the Web Audio analyser path when a browser still reports `mic level 0%`, and it attempts to detect any steady recorded pitch from low male range through A4 rather than requiring the singer to hit concert A.
 - Mic Lab reports are exported as `.txt` JSON so phone/browser evidence can be sent back from Telegram and preserved as regression fixtures before changing pitch thresholds.
 - The live analyser loop schedules `requestAnimationFrame((timestamp) => processMicrophoneFrame(null, timestamp))` so the browser frame timestamp is not misread as a pitch-frequency override.
-- `getUserMedia` requests instrument-friendly raw audio constraints (`echoCancellation: false`, `noiseSuppression: false`, `autoGainControl: false`, mono). This is especially important when testing with piano tones from speakers/YouTube because default speech processing can remove steady tones as echo/noise.
-- Microphone mode can score sung natural-note prompts when the detected pitch is within tolerance and debounce. Chord singing is not scored yet.
+- `getUserMedia` currently uses the built-in-vocal microphone constraints (`echoCancellation: false`, `noiseSuppression: false`, `autoGainControl: true`, mono). Android Firefox field reports showed the gain path gives usable voice levels while still avoiding browser cleanup that can remove steady musical tones as echo/noise.
+- Microphone mode can score sung natural-note prompts by pitch class, independent of octave, when the detected note stays within a forgiving 50-cent vocal tolerance for a short stability window. A post-hit debounce prevents repeated animation-frame scoring, and `window.clefhangerInjectPitch(frequency)` gives browser smoke tests a no-hardware pitch-injection seam. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
 - 60-second rush round.
 - Mode-weighted scoring, slider-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-slider-speed/per-difficulty high-score persistence.

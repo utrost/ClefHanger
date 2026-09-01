@@ -1,8 +1,9 @@
-import { SEMITONES_FROM_C, answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
+import { SEMITONES_FROM_C, answerLabel } from './game.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
-const DEFAULT_TOLERANCE_CENTS = 35;
+const DEFAULT_TOLERANCE_CENTS = 50;
 const DEFAULT_DEBOUNCE_MS = 650;
+const DEFAULT_STABLE_WINDOW_MS = 150;
 const MIN_PLAYABLE_MIC_FREQUENCY = 80;
 const MAX_PLAYABLE_MIC_FREQUENCY = 1000;
 const MIN_PITCH_RMS = 0.0005;
@@ -48,6 +49,7 @@ export function createMicrophoneState() {
     calibration: null,
     error: null,
     lastAcceptedAtMs: 0,
+    vocalCandidate: null,
   };
 }
 
@@ -131,17 +133,44 @@ export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs 
   if (nowMs - lastAcceptedAtMs < debounceMs) return { status: 'debounce', answer: null, detected, cents: null };
   if (prompt.kind === 'chord') return { status: 'unsupported-chord', answer: null, detected, cents: null };
 
-  const targetFrequency = getPitchFrequency(prompt.noteName, prompt.octave, prompt.accidental);
-  const cents = targetFrequency ? Math.round(centsBetween(frequency, targetFrequency)) : null;
   const targetAnswer = answerLabel(prompt.noteName, prompt.accidental);
   const targetSemitone = SEMITONES_FROM_C[targetAnswer];
   const detectedSemitone = SEMITONES_FROM_C[detected.answer];
   const samePitchClass = targetSemitone !== undefined && targetSemitone === detectedSemitone;
+  const cents = samePitchClass ? detected.cents : centsToNearestPitchClass({ frequency, targetSemitone });
   const inTune = cents !== null && Math.abs(cents) <= toleranceCents;
   if (samePitchClass && inTune) {
     return { status: 'match', answer: targetAnswer, detected, cents };
   }
   return { status: samePitchClass ? 'out-of-tune' : 'wrong-note', answer: null, detected, cents };
+}
+
+export function evaluateVocalMatchFrame({ prompt, frequency, nowMs, previousCandidate = null, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS, stableWindowMs = DEFAULT_STABLE_WINDOW_MS } = {}) {
+  const match = classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs, toleranceCents, debounceMs });
+  if (match.status === 'debounce') return { ...match, candidate: previousCandidate || null };
+  if (match.status !== 'match') return { ...match, candidate: null };
+
+  const candidate = previousCandidate?.answer === match.answer
+    ? previousCandidate
+    : { answer: match.answer, sinceMs: nowMs };
+  if (nowMs - candidate.sinceMs < stableWindowMs) {
+    return { ...match, status: 'pending-stable', answer: null, candidate };
+  }
+  return { ...match, candidate };
+}
+
+function centsToNearestPitchClass({ frequency, targetSemitone } = {}) {
+  if (!Number.isFinite(frequency) || targetSemitone === undefined) return null;
+  const detected = frequencyToNearestPitch(frequency);
+  if (!detected) return null;
+  let nearest = null;
+  for (let octave = 0; octave <= 8; octave += 1) {
+    const midi = (octave + 1) * 12 + targetSemitone;
+    const targetFrequency = 440 * (2 ** ((midi - 69) / 12));
+    const cents = Math.round(centsBetween(frequency, targetFrequency));
+    if (nearest === null || Math.abs(cents) < Math.abs(nearest)) nearest = cents;
+  }
+  return nearest;
 }
 
 export function detectPitchFromTimeDomain(samples, sampleRate) {

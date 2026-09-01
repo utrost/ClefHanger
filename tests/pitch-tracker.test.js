@@ -8,6 +8,7 @@ import {
   createMicrophoneState,
   detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
+  evaluateVocalMatchFrame,
   frequencyToNearestPitch,
   getBuiltInVocalMicrophoneConstraints,
   getInstrumentMicrophoneConstraints,
@@ -100,15 +101,43 @@ test('scores exact sung pitch for flat prompts even when detection names the enh
   assert.ok(Math.abs(match.cents) <= 2);
 });
 
-test('requires the exact octave, not just the same note letter, for sung answers', () => {
+test('scores microphone note answers by pitch class across octaves with forgiving vocal tolerance', () => {
   const prompt = { answer: 'C', noteName: 'C', octave: 4 };
-  const match = classifyVocalMatch({ prompt, frequency: 523.25, nowMs: 1000, lastAcceptedAtMs: 0 });
+  const octaveUp = classifyVocalMatch({ prompt, frequency: 523.25, nowMs: 1000, lastAcceptedAtMs: 0 });
 
-  assert.equal(match.status, 'out-of-tune');
-  assert.equal(match.answer, null);
-  assert.equal(match.detected.answer, 'C');
-  assert.equal(match.detected.octave, 5);
-  assert.ok(match.cents > 1100);
+  assert.equal(octaveUp.status, 'match');
+  assert.equal(octaveUp.answer, 'C');
+  assert.equal(octaveUp.detected.answer, 'C');
+  assert.equal(octaveUp.detected.octave, 5);
+  assert.ok(Math.abs(octaveUp.cents) <= 1);
+
+  const beginnerVoiceNearBoundary = classifyVocalMatch({ prompt: { answer: 'B', noteName: 'B', octave: 4 }, frequency: 125.98, nowMs: 1000, lastAcceptedAtMs: 0 });
+  assert.equal(beginnerVoiceNearBoundary.status, 'match');
+  assert.equal(beginnerVoiceNearBoundary.answer, 'B');
+  assert.equal(beginnerVoiceNearBoundary.detected.octave, 2);
+  assert.equal(beginnerVoiceNearBoundary.cents, 35);
+});
+
+test('debounces microphone scoring until the same in-tune pitch class is stable for a short window', () => {
+  const prompt = { answer: 'A', noteName: 'A', octave: 4 };
+  const first = evaluateVocalMatchFrame({ prompt, frequency: 440, nowMs: 1000, previousCandidate: null, lastAcceptedAtMs: 0 });
+  assert.equal(first.status, 'pending-stable');
+  assert.equal(first.answer, null);
+  assert.deepEqual(first.candidate, { answer: 'A', sinceMs: 1000 });
+
+  const stillTooSoon = evaluateVocalMatchFrame({ prompt, frequency: 441, nowMs: 1120, previousCandidate: first.candidate, lastAcceptedAtMs: 0 });
+  assert.equal(stillTooSoon.status, 'pending-stable');
+  assert.equal(stillTooSoon.answer, null);
+  assert.deepEqual(stillTooSoon.candidate, { answer: 'A', sinceMs: 1000 });
+
+  const stable = evaluateVocalMatchFrame({ prompt, frequency: 442, nowMs: 1160, previousCandidate: stillTooSoon.candidate, lastAcceptedAtMs: 0 });
+  assert.equal(stable.status, 'match');
+  assert.equal(stable.answer, 'A');
+  assert.deepEqual(stable.candidate, { answer: 'A', sinceMs: 1000 });
+
+  const cooldown = evaluateVocalMatchFrame({ prompt, frequency: 442, nowMs: 1200, previousCandidate: stable.candidate, lastAcceptedAtMs: 1160 });
+  assert.equal(cooldown.status, 'debounce');
+  assert.equal(cooldown.answer, null);
 });
 
 test('microphone mode is a first-class input option with permission state', () => {
@@ -126,6 +155,7 @@ test('microphone mode is a first-class input option with permission state', () =
     calibration: null,
     error: null,
     lastAcceptedAtMs: 0,
+    vocalCandidate: null,
   });
 });
 

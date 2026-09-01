@@ -24,25 +24,25 @@ import {
   getAnswerOptions,
   getPromptFrequencies,
   createGhostNoteFromPitch,
-} from './core/game.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
+} from './core/game.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
   buildMicrophoneListeningMessage,
-  classifyVocalMatch,
   createMicrophoneState,
   detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
+  evaluateVocalMatchFrame,
   frequencyToNearestPitch,
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice37-singplay-ghost-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice38-mic-scoring-2026-09-01';
 
-const appVersion = 'clefhanger-slice37-singplay-ghost-2026-09-01';
+const appVersion = 'clefhanger-slice38-mic-scoring-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -451,7 +451,7 @@ async function startMicrophone() {
     return false;
   }
   try {
-    microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null, inputLevel: 0, silentFrameCount: 0, trackState: 'none' };
+    microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null, inputLevel: 0, silentFrameCount: 0, trackState: 'none', vocalCandidate: null };
     render();
     const permissionState = await checkMicrophonePermissionState();
     if (permissionState === 'denied') {
@@ -608,7 +608,9 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
     const calibration = buildCalibrationReading(frequency);
     microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, inputLevel, silentFrameCount: 0, trackState: getMicrophoneTrackState(), calibration };
     if (selectedInputMode === 'microphone' && ['running', 'practice'].includes(state.phase)) {
-      const match = classifyVocalMatch({ prompt: state.activeNote, frequency, nowMs, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs });
+      const match = evaluateVocalMatchFrame({ prompt: state.activeNote, frequency, nowMs, previousCandidate: microphoneState.vocalCandidate, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs });
+      microphoneState = { ...microphoneState, vocalCandidate: match.candidate };
+      if (match.status === 'pending-stable') microphoneDebugText = `Hold ${match.detected.answer} steady…`;
       if (match.status === 'match') {
         microphoneState = { ...microphoneState, lastAcceptedAtMs: nowMs };
         handleAnswer(match.answer);
@@ -624,6 +626,7 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
       silentFrameCount: (microphoneState.silentFrameCount || 0) + 1,
       trackState: getMicrophoneTrackState(),
       calibration: buildCalibrationReading(null),
+      vocalCandidate: null,
     };
   }
 
@@ -864,8 +867,11 @@ window.__clefHanger = {
   buildCurrentMicReport,
   downloadMicReport,
   processMicrophoneFrame,
+  clefhangerInjectPitch: (frequency, nowMs = performance.now()) => processMicrophoneFrame(frequency, nowMs),
   getMicrophoneState: () => microphoneState,
   getMicrophoneRecordingDiagnostic: () => microphoneRecordingDiagnostic,
   openSettings,
   closeSettings,
 };
+
+window.clefhangerInjectPitch = window.__clefHanger.clefhangerInjectPitch;

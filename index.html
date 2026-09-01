@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice37-singplay-ghost-2026-09-01">
+<html lang="en" data-app-version="clefhanger-slice38-mic-scoring-2026-09-01">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -522,10 +522,10 @@
         <div id="microphone-panel" aria-label="Microphone answer status" hidden>
           <p id="microphone-status">Mic off. Grant mic to calibrate and sing answers.</p>
           <p id="heard-note" aria-live="polite">You played —</p>
-          <p>Sing the front note. ClefHanger accepts a steady pitch within 35 cents.</p>
+          <p>Sing the front note. ClefHanger accepts a steady matching pitch class within 50 cents, in any octave for now.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 37: Sing/Play ghost note</p>
+        <p class="microcopy">Slice 38: forgiving mic scoring</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -583,12 +583,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice37-singplay-ghost-2026-09-01"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice38-mic-scoring-2026-09-01"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice37-singplay-ghost-2026-09-01')
+            .register('./sw.js?v=clefhanger-slice38-mic-scoring-2026-09-01')
             .then((registration) => registration.update())
             .catch(() => {});
         });
