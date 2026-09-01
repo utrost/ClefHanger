@@ -1,4 +1,4 @@
-import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js';
+import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js?v=clefhanger-slice33-cache-refresh-2026-09-01';
 
 export const NOTE_BUTTONS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 export const ACCIDENTAL_BUTTONS = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯', 'D♭', 'E♭', 'G♭', 'A♭', 'B♭'];

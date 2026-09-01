@@ -23,8 +23,8 @@ import {
   getLedgerLinesForStaffStep,
   getAnswerOptions,
   getPromptFrequencies,
-} from './core/game.js';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js';
+} from './core/game.js?v=clefhanger-slice33-cache-refresh-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice33-cache-refresh-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -37,9 +37,9 @@ import {
   getInstrumentMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js';
+} from './core/pitch.js?v=clefhanger-slice33-cache-refresh-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice33-cache-refresh-2026-09-01';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice33-cache-refresh-2026-09-01';
 
 const appVersion = 'clefhanger-slice33-cache-refresh-2026-09-01';
 const staff = document.querySelector('#staff');
