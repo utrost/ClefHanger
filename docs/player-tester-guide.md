@@ -99,8 +99,8 @@ Open **Settings** to change modes.
 
 - **Treble**: natural treble notes.
 - **Bass**: lower-register bass-clef notes.
-- **Sharps #**: sharp note names.
-- **Flats ♭**: flat note names.
+- **Sharps #**: sharp note names. The learning suggestion explains that `♯` keeps the note on the same staff spot as the natural note, then raises the pitch.
+- **Flats ♭**: flat note names. The learning suggestion explains that `♭` keeps the note on the same staff spot as the natural note, then lowers the pitch.
 - **Chords**: direct triad-name buttons such as C, Dm, Em, F, G, Am.
 
 Beginner lesson narrowing only applies to Treble + Beginner. Other modes expose their full answer set.
@@ -242,7 +242,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 39: learning coach`.
+2. Confirm the page shows `Slice 40: accidental learning`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus highlighted correct answer.
 5. Tap the correct answer and verify score increases and a pitch plays.

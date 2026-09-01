@@ -1,18 +1,18 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice39-learning-coach-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
+This document describes what exists in code today in `clefhanger-slice40-accidental-learning-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
 
 ## Runtime shape
 
 - App type: dependency-free static PWA.
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
-- Current app marker: `clefhanger-slice39-learning-coach-2026-09-01`.
-- Current visible slice marker: `Slice 39: learning coach`.
-- Current service-worker cache: `clefhanger-pwa-v33`.
+- Current app marker: `clefhanger-slice40-accidental-learning-2026-09-01`.
+- Current visible slice marker: `Slice 40: accidental learning`.
+- Current service-worker cache: `clefhanger-pwa-v34`.
 - Core modules:
   - `src/core/game.js`: game state, note pools, scoring, queues, pitch-frequency helpers, ghost-note geometry.
-  - `src/core/learning.js`: beginner lessons, first-run tutorial, teaching feedback, correction overlay, friendly mic messages, and next-step learning recommendations.
+  - `src/core/learning.js`: beginner lessons, first-run tutorial, teaching feedback, correction overlay, friendly mic messages, next-step learning recommendations, and accidental learning hints.
   - `src/core/pitch.js`: microphone constraints, frequency-to-note conversion, cents math, calibration readouts, pitch detection, vocal match/scoring debounce.
   - `src/core/mic-diagnostics.js`: decoded-audio summaries, recorded pitch windows, Mic Lab report JSON and `.txt` export.
   - `src/core/audio.js`: synthetic piano-like Web Audio voice and A4 reference tone.
@@ -201,6 +201,7 @@ Current thresholds and messages:
 - Rush at or above 80% accuracy with no next lesson: suggest changing only one setting for more challenge.
 - Rush with many misses at higher speed: suggest lowering speed on the same lesson.
 - Microphone mode without stable pitch: suggest using Notes first and troubleshooting Sing/Play separately.
+- Sharp/flat prompts in Sharps or Flats mode: explain that the accidental uses the same staff spot as the natural note, then raises or lowers it by one small step.
 
 The line renders under the main feedback as `#learning-coach` with `aria-label="Learning suggestion"`. The ending splash repeats the recommendation in its detail text.
 

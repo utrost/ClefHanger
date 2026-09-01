@@ -7,6 +7,7 @@ import {
   buildBeginnerMicMessage,
   buildCorrectionOverlay,
   buildLearningRecommendation,
+  buildAccidentalLearningHint,
   buildTutorialSteps,
   getBeginnerLesson,
   getLessonIntroCard,
@@ -131,6 +132,18 @@ test('learning coach recommends repeat, rush, or next lesson from simple progres
   const tooManyMisses = buildLearningRecommendation({ playStyle: 'rush', lessonId: 'mixed', correct: 4, wrong: 0, missed: 5, accuracy: 44, speedId: '8' });
   assert.equal(tooManyMisses.kind, 'lower-speed');
   assert.match(tooManyMisses.text, /lower speed/i);
+});
+
+test('accidental learning hint explains that sharps and flats reuse staff positions', () => {
+  const sharpHint = buildAccidentalLearningHint({ modeId: 'sharps', prompt: { noteName: 'C', accidental: 'sharp', answer: 'C♯' } });
+  assert.match(sharpHint.text, /same staff spot as C/i);
+  assert.match(sharpHint.text, /♯ raises/i);
+
+  const flatHint = buildAccidentalLearningHint({ modeId: 'flats', prompt: { noteName: 'D', accidental: 'flat', answer: 'D♭' } });
+  assert.match(flatHint.text, /same staff spot as D/i);
+  assert.match(flatHint.text, /♭ lowers/i);
+
+  assert.equal(buildAccidentalLearningHint({ modeId: 'basics', prompt: { answer: 'C' } }), null);
 });
 
 test('user journey documents the learning contract before adding more notation', () => {

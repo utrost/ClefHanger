@@ -177,7 +177,7 @@ Use Piano input when:
 
 - note names are already somewhat familiar;
 - the user wants to see where C, D, E, F, G, A, B sit on a keyboard;
-- practicing Sharps or Flats, where black keys matter.
+- practicing Sharps or Flats, where black keys matter and the suggestion line explains how `♯` and `♭` modify the same staff position.
 
 ### Sing/Play input
 

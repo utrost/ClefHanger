@@ -221,12 +221,13 @@ Verification — implemented:
 - Browser-smoke that the recommendation appears after relevant user actions and never blocks the main controls.
 - Update `docs/user-journey.md`, `docs/player-tester-guide.md`, and `docs/current-state-reference.md` with the actual recommendation wording and thresholds.
 
-## Slice 8e — Accidentals as learning
+## Slice 8e — Accidentals as learning — implemented
 
-- Turn the existing sharp/flat mechanics into a beginner lesson.
+- Turn the existing sharp/flat mechanics into beginner-facing learning guidance.
 - Show how the same staff position changes answer with `♯` or `♭`.
 - Keep direct touch answers; no typed input.
-- Start this after Slice 8d.4 or keep its first pass documentation-only; beginners need a clear progression contract before more notation variants are added.
+- The same learning suggestion line explains `C♯`/`D♭` style prompts as the same staff position plus a raised/lowered accidental.
+- Future work can still add fuller accidental-specific lesson cards after real use shows which copy helps.
 
 ## Slice 8f — Intervals and rapid jumps
 

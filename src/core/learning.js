@@ -139,6 +139,21 @@ export function getNextBeginnerLesson(lessonId = 'first-steps') {
   return BEGINNER_LESSONS[index + 1] || null;
 }
 
+export function buildAccidentalLearningHint({ modeId = 'basics', prompt } = {}) {
+  if (!['sharps', 'flats'].includes(modeId) || !prompt?.answer) return null;
+  const base = prompt.noteName || prompt.answer[0];
+  if (modeId === 'sharps') {
+    return {
+      kind: 'accidental-sharp',
+      text: `${prompt.answer} uses the same staff spot as ${base}; ♯ raises it by one small step.`,
+    };
+  }
+  return {
+    kind: 'accidental-flat',
+    text: `${prompt.answer} uses the same staff spot as ${base}; ♭ lowers it by one small step.`,
+  };
+}
+
 export function buildLearningRecommendation({
   playStyle = 'practice',
   lessonId = 'first-steps',
