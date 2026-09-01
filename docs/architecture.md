@@ -56,6 +56,7 @@ Current repository behavior:
 - A 1-second microphone recording diagnostic can compare MediaRecorder capture against the Web Audio analyser path when a browser still reports `mic level 0%`, and it attempts to detect any steady recorded pitch from low male range through A4 rather than requiring the singer to hit concert A.
 - Mic Lab reports are exported as `.txt` JSON so phone/browser evidence can be sent back from Telegram and preserved as regression fixtures before changing pitch thresholds.
 - The live analyser loop schedules `requestAnimationFrame((timestamp) => processMicrophoneFrame(null, timestamp))` so the browser frame timestamp is not misread as a pitch-frequency override.
+- `getUserMedia` requests instrument-friendly raw audio constraints (`echoCancellation: false`, `noiseSuppression: false`, `autoGainControl: false`, mono). This is especially important when testing with piano tones from speakers/YouTube because default speech processing can remove steady tones as echo/noise.
 - Microphone mode can score sung natural-note prompts when the detected pitch is within tolerance and debounce. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
 - 60-second rush round.

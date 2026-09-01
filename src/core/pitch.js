@@ -12,6 +12,17 @@ export function normalizeMicrophoneInputMode(inputMode) {
   return 'buttons';
 }
 
+export function getInstrumentMicrophoneConstraints() {
+  return {
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false,
+      channelCount: 1,
+    },
+  };
+}
+
 export function createMicrophoneState() {
   return {
     permission: 'idle',

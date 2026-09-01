@@ -9,6 +9,7 @@ import {
   detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
   frequencyToNearestPitch,
+  getInstrumentMicrophoneConstraints,
   getCenteredRms,
   microphoneInputLevelPercent,
   normalizeMicrophoneInputMode,
@@ -103,6 +104,17 @@ test('microphone mode is a first-class input option with permission state', () =
     calibration: null,
     error: null,
     lastAcceptedAtMs: 0,
+  });
+});
+
+test('instrument microphone capture asks browsers to avoid speech cleanup processing', () => {
+  assert.deepEqual(getInstrumentMicrophoneConstraints(), {
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false,
+      channelCount: 1,
+    },
   });
 });
 

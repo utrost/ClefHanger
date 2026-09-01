@@ -22,6 +22,13 @@ export function summarizeAudioSamples(samples, sampleRate, { label = 'capture' }
   };
 }
 
+export function formatDiagnosticLevelPercent(level) {
+  if (!Number.isFinite(level) || level <= 0) return '0%';
+  const percent = level * 100;
+  if (percent < 10) return `${percent.toFixed(1)}%`;
+  return `${Math.round(percent)}%`;
+}
+
 export function summarizePitchWindows(samples, sampleRate, { windowSize = 4096, hopSize = 2048, maxWindows = 32 } = {}) {
   if (!samples || !samples.length || !sampleRate) return { status: 'no-audio', candidates: [], best: null };
   const candidates = [];

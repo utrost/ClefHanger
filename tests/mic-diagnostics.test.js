@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   buildMicDiagnosticReport,
   buildMicDiagnosticTextFile,
+  formatDiagnosticLevelPercent,
   summarizeAudioSamples,
   summarizePitchWindows,
 } from '../src/core/mic-diagnostics.js';
@@ -24,6 +25,12 @@ test('summarizes decoded audio level and pitch candidates for voice/piano fixtur
   assert.equal(windows.best.note, 'A2');
   assert.ok(Math.abs(windows.best.frequency - 110) < 3);
   assert.ok(windows.candidates.length > 0);
+});
+
+test('diagnostic level copy keeps sub-one-percent audio visible', () => {
+  assert.equal(formatDiagnosticLevelPercent(0), '0%');
+  assert.equal(formatDiagnosticLevelPercent(0.00364976030535239), '0.4%');
+  assert.equal(formatDiagnosticLevelPercent(0.03120153769850731), '3.1%');
 });
 
 test('diagnostic report keeps live analyser separate from MediaRecorder evidence', () => {

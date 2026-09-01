@@ -18,7 +18,7 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice31-live-mic-raf/);
+  assert.match(html, /data-app-version="clefhanger-slice32-raw-mic/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -59,6 +59,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /decodeAudioData/);
   assert.match(app, /getMicrophoneRecordingDiagnostic/);
   assert.match(app, /navigator\.mediaDevices\.getUserMedia/);
+  assert.match(app, /getInstrumentMicrophoneConstraints\(\)/);
+  assert.doesNotMatch(app, /getUserMedia\(\{ audio: true \}\)/);
+  assert.match(app, /formatDiagnosticLevelPercent\(decodedRms\)/);
   assert.match(app, /selectInputMode: \(inputMode\)/);
   assert.match(app, /microphone/);
   assert.match(app, /processMicrophoneFrame/);

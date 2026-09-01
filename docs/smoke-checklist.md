@@ -26,6 +26,7 @@ Use this checklist before calling a build ready for actual testing.
 - A correct answer plays a short piano-like pitch cue. Wrong answers do not play the success pitch.
 - In Settings, tap **Grant mic**. The settings calibration line should immediately show `Requesting mic…`; if Chrome denies or never returns a permission result it should show a site-settings hint instead of appearing dead. If the browser prompts, allow microphone access; the status should change from mic-off to listening.
 - Sing any steady comfortable note and verify both the settings calibration readout and the main `You played G2 · 98 Hz · in tune` / `You played A4 · 440 Hz · in tune` style readout update with detected note, Hz, cents, and a listening level. **Play A** is only an optional reference tone. Implausible high-frequency noise spikes should fall back to the steady-pitch prompt rather than showing octave-8/9 note names. If no note appears after mic access is granted, verify the Mic panel distinguishes `level 0%` no-audio, too-quiet input, and no-steady-pitch input. Run **Record 1s test** while singing; it should report captured bytes, a decoded level if decodable, and a recorded pitch if the chunked detector can lock. Use Mic Lab to label the capture as Silence, Voice, Piano, or App A tone, then tap **Export mic report** and verify it downloads a `clefhanger-mic-...txt` JSON report. If no microphone is available, verify the blocked/unavailable message is visible and the console stays clean.
+- For piano/speaker tests, prefer a steady tone from a second device or the room speaker rather than hidden system audio routing. Check the exported report's `track.settings`; if `echoCancellation`, `noiseSuppression`, or `autoGainControl` are still `true`, the browser ignored the raw-instrument request and may be suppressing the tone.
 - With Mic input selected during a round, sing the front natural note; a steady in-tune pitch should clear it. Chord singing is not expected to score yet.
 - In Sharps/Flats, accidental button answers such as `F♯` / `B♭` are accepted.
 - In Sharps/Flats with Piano input, the black keys use sharp/flat labels for the selected mode.
@@ -38,7 +39,7 @@ Use this checklist before calling a build ready for actual testing.
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice31-live-mic-raf`.
+- Verify the HTML contains `clefhanger-slice32-raw-mic`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/audio.js`, `src/core/pitch.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

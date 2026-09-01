@@ -52,6 +52,7 @@ Slices through 25 are implemented as a dependency-free static PWA:
 - A 1-second microphone recording diagnostic can compare MediaRecorder capture against the Web Audio analyser path when a browser still reports `mic level 0%`, and it attempts to detect any steady recorded pitch from low male range through A4 rather than requiring the singer to hit concert A.
 - Mic Lab can label a silence/voice/piano/app-tone capture and export a Telegram-friendly `.txt` JSON report with browser, track, live analyser, recording, decoded-level, and pitch-window evidence for fixture-based debugging.
 - Real-device Mic Lab reports guard a regression where the browser's animation-frame timestamp could be mistaken for a live pitch value; the live analyser loop now passes that timestamp as time only.
+- Mic capture now requests raw-ish instrument audio (`echoCancellation`, `noiseSuppression`, and `autoGainControl` off) because browser speech cleanup can suppress speaker/YouTube piano tones before pitch detection sees them. Browsers may ignore the request, so Mic Lab reports still include the actual track settings.
 - Microphone mode can score sung natural-note answers when the detected pitch is within tolerance; chord singing is not scored yet.
 - Extra accidental buttons for #/♭ answers; chord mode uses direct triad buttons such as C, Dm, Em, F, G, and Am; piano black keys map to sharps/flats in those modes.
 - Correct answers play a small piano-like Web Audio voice instead of a plain beep; chords play as short arpeggios.

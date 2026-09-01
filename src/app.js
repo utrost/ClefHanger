@@ -34,13 +34,14 @@ import {
   detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
   frequencyToNearestPitch,
+  getInstrumentMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
 } from './core/pitch.js';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile } from './core/mic-diagnostics.js';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js';
 import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js';
 
-const appVersion = 'clefhanger-slice31-live-mic-raf-2026-08-30';
+const appVersion = 'clefhanger-slice32-raw-mic-2026-08-30';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -438,7 +439,7 @@ async function startMicrophone() {
     if (permissionState === 'denied') {
       throw new DOMException('Permission denied before request', 'NotAllowedError');
     }
-    microphoneStream = await withMicrophoneRequestTimeout(navigator.mediaDevices.getUserMedia({ audio: true }));
+    microphoneStream = await withMicrophoneRequestTimeout(navigator.mediaDevices.getUserMedia(getInstrumentMicrophoneConstraints()));
     const context = getAudioContext();
     if (!context) throw new Error('AudioContext unavailable');
     if (context.state === 'suspended') await context.resume();
@@ -514,7 +515,7 @@ async function recordMicrophoneDiagnostic() {
         decodedRms = getCenteredRms(decodedSamples);
         recordedFrequency = detectPitchFromRecordedAudio(decodedSamples, decoded.sampleRate);
         recordedPitch = frequencyToNearestPitch(recordedFrequency);
-        message += ` Decoded level ${Math.round(decodedRms * 100)}%.`;
+        message += ` Decoded level ${formatDiagnosticLevelPercent(decodedRms)}.`;
         if (recordedPitch) {
           const pitchLabel = `${recordedPitch.answer}${recordedPitch.octave}`;
           microphoneDebugText = buildBeginnerMicMessage({ pitchLabel, frequency: recordedFrequency, decodedLevel: decodedRms, bytes: blob.size, advanced: true });
