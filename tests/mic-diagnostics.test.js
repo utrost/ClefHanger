@@ -33,6 +33,16 @@ test('diagnostic level copy keeps sub-one-percent audio visible', () => {
   assert.equal(formatDiagnosticLevelPercent(0.03120153769850731), '3.1%');
 });
 
+test('diagnostic summary keeps loud-but-sub-one-percent voice evidence visible', () => {
+  const sampleRate = 48000;
+  const samples = sineSamples({ frequency: 220, sampleRate, length: sampleRate, amplitude: 0.0014 });
+  const summary = summarizeAudioSamples(samples, sampleRate, { label: 'voice' });
+
+  assert.equal(summary.label, 'voice');
+  assert.equal(summary.rmsPercent, 0.1);
+  assert.equal(summary.peakPercent, 0.1);
+});
+
 test('diagnostic report keeps live analyser separate from MediaRecorder evidence', () => {
   const report = buildMicDiagnosticReport({
     appVersion: 'clefhanger-test',

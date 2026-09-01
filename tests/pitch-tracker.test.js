@@ -136,6 +136,19 @@ test('time-domain pitch detector keeps quiet Firefox-like sung tones', () => {
   assert.ok(Math.abs(detected - 440) < 8, `expected about 440 Hz, got ${detected}`);
 });
 
+test('time-domain pitch detector keeps very quiet Mac Firefox voice levels', () => {
+  const quietSamples = sineSamples({ frequency: 220, sampleRate: 48000, amplitude: 0.0014 });
+  const detected = detectPitchFromTimeDomain(quietSamples, 48000);
+
+  assert.ok(getCenteredRms(quietSamples) < 0.001, 'fixture should match sub-0.1% RMS field reports');
+  assert.ok(Math.abs(detected - 220) < 5, `expected about 220 Hz, got ${detected}`);
+});
+
+test('microphone level percent preserves sub-one-percent field evidence', () => {
+  assert.equal(microphoneInputLevelPercent(0.0009345134136993287), 0.1);
+  assert.equal(microphoneInputLevelPercent(0.0000296998785206117), 0);
+});
+
 test('recording diagnostic scans decoded audio chunks for a sung pitch', () => {
   const sampleRate = 44100;
   const silence = Float32Array.from({ length: 4096 }, () => 0);

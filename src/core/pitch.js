@@ -1,10 +1,11 @@
-import { answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice33-cache-refresh-2026-09-01';
+import { answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice34-quiet-mic-2026-09-01';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 35;
 const DEFAULT_DEBOUNCE_MS = 650;
 const MIN_PLAYABLE_MIC_FREQUENCY = 80;
 const MAX_PLAYABLE_MIC_FREQUENCY = 1000;
+const MIN_PITCH_RMS = 0.0005;
 
 export function normalizeMicrophoneInputMode(inputMode) {
   if (inputMode === 'microphone') return 'microphone';
@@ -91,7 +92,9 @@ export function buildHeardNoteMessage(pitch) {
 
 export function microphoneInputLevelPercent(inputLevel) {
   if (!Number.isFinite(inputLevel) || inputLevel <= 0) return 0;
-  return Math.max(0, Math.min(100, Math.round(inputLevel * 100)));
+  const percent = inputLevel * 100;
+  if (percent < 1) return Math.max(0, Math.min(100, Math.round(percent * 10) / 10));
+  return Math.max(0, Math.min(100, Math.round(percent)));
 }
 
 export function buildMicrophoneListeningMessage({ listening, note, frequency, cents, inputLevel = 0, silentFrameCount = 0, trackState = 'live' } = {}) {
@@ -131,7 +134,7 @@ export function detectPitchFromTimeDomain(samples, sampleRate) {
   if (!samples || !samples.length || !sampleRate) return null;
 
   const rms = getCenteredRms(samples);
-  if (rms < 0.002) return null;
+  if (rms < MIN_PITCH_RMS) return null;
 
   const centered = centerSamples(samples);
   const minLag = Math.floor(sampleRate / MAX_PLAYABLE_MIC_FREQUENCY);
