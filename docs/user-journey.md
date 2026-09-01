@@ -67,9 +67,10 @@ Start simple and add only one challenge at a time:
 2. **Line notes / Practice / Notes**.
 3. **Space notes / Practice / Notes**.
 4. **Ledger lines / Practice / Notes**.
-5. **Mixed notes / Practice / Notes**.
-6. Try the same lessons in **Rush**.
-7. Try **Piano** or **Sing/Play** only after the written-note loop is understood.
+5. **Interval jumps / Practice / Notes**.
+6. **Mixed notes / Practice / Notes**.
+7. **The same material in Rush**.
+8. **Piano or Sing/Play** only after the written-note loop is understood.
 
 This path keeps the question clear: first learn the staff position, then add speed, then add a different input style.
 
@@ -132,7 +133,8 @@ Recommended order:
 2. **Line notes** — E, G, B, D, F.
 3. **Space notes** — F, A, C, E.
 4. **Ledger lines** — C and A just outside the staff.
-5. **Mixed notes** — full beginner natural-note set.
+5. **Interval jumps** — C through G with same-note, step, and skip hints.
+6. **Mixed notes** — all seven natural note names.
 
 Practice is not about score. It is about recognizing the note quickly enough that Rush will later feel playful instead of stressful.
 

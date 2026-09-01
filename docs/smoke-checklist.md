@@ -15,8 +15,9 @@ For exact current rules and constants, see [Current State Reference](./current-s
 - Treble mode shows the treble-clef loop anchored on the G line rather than floating above it.
 - Bass mode shows a bass clef and lower-register natural notes.
 - The beginner default shows Practice selected, First steps selected, and only C/D/E answer buttons.
-- Select Line notes, Space notes, and Ledger lines; each should show a small lesson intro card with concrete examples.
+- Select Line notes, Space notes, Ledger lines, and Interval jumps; each should show a small lesson intro card with concrete examples.
 - Ledger lines practice should show only C/A answer buttons and notes on the first ledger lines below/above the treble staff.
+- Interval jumps practice should show C/D/E/F/G buttons; after one correct answer, the learning suggestion should describe same note, step, skip, or jump movement from the previous prompt.
 - Tap **Start practice**. The timer should show `∞`, the note should stay in place long enough to study it, and no sprint summary should appear.
 - Tap a wrong note in Practice. The feedback should name the correct answer, the staff should show a small correction label on the note, and the correct answer button should be highlighted.
 - Switch to **Rush** and tap **Start 60s sprint**.
@@ -41,7 +42,7 @@ For exact current rules and constants, see [Current State Reference](./current-s
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice40-accidental-learning`.
+- Verify the HTML contains `clefhanger-slice41-interval-jumps`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/audio.js`, `src/core/pitch.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

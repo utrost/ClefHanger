@@ -1,4 +1,4 @@
-import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js?v=clefhanger-slice40-accidental-learning-2026-09-01';
+import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js?v=clefhanger-slice41-interval-jumps-2026-09-01';
 
 export const NOTE_BUTTONS = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 export const ACCIDENTAL_BUTTONS = ['C♯', 'D♯', 'F♯', 'G♯', 'A♯', 'D♭', 'E♭', 'G♭', 'A♭', 'B♭'];
@@ -266,6 +266,7 @@ export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Da
     seed: seed >>> 0,
     noteCounter: 0,
     activeNote: null,
+    previousPrompt: null,
     noteQueue: [],
     correction: null,
     score: 0,
@@ -300,6 +301,7 @@ function cloneState(state) {
   return {
     ...state,
     activeNote: state.activeNote ? cloneNote(state.activeNote) : (noteQueue[0] || null),
+    previousPrompt: state.previousPrompt ? cloneNote(state.previousPrompt) : null,
     noteQueue,
     feedback: { ...state.feedback },
   };
@@ -388,6 +390,7 @@ export function answerActiveNote(state, answer, nowMs) {
       ? buildBeginnerFeedback({ prompt: next.activeNote, kind: 'correct', points })
       : { kind: 'correct', text: `${normalized} — held on! +${points}` };
     next.correction = null;
+    next.previousPrompt = cloneNote(next.activeNote);
     next.noteQueue = (next.noteQueue || []).slice(1);
     next.activeNote = next.noteQueue[0] || null;
   } else {
@@ -408,6 +411,7 @@ export function missExpiredNotes(state, nowMs) {
   next.streak = 0;
   next.pointsEarned = 0;
   next.feedback = { kind: 'missed', text: `${next.activeNote.answer} fell off the staff.` };
+  next.previousPrompt = cloneNote(next.activeNote);
   next.noteQueue = (next.noteQueue || []).slice(1);
   next.activeNote = next.noteQueue[0] || null;
   return next;

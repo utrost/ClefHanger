@@ -24,13 +24,13 @@ The first playable slices proved the simplest complete loop:
 
 ## Current playable slice
 
-Slices through 38 are implemented as a dependency-free static PWA:
+Slices through 41 are implemented as a dependency-free static PWA:
 
 - Beginner-first practice flow: the app now starts in untimed Practice mode instead of throwing a new player straight into a rush.
 - First-run tutorial card with three small tips and a dismiss action.
-- Four beginner lessons: First steps, Line notes, Space notes, Ledger lines, and Mixed notes.
-- Tiny lesson intro cards for line, space, and ledger-line lessons before practice starts.
-- Adaptive beginner answer tray: First steps starts with only C, D, and E; ledger-line practice uses only C and A notes just outside the treble staff.
+- Six beginner lessons: First steps, Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes.
+- Tiny lesson intro cards for line, space, ledger-line, and interval-jump lessons before practice starts.
+- Adaptive beginner answer tray: First steps starts with only C, D, and E; ledger-line practice uses only C and A notes just outside the treble staff; Interval jumps uses C, D, E, F, and G while teaching same note, step, or skip movement.
 - Wrong answers teach instead of only rejecting: the app says what the note was and gives a short location hint such as `bottom line E`.
 - Visual correction overlay: after a wrong answer, the staff briefly labels the correct note and the correct answer button is highlighted.
 

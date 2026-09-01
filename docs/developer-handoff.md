@@ -85,9 +85,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice40-accidental-learning-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v34`.
-- Visible marker: `Slice 40: accidental learning`.
+- App version: `clefhanger-slice41-interval-jumps-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v35`.
+- Visible marker: `Slice 41: interval jumps`.
 
 ## State ownership
 
@@ -252,10 +252,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice40-accidental-learning'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice41-interval-jumps'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v34'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v35'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

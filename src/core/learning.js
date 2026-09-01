@@ -48,6 +48,20 @@ export const BEGINNER_LESSONS = [
     staffSteps: [-2, 10],
   },
   {
+    id: 'interval-jumps',
+    label: 'Interval jumps',
+    title: 'Same, step, or skip',
+    body: 'Watch how the next note moves from the last one: repeat, one step, or a skip.',
+    intro: {
+      title: 'Interval jumps',
+      body: 'Do not think chord theory yet. Compare this note to the last one: same note, one step up/down, or a skip over one note.',
+      examples: ['same', 'step', 'skip'],
+    },
+    answers: ['C', 'D', 'E', 'F', 'G'],
+    noteNames: ['C', 'D', 'E', 'F', 'G'],
+    staffSteps: [-2, -1, 0, 1, 2],
+  },
+  {
     id: 'mixed',
     label: 'Mixed notes',
     title: 'All natural notes',
@@ -152,6 +166,37 @@ export function buildAccidentalLearningHint({ modeId = 'basics', prompt } = {}) 
     kind: 'accidental-flat',
     text: `${prompt.answer} uses the same staff spot as ${base}; ♭ lowers it by one small step.`,
   };
+}
+
+export function buildIntervalLearningHint({ previousPrompt, prompt } = {}) {
+  if (!previousPrompt || !prompt || !Number.isFinite(previousPrompt.staffStep) || !Number.isFinite(prompt.staffStep)) return null;
+  const delta = prompt.staffStep - previousPrompt.staffStep;
+  const direction = delta > 0 ? 'up' : 'down';
+  const previous = previousPrompt.noteName || previousPrompt.answer;
+  const current = prompt.noteName || prompt.answer;
+
+  if (delta === 0) {
+    return { kind: 'same-note', text: `${current} is the same note again — same staff spot.` };
+  }
+  if (Math.abs(delta) === 1) {
+    return { kind: `step-${direction}`, text: `${current} is one step ${direction} from ${previous}. Adjacent line/space notes are steps.` };
+  }
+  if (Math.abs(delta) === 2) {
+    const skipped = noteNameBetween(previous, current, direction);
+    const skipText = skipped ? ` It skips over ${skipped}.` : '';
+    return { kind: `skip-${direction}`, text: `${current} is a skip ${direction} from ${previous}.${skipText}` };
+  }
+  return { kind: `jump-${direction}`, text: `${current} jumps ${direction} from ${previous}. Read the landing note before tapping.` };
+}
+
+function noteNameBetween(previous, current, direction) {
+  const names = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+  const from = names.indexOf(previous?.[0]);
+  const to = names.indexOf(current?.[0]);
+  if (from === -1 || to === -1) return null;
+  const expected = direction === 'up' ? (from + 2) % names.length : (from + names.length - 2) % names.length;
+  if (to !== expected) return null;
+  return names[direction === 'up' ? (from + 1) % names.length : (from + names.length - 1) % names.length];
 }
 
 export function buildLearningRecommendation({

@@ -39,9 +39,9 @@ For the product-level player journey, see [User Journey](./user-journey.md). For
 - Mobile-first static app with no bundler/runtime dependencies.
 - Default Practice mode for beginners, with an alternate Rush mode for timed play and a terminal ending splash after the 60-second timer expires.
 - Three-step first-run tutorial.
-- Beginner lesson sequence: First steps, Line notes, Space notes, Ledger lines, Mixed notes.
-- Tiny lesson intro cards for line, space, and ledger-line practice.
-- Scaffolded beginner answer tray, starting with only C/D/E and narrowing ledger-line practice to C/A.
+- Beginner lesson sequence: First steps, Line notes, Space notes, Ledger lines, Interval jumps, Mixed notes.
+- Tiny lesson intro cards for line, space, ledger-line, and interval-jump practice.
+- Scaffolded beginner answer tray, starting with only C/D/E, narrowing ledger-line practice to C/A, and using C/D/E/F/G for interval jumps.
 - Teaching feedback plus a visual correction overlay after wrong answers: the note is labelled on the staff and the correct button is highlighted.
 - Treble and bass clef.
 - Corrected SVG clef anchors for treble and bass.

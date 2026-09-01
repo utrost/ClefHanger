@@ -10,6 +10,7 @@ The current build is beginner-first:
 
 - Practice is the default.
 - The first lesson only asks for C, D, and E.
+- Interval jumps adds same-note, step, and skip hints before the full mixed set.
 - Wrong answers teach the correct note instead of only punishing you.
 - Rush mode is still available for 60-second timed play.
 
@@ -87,6 +88,12 @@ Use Rush when the lesson feels familiar.
 
 - Buttons: C and A.
 - Teaches the first short extra lines just outside the treble staff.
+
+### Interval jumps
+
+- Buttons: C, D, E, F, G.
+- Teaches same note, step, or skip: whether the new note repeats, moves one step up/down, or skips over one note.
+- This is still note-reading practice, not chord theory.
 
 ### Mixed notes
 
@@ -242,7 +249,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 40: accidental learning`.
+2. Confirm the page shows `Slice 41: interval jumps`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus highlighted correct answer.
 5. Tap the correct answer and verify score increases and a pitch plays.

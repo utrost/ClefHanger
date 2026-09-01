@@ -8,6 +8,7 @@ import {
   buildCorrectionOverlay,
   buildLearningRecommendation,
   buildAccidentalLearningHint,
+  buildIntervalLearningHint,
   buildTutorialSteps,
   getBeginnerLesson,
   getLessonIntroCard,
@@ -28,7 +29,7 @@ test('first-run tutorial is tiny, concrete, and beginner-safe', () => {
 });
 
 test('beginner lessons start narrow before full seven-note quiz', () => {
-  assert.deepEqual(BEGINNER_LESSONS.map((lesson) => lesson.id), ['first-steps', 'line-notes', 'space-notes', 'ledger-notes', 'mixed']);
+  assert.deepEqual(BEGINNER_LESSONS.map((lesson) => lesson.id), ['first-steps', 'line-notes', 'space-notes', 'ledger-notes', 'interval-jumps', 'mixed']);
   assert.deepEqual(getBeginnerLesson('first-steps').answers, ['C', 'D', 'E']);
   assert.deepEqual(getBeginnerLesson('line-notes').answers, ['E', 'G', 'B', 'D', 'F']);
   assert.deepEqual(getBeginnerLesson('space-notes').answers, ['F', 'A', 'C', 'E']);
@@ -144,6 +145,43 @@ test('accidental learning hint explains that sharps and flats reuse staff positi
   assert.match(flatHint.text, /♭ lowers/i);
 
   assert.equal(buildAccidentalLearningHint({ modeId: 'basics', prompt: { answer: 'C' } }), null);
+});
+
+test('interval practice teaches repeated notes, steps, and skips without chord theory', () => {
+  assert.ok(BEGINNER_LESSONS.find((lesson) => lesson.id === 'interval-jumps'));
+  assert.deepEqual(getBeginnerLesson('interval-jumps').answers, ['C', 'D', 'E', 'F', 'G']);
+
+  const repeat = buildIntervalLearningHint({ previousPrompt: { noteName: 'C', staffStep: -2 }, prompt: { noteName: 'C', staffStep: -2 } });
+  assert.equal(repeat.kind, 'same-note');
+  assert.match(repeat.text, /same note/i);
+
+  const stepUp = buildIntervalLearningHint({ previousPrompt: { noteName: 'C', staffStep: -2 }, prompt: { noteName: 'D', staffStep: -1 } });
+  assert.equal(stepUp.kind, 'step-up');
+  assert.match(stepUp.text, /one step up/i);
+
+  const stepDown = buildIntervalLearningHint({ previousPrompt: { noteName: 'E', staffStep: 0 }, prompt: { noteName: 'D', staffStep: -1 } });
+  assert.equal(stepDown.kind, 'step-down');
+  assert.match(stepDown.text, /one step down/i);
+
+  const skip = buildIntervalLearningHint({ previousPrompt: { noteName: 'C', staffStep: -2 }, prompt: { noteName: 'E', staffStep: 0 } });
+  assert.equal(skip.kind, 'skip-up');
+  assert.match(skip.text, /skips over D/i);
+
+  assert.equal(buildIntervalLearningHint({ previousPrompt: null, prompt: { noteName: 'C', staffStep: -2 } }), null);
+});
+
+test('interval lesson appears in the documented beginner ramp', () => {
+  const roadmap = read('docs/mvp-roadmap.md');
+  const guide = read('docs/player-tester-guide.md');
+  assert.match(roadmap, /Slice 8f .* implemented/i);
+  assert.match(guide, /Interval jumps/i);
+  assert.match(guide, /same note, step, or skip/i);
+});
+
+test('shell wires interval learning hints into the learning coach path', () => {
+  const app = read('src/app.js');
+  assert.match(app, /buildIntervalLearningHint/);
+  assert.match(app, /previousPrompt/);
 });
 
 test('user journey documents the learning contract before adding more notation', () => {

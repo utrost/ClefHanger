@@ -24,8 +24,8 @@ import {
   getAnswerOptions,
   getPromptFrequencies,
   createGhostNoteFromPitch,
-} from './core/game.js?v=clefhanger-slice40-accidental-learning-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice40-accidental-learning-2026-09-01';
+} from './core/game.js?v=clefhanger-slice41-interval-jumps-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice41-interval-jumps-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -38,11 +38,11 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice40-accidental-learning-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice40-accidental-learning-2026-09-01';
-import { BEGINNER_LESSONS, buildAccidentalLearningHint, buildBeginnerMicMessage, buildCorrectionOverlay, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice40-accidental-learning-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice41-interval-jumps-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice41-interval-jumps-2026-09-01';
+import { BEGINNER_LESSONS, buildAccidentalLearningHint, buildBeginnerMicMessage, buildCorrectionOverlay, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice41-interval-jumps-2026-09-01';
 
-const appVersion = 'clefhanger-slice40-accidental-learning-2026-09-01';
+const appVersion = 'clefhanger-slice41-interval-jumps-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -263,6 +263,10 @@ function renderLessonIntro() {
 function currentLearningRecommendation() {
   const accidentalHint = buildAccidentalLearningHint({ modeId: selectedModeId, prompt: state.activeNote });
   if (accidentalHint) return accidentalHint;
+  const intervalHint = selectedLessonId === 'interval-jumps'
+    ? buildIntervalLearningHint({ previousPrompt: state.previousPrompt, prompt: state.activeNote })
+    : null;
+  if (intervalHint) return intervalHint;
   const attempts = state.correct + state.wrong + state.missed;
   const accuracy = attempts > 0 ? Math.round((state.correct / attempts) * 100) : 0;
   const microphoneStable = selectedInputMode !== 'microphone' || Boolean(microphoneState.note && microphoneState.frequency);

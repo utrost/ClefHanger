@@ -190,6 +190,8 @@ Documentation/guideline work — implemented:
   - First steps / Practice / Notes.
   - Line notes / Practice / Notes.
   - Space notes / Practice / Notes.
+  - Ledger lines / Practice / Notes.
+  - Interval jumps / Practice / Notes.
   - Mixed notes / Practice / Notes.
   - The same material in Rush.
   - Piano or Sing/Play only after the written-note loop is understood.
@@ -229,11 +231,13 @@ Verification — implemented:
 - The same learning suggestion line explains `C♯`/`D♭` style prompts as the same staff position plus a raised/lowered accidental.
 - Future work can still add fuller accidental-specific lesson cards after real use shows which copy helps.
 
-## Slice 8f — Intervals and rapid jumps
+## Slice 8f — Intervals and rapid jumps — implemented
 
-- Teach small movement patterns: same note, step up/down, skip.
-- Keep it separate from chord theory.
-- Use Practice first, then Rush if it holds up.
+- Add a small Interval jumps Practice lesson before Mixed notes.
+- Teach small movement patterns: same note, step up/down, skip, and larger jumps.
+- Keep it separate from chord theory: the lesson still answers single note names with direct touch buttons.
+- Use the learning suggestion line to compare the current prompt with the previous completed prompt.
+- Keep the beginner answer tray narrow at C, D, E, F, G before returning to all seven Mixed notes.
 
 ## Product risks to validate early
 
