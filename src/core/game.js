@@ -1,15 +1,15 @@
-import { buildBeginnerFeedback, buildCorrectionOverlay, getBeginnerLesson, getLessonPool } from './learning.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+} from './content.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+} from './content.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
 
 
 export const STAFF_LAYOUT = {
@@ -101,6 +101,7 @@ export function createInitialState({ roundLengthMs = 60000, nowMs = 0, seed = Da
     correct: 0,
     wrong: 0,
     missed: 0,
+    lastOutcome: null,
     feedback: { kind: 'idle', text: 'Tap Start when ready.' },
   };
 }
@@ -127,8 +128,23 @@ function cloneState(state) {
     ...state,
     activeNote: state.activeNote ? cloneNote(state.activeNote) : (noteQueue[0] || null),
     previousPrompt: state.previousPrompt ? cloneNote(state.previousPrompt) : null,
+    lastOutcome: state.lastOutcome ? { ...state.lastOutcome, prompt: cloneNote(state.lastOutcome.prompt) } : null,
     noteQueue,
     feedback: { ...state.feedback },
+  };
+}
+
+function buildOutcome({ result, prompt, expectedAnswer, givenAnswer, pointsEarned = 0, streak = 0, modeId, lessonId, phase }) {
+  return {
+    result,
+    prompt: cloneNote(prompt),
+    expectedAnswer,
+    givenAnswer,
+    pointsEarned,
+    streak,
+    modeId,
+    lessonId,
+    phase,
   };
 }
 
@@ -204,24 +220,27 @@ export function answerActiveNote(state, answer, nowMs) {
     const speed = getSpeed(next.speedId);
     const difficulty = getDifficulty(next.difficultyId);
     const points = calculatePoints({ mode, speed, difficulty, streak: next.streak });
+    const answeredPrompt = cloneNote(next.activeNote);
     next.correct += 1;
     next.streak += 1;
     next.bestStreak = Math.max(next.bestStreak, next.streak);
     next.pointsEarned = points;
     next.score += points;
+    next.lastOutcome = buildOutcome({ result: 'correct', prompt: answeredPrompt, expectedAnswer: answeredPrompt.answer, givenAnswer: normalized, pointsEarned: points, streak: next.streak, modeId: next.modeId, lessonId: next.lessonId, phase: next.phase });
     next.feedback = next.phase === 'practice'
-      ? buildBeginnerFeedback({ prompt: next.activeNote, kind: 'correct', points })
+      ? { kind: 'correct', text: `${normalized} — correct. +${points}`, correctAnswer: normalized }
       : { kind: 'correct', text: `${normalized} — held on! +${points}` };
     next.correction = null;
-    next.previousPrompt = cloneNote(next.activeNote);
+    next.previousPrompt = cloneNote(answeredPrompt);
     next.noteQueue = (next.noteQueue || []).slice(1);
     next.activeNote = next.noteQueue[0] || null;
   } else {
     next.wrong += 1;
     next.streak = 0;
     next.pointsEarned = 0;
-    next.feedback = buildBeginnerFeedback({ prompt: next.activeNote, givenAnswer: normalized || answer, kind: 'wrong' });
-    next.correction = { ...buildCorrectionOverlay({ prompt: next.activeNote, feedback: next.feedback }), frozenUntilMs: nowMs + 1400, frozenAtMs: nowMs };
+    next.lastOutcome = buildOutcome({ result: 'wrong', prompt: next.activeNote, expectedAnswer: next.activeNote.answer, givenAnswer: normalized || answer, pointsEarned: 0, streak: 0, modeId: next.modeId, lessonId: next.lessonId, phase: next.phase });
+    next.feedback = { kind: 'wrong', text: `${normalized || answer || 'That'} is not it. Try again.`, correctAnswer: next.activeNote.answer };
+    next.correction = null;
   }
   next.lastInputAtMs = nowMs;
   return next;
@@ -234,6 +253,7 @@ export function missExpiredNotes(state, nowMs) {
   next.streak = 0;
   next.pointsEarned = 0;
   next.feedback = { kind: 'missed', text: `${next.activeNote.answer} fell off the staff.` };
+  next.lastOutcome = buildOutcome({ result: 'missed', prompt: next.activeNote, expectedAnswer: next.activeNote.answer, givenAnswer: null, pointsEarned: 0, streak: 0, modeId: next.modeId, lessonId: next.lessonId, phase: next.phase });
   next.previousPrompt = cloneNote(next.activeNote);
   next.noteQueue = (next.noteQueue || []).slice(1);
   next.activeNote = next.noteQueue[0] || null;

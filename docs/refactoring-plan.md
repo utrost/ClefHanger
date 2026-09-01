@@ -348,9 +348,11 @@ npm run check
 
 - Scoring changes can be reviewed without reading note generation and reducer queue logic.
 
-### Slice 2.4 — Decouple game reducer from learning copy
+### Slice 2.4 — Decouple game reducer from learning copy — implemented
 
 **Objective:** reverse the current dependency where `game.js` imports `learning.js`.
+
+**Implementation note:** landed in Slice 46 with `tests/game-learning-boundary.test.js` and `src/core/lessons.js`. `game.js` now imports lesson filtering from `lessons.js`, emits neutral `lastOutcome` metadata, and no longer imports `learning.js`. `learning.js` owns `buildTeachingFeedback(...)` and `applyLearningFeedback(...)`; `src/app.js` applies that layer after practice answers so player-facing beginner feedback and correction freeze behavior remain unchanged.
 
 **Create or modify:**
 

@@ -15,8 +15,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice45-scoring-helpers-2026-09-01"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice45-scoring-helpers-2026-09-01'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice46-learning-boundary-2026-09-01"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice46-learning-boundary-2026-09-01'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
@@ -55,8 +55,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice45-scoring-helpers/);
-  assert.match(html, /Slice 45: scoring helpers/);
+  assert.match(html, /data-app-version="clefhanger-slice46-learning-boundary/);
+  assert.match(html, /Slice 46: learning boundary/);
 });
 
 test('manifest and service worker describe an installable subpath-safe app shell', () => {
@@ -75,8 +75,8 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v39/);
-  for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
+  assert.match(sw, /clefhanger-pwa-v40/);
+  for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }
   assert.match(sw, /request\.mode === 'navigate'/);

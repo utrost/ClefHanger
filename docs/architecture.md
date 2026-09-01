@@ -23,10 +23,12 @@ Current boundaries:
   - Note names, Level 1 treble note pool including first ledger-line notes, bass-note pool, accidental pools, chord pools, piano key definitions, mode definitions, speed definitions, difficulty definitions, and safe catalog lookups.
 - `src/core/scoring.js`
   - Mode-weighted point arithmetic, slider-speed bonus, difficulty multiplier, streak bonus, accuracy, high-score keys, and summary view data.
+- `src/core/lessons.js`
+  - Beginner lesson definitions, lesson intro cards, scaffolded answer options, and lesson-specific prompt-pool filtering.
 - `src/core/game.js`
-  - Staff/clef/ledger-line layout anchors, beginner practice lifecycle, note queue state, round lifecycle, scoring flow, misses, timer helpers, and compatibility re-exports for older importers.
+  - Staff/clef/ledger-line layout anchors, beginner practice lifecycle, note queue state, round lifecycle, scoring flow, neutral answer/miss outcomes, misses, timer helpers, and compatibility re-exports for older importers.
 - `src/core/learning.js`
-  - First-run tutorial text, beginner lesson definitions, lesson intro cards, scaffolded answer options, teaching feedback, visual correction overlay data, and beginner-friendly microphone messages.
+  - Teaching feedback and visual correction overlay data from neutral game outcomes, accidental/interval hints, learning recommendations, beginner-friendly microphone messages, and lesson re-exports for compatibility.
 - `src/core/pitch.js`
   - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
 - `src/core/mic-diagnostics.js`

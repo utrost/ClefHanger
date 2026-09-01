@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clefhanger-pwa-v39';
+const CACHE_NAME = 'clefhanger-pwa-v40';
 const APP_SHELL = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const APP_SHELL = [
   './src/core/pitch.js',
   './src/core/mic-diagnostics.js',
   './src/core/learning.js',
+  './src/core/lessons.js',
   './src/core/music-theory.js',
   './src/ui/staff-renderer.js',
   './icons/icon-192.png',

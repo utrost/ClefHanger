@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+} from './core/content.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -22,9 +22,9 @@ import {
   getRemainingSeconds,
   getRoundSummary,
   getHighScoreKey,
-} from './core/game.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+} from './core/game.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -37,12 +37,12 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-import { BEGINNER_LESSONS, buildAccidentalLearningHint, buildBeginnerMicMessage, buildCorrectionOverlay, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice45-scoring-helpers-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice46-learning-boundary-2026-09-01';
 
-const appVersion = 'clefhanger-slice45-scoring-helpers-2026-09-01';
+const appVersion = 'clefhanger-slice46-learning-boundary-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -562,6 +562,7 @@ function handleAnswer(answer) {
   const now = performance.now();
   const answeredPrompt = state.activeNote;
   state = answerActiveNote(state, answer, now);
+  if (state.phase === 'practice') state = applyLearningFeedback(state, now);
   if (!showHints && state.feedback.kind === 'wrong') state.feedback.text = `${answer} is not it. Try again.`;
   if (state.feedback.kind === 'correct') playPromptAudio(answeredPrompt);
   if (state.phase === 'running') state = updateRound(state, now);

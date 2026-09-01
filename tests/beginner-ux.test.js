@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   BEGINNER_LESSONS,
+  applyLearningFeedback,
   buildBeginnerFeedback,
   buildBeginnerMicMessage,
   buildCorrectionOverlay,
@@ -90,7 +91,7 @@ test('wrong answers teach the correct note and why it was correct', () => {
   assert.equal(feedback.correctAnswer, 'G');
 
   const state = { ...createInitialState(), phase: 'practice', activeNote: note, noteQueue: [note] };
-  const answered = answerActiveNote(state, 'E', 3000);
+  const answered = applyLearningFeedback(answerActiveNote(state, 'E', 3000), 3000);
   assert.equal(answered.feedback.kind, 'wrong');
   assert.match(answered.feedback.text, /That was G/i);
 });

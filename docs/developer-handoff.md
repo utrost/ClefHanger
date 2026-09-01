@@ -13,8 +13,9 @@ Important files:
 - `src/ui/staff-renderer.js`: pure SVG staff/note/chord/correction/ghost-note renderer.
 - `src/core/music-theory.js`: pure accidentals, semitone, frequency, staff-step, and ghost-note helpers.
 - `src/core/scoring.js`: pure score, accuracy, high-score-key, and round-summary helpers.
+- `src/core/lessons.js`: beginner lesson catalog, intro cards, and lesson-specific answer/prompt filtering.
 - `src/core/game.js`: renderer-free game model and round/practice reducer.
-- `src/core/learning.js`: beginner learning layer.
+- `src/core/learning.js`: beginner teaching copy layer that consumes neutral game outcomes.
 - `src/core/pitch.js`: microphone and pitch logic.
 - `src/core/mic-diagnostics.js`: Mic Lab reporting.
 - `src/core/audio.js`: Web Audio note playback.
@@ -72,6 +73,8 @@ Do not make microphone, scoring, notation, lesson, or persistence changes only i
 
 Scoring changes should start in `src/core/scoring.js` with focused coverage in `tests/scoring.test.js`; `src/core/game.js` should call those helpers from reducer flow rather than embedding point arithmetic.
 
+Learning-copy changes should start in `src/core/learning.js`; lesson catalog/filtering changes should start in `src/core/lessons.js`. `src/core/game.js` emits `lastOutcome` metadata for correct/wrong/missed transitions and must not import `learning.js`.
+
 ## Native ES-module versioning
 
 This project does not bundle files into content-hashed assets. That means browser and service-worker caches can serve mixed old/new modules unless every marker is bumped together.
@@ -91,9 +94,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice45-scoring-helpers-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v39`.
-- Visible marker: `Slice 45: scoring helpers`.
+- App version: `clefhanger-slice46-learning-boundary-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v40`.
+- Visible marker: `Slice 46: learning boundary`.
 
 ## State ownership
 
@@ -146,13 +149,13 @@ Watch for:
 
 ## Adding beginner lessons
 
-Change `src/core/learning.js` first:
+Change `src/core/lessons.js` first:
 
 - Add a `BEGINNER_LESSONS` entry.
 - Define `answers` and `noteNames`.
 - Add `staffSteps` if the lesson needs geometry-specific filtering.
 - Add `intro` if the default title/body/examples are not enough.
-- Add tests in `tests/beginner-ux.test.js`.
+- Add tests in `tests/beginner-ux.test.js` or `tests/game-learning-boundary.test.js` depending on whether the change is lesson catalog data or outcome-to-copy behavior.
 - Update README, player guide, current-state reference, and smoke checklist.
 
 Beginner scaffolding currently only narrows answers for Treble + Beginner. If that changes, update `getScaffoldedAnswerOptions` and document the new scope explicitly.
@@ -264,10 +267,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice45-scoring-helpers'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice46-learning-boundary'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v39'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v40'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 
