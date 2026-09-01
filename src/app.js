@@ -23,8 +23,8 @@ import {
   getLedgerLinesForStaffStep,
   getAnswerOptions,
   getPromptFrequencies,
-} from './core/game.js?v=clefhanger-slice34-quiet-mic-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice34-quiet-mic-2026-09-01';
+} from './core/game.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -34,14 +34,14 @@ import {
   detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
   frequencyToNearestPitch,
-  getInstrumentMicrophoneConstraints,
+  getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice34-quiet-mic-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice34-quiet-mic-2026-09-01';
-import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice34-quiet-mic-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
+import { BEGINNER_LESSONS, buildBeginnerMicMessage, buildCorrectionOverlay, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
 
-const appVersion = 'clefhanger-slice34-quiet-mic-2026-09-01';
+const appVersion = 'clefhanger-slice35-built-in-mics-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -439,7 +439,7 @@ async function startMicrophone() {
     if (permissionState === 'denied') {
       throw new DOMException('Permission denied before request', 'NotAllowedError');
     }
-    microphoneStream = await withMicrophoneRequestTimeout(navigator.mediaDevices.getUserMedia(getInstrumentMicrophoneConstraints()));
+    microphoneStream = await withMicrophoneRequestTimeout(navigator.mediaDevices.getUserMedia(getBuiltInVocalMicrophoneConstraints()));
     const context = getAudioContext();
     if (!context) throw new Error('AudioContext unavailable');
     if (context.state === 'suspended') await context.resume();

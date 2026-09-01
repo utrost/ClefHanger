@@ -9,6 +9,7 @@ import {
   detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
   frequencyToNearestPitch,
+  getBuiltInVocalMicrophoneConstraints,
   getInstrumentMicrophoneConstraints,
   getCenteredRms,
   microphoneInputLevelPercent,
@@ -113,6 +114,17 @@ test('instrument microphone capture asks browsers to avoid speech cleanup proces
       echoCancellation: false,
       noiseSuppression: false,
       autoGainControl: false,
+      channelCount: 1,
+    },
+  });
+});
+
+test('built-in vocal microphone capture keeps gain while disabling cleanup', () => {
+  assert.deepEqual(getBuiltInVocalMicrophoneConstraints(), {
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: true,
       channelCount: 1,
     },
   });

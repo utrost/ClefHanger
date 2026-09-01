@@ -1,4 +1,4 @@
-import { answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice34-quiet-mic-2026-09-01';
+import { answerLabel, getPitchFrequency } from './game.js?v=clefhanger-slice35-built-in-mics-2026-09-01';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 35;
@@ -19,6 +19,17 @@ export function getInstrumentMicrophoneConstraints() {
       echoCancellation: false,
       noiseSuppression: false,
       autoGainControl: false,
+      channelCount: 1,
+    },
+  };
+}
+
+export function getBuiltInVocalMicrophoneConstraints() {
+  return {
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: true,
       channelCount: 1,
     },
   };
