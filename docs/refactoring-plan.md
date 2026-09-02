@@ -605,9 +605,11 @@ export async function startMicrophoneSession({ navigator, audioContext, analyser
 - injected pitch hook goes through the same scoring path as live mic frames
 - chord singing remains explicitly out of scope
 
-### Slice 4.3 — Add minimal CI
+### Slice 4.3 — Add minimal CI — implemented
 
 **Objective:** give refactors an external green/red signal.
+
+**Implementation note:** landed as `.github/workflows/check.yml`. The workflow runs on `push` and `pull_request`, checks out the repository, sets up Node.js 24 to match local verification, prints Node/npm/Python versions, then runs `npm test` and `npm run check` as separate readable Actions steps.
 
 **Create:**
 
@@ -624,10 +626,10 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
       - run: npm test
       - run: npm run check
 ```
@@ -650,7 +652,7 @@ jobs:
 7. Slice 3.2 — microphone session adapter — implemented.
 8. Slice 3.3 — MediaRecorder diagnostic adapter — implemented.
 9. Slice 4.2 — shell test conversion as needed.
-10. Slice 4.3 — minimal CI.
+10. Slice 4.3 — minimal CI — implemented.
 
 Reasoning:
 

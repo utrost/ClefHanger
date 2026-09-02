@@ -100,6 +100,17 @@ Current marker set:
 - Service-worker cache: `clefhanger-pwa-v44`.
 - Visible marker: `Slice 50: mic recording diagnostic adapter`.
 
+## CI
+
+GitHub Actions are enabled for the public `utrost/ClefHanger` repo. `.github/workflows/check.yml` runs on `push` and `pull_request` with Node.js 24 and executes:
+
+```bash
+npm test
+npm run check
+```
+
+Use `gh run list --branch main --limit 5` after pushing to verify the current head has a green `check` run.
+
 ## State ownership
 
 `src/core/game.js` owns game state transitions. Treat returned state as immutable-ish: helper functions clone state and return a new object.
