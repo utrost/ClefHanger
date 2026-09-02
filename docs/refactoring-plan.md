@@ -418,9 +418,11 @@ Manual smoke:
 
 ## Phase 3 — Platform adapter extraction
 
-### Slice 3.1 — Extract LocalStorage adapter
+### Slice 3.1 — Extract LocalStorage adapter — implemented
 
 **Objective:** keep persistence out of the composition root and make key behavior testable.
+
+**Implementation note:** landed in Slice 48 as `src/platform/storage.js` with `tests/storage.test.js`. `src/app.js` now reads startup preferences and high scores through `createStorageAdapter()` and writes UI selections through `writePreference(...)`; direct `localStorage.getItem/setItem` calls are no longer scattered through the composition root.
 
 **Create:**
 

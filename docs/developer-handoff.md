@@ -96,9 +96,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice47-version-consistency-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v41`.
-- Visible marker: `Slice 47: version consistency`.
+- App version: `clefhanger-slice48-storage-adapter-2026-09-01`.
+- Service-worker cache: `clefhanger-pwa-v42`.
+- Visible marker: `Slice 48: storage adapter`.
 
 ## State ownership
 
@@ -121,8 +121,13 @@ Main state fields:
 - animation frame ids;
 - `AudioContext`;
 - microphone stream/source/analyser/keepalive gain/buffer;
-- `localStorage` preference persistence;
 - DOM event listeners and assignments.
+
+`src/platform/storage.js` owns LocalStorage access:
+
+- preference key names and legacy fallback keys;
+- safe default preferences when storage is missing, invalid, or throwing;
+- high-score reads/writes using the scoring module's comparable key format.
 
 `src/ui/staff-renderer.js` owns SVG staff presentation:
 
@@ -269,10 +274,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice47-version-consistency'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice48-storage-adapter'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v41'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v42'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

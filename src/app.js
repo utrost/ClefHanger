@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice47-version-consistency-2026-09-01';
+} from './core/content.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,10 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-  getHighScoreKey,
-} from './core/game.js?v=clefhanger-slice47-version-consistency-2026-09-01';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice47-version-consistency-2026-09-01';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice47-version-consistency-2026-09-01';
+} from './core/game.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -37,12 +36,13 @@ import {
   getBuiltInVocalMicrophoneConstraints,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice47-version-consistency-2026-09-01';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice47-version-consistency-2026-09-01';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice47-version-consistency-2026-09-01';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice47-version-consistency-2026-09-01';
+} from './core/pitch.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
 
-const appVersion = 'clefhanger-slice47-version-consistency-2026-09-01';
+const appVersion = 'clefhanger-slice48-storage-adapter-2026-09-01';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -99,14 +99,16 @@ const speedLabelEl = document.querySelector('#speed-label');
 const difficultyLabelEl = document.querySelector('#difficulty-label');
 const difficultyHelpEl = document.querySelector('#difficulty-help');
 
-let selectedModeId = localStorage.getItem('clefhanger.selectedMode.v3') || 'basics';
-let selectedSpeedId = getSpeed(localStorage.getItem('clefhanger.selectedSpeed.v6') || localStorage.getItem('clefhanger.selectedSpeed.v3') || '5').id;
-let selectedDifficultyId = localStorage.getItem('clefhanger.selectedDifficulty.v4') || 'beginner';
-let selectedInputMode = normalizeInputMode(localStorage.getItem('clefhanger.selectedInputMode.v7') || localStorage.getItem('clefhanger.selectedInputMode.v5') || 'buttons');
-let selectedPlayStyle = localStorage.getItem('clefhanger.selectedPlayStyle.v1') || 'practice';
-let selectedLessonId = getBeginnerLesson(localStorage.getItem('clefhanger.selectedLesson.v1') || 'first-steps').id;
-let showHints = localStorage.getItem('clefhanger.showHints.v1') !== 'false';
-let lessonIntroHidden = localStorage.getItem('clefhanger.lessonIntroHidden.v1') === 'true';
+const storageAdapter = createStorageAdapter();
+const storedPreferences = storageAdapter.readPreferences();
+let selectedModeId = storedPreferences.modeId;
+let selectedSpeedId = storedPreferences.speedId;
+let selectedDifficultyId = storedPreferences.difficultyId;
+let selectedInputMode = storedPreferences.inputMode;
+let selectedPlayStyle = storedPreferences.playStyle;
+let selectedLessonId = storedPreferences.lessonId;
+let showHints = storedPreferences.showHints;
+let lessonIntroHidden = storedPreferences.lessonIntroHidden;
 let tutorialStepIndex = 0;
 let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId });
 let rafId = null;
@@ -124,11 +126,11 @@ let lastMicRecordingEvidence = null;
 let lastMicReport = null;
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
-  return Number.parseInt(localStorage.getItem(getHighScoreKey(modeId, speedId, difficultyId)) || '0', 10) || 0;
+  return storageAdapter.readHighScore(modeId, speedId, difficultyId);
 }
 
 function setBestScore(score, modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
-  if (score > getBestScore(modeId, speedId, difficultyId)) localStorage.setItem(getHighScoreKey(modeId, speedId, difficultyId), String(score));
+  storageAdapter.writeHighScore(score, modeId, speedId, difficultyId);
 }
 
 function normalizeInputMode(inputMode) {
@@ -622,7 +624,7 @@ function installInputModes() {
   for (const button of inputModeButtons.querySelectorAll('button')) {
     button.addEventListener('click', () => {
       selectedInputMode = normalizeInputMode(button.dataset.inputMode);
-      localStorage.setItem('clefhanger.selectedInputMode.v7', selectedInputMode);
+      storageAdapter.writePreference('selectedInputMode', selectedInputMode);
       render();
     });
   }
@@ -648,7 +650,7 @@ function installModes() {
     button.textContent = mode.label;
     button.addEventListener('click', () => {
       selectedModeId = mode.id;
-      localStorage.setItem('clefhanger.selectedMode.v3', selectedModeId);
+      storageAdapter.writePreference('selectedMode', selectedModeId);
       resetIdleState();
     });
     modeButtons.append(button);
@@ -658,7 +660,7 @@ function installModes() {
 function installSpeedSlider() {
   speedSlider.addEventListener('input', () => {
     selectedSpeedId = getSpeed(speedSlider.value).id;
-    localStorage.setItem('clefhanger.selectedSpeed.v6', selectedSpeedId);
+    storageAdapter.writePreference('selectedSpeed', selectedSpeedId);
     resetIdleState();
   });
 }
@@ -680,31 +682,31 @@ function installBeginnerControls() {
   });
   tutorialDismissButton.addEventListener('click', () => {
     tutorialCard.hidden = true;
-    localStorage.setItem('clefhanger.tutorialDismissed.v1', 'true');
+    storageAdapter.writePreference('tutorialDismissed', true);
   });
-  if (localStorage.getItem('clefhanger.tutorialDismissed.v1') === 'true') tutorialCard.hidden = true;
+  if (storedPreferences.tutorialDismissed) tutorialCard.hidden = true;
   for (const button of playStyleButtons) {
     button.addEventListener('click', () => {
       selectedPlayStyle = button.dataset.playStyle === 'rush' ? 'rush' : 'practice';
-      localStorage.setItem('clefhanger.selectedPlayStyle.v1', selectedPlayStyle);
+      storageAdapter.writePreference('selectedPlayStyle', selectedPlayStyle);
       resetIdleState();
     });
   }
   lessonSelect.addEventListener('change', () => {
     selectedLessonId = getBeginnerLesson(lessonSelect.value).id;
     lessonIntroHidden = false;
-    localStorage.setItem('clefhanger.selectedLesson.v1', selectedLessonId);
-    localStorage.setItem('clefhanger.lessonIntroHidden.v1', 'false');
+    storageAdapter.writePreference('selectedLesson', selectedLessonId);
+    storageAdapter.writePreference('lessonIntroHidden', false);
     resetIdleState();
   });
   lessonIntroDismissButton.addEventListener('click', () => {
     lessonIntroHidden = true;
-    localStorage.setItem('clefhanger.lessonIntroHidden.v1', 'true');
+    storageAdapter.writePreference('lessonIntroHidden', true);
     render();
   });
   hintToggle.addEventListener('change', () => {
     showHints = hintToggle.checked;
-    localStorage.setItem('clefhanger.showHints.v1', showHints ? 'true' : 'false');
+    storageAdapter.writePreference('showHints', showHints);
     render();
   });
 }
@@ -719,7 +721,7 @@ function installDifficulties() {
     button.textContent = difficulty.label;
     button.addEventListener('click', () => {
       selectedDifficultyId = difficulty.id;
-      localStorage.setItem('clefhanger.selectedDifficulty.v4', selectedDifficultyId);
+      storageAdapter.writePreference('selectedDifficulty', selectedDifficultyId);
       resetIdleState();
     });
     difficultyButtons.append(button);
@@ -763,7 +765,7 @@ window.__clefHanger = {
   },
   selectSpeed: (speedId) => {
     selectedSpeedId = getSpeed(speedId).id;
-    localStorage.setItem('clefhanger.selectedSpeed.v6', selectedSpeedId);
+    storageAdapter.writePreference('selectedSpeed', selectedSpeedId);
     resetIdleState();
   },
   selectDifficulty: (difficultyId) => {
