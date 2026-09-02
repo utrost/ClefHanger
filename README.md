@@ -77,6 +77,7 @@ Then open `http://localhost:4173/`.
 
 - [User journey](docs/user-journey.md) — what a normal player is supposed to do, from first run through practice, rush, and mic use.
 - [Player and tester guide](docs/player-tester-guide.md) — how to play, test, troubleshoot microphone mode, and send useful reports.
+- [Human test handbook](docs/human-test-handbook.md) — repeatable pass/fail scripts for manual local, live, phone, PWA, and microphone testing.
 - [Current state reference](docs/current-state-reference.md) — exact implemented behavior, constants, scoring, mic rules, persistence, and known limits.
 - [Developer handoff](docs/developer-handoff.md) — code ownership, TDD/deploy workflow, ES-module cache rules, and continuation notes.
 - [Refactoring plan](docs/refactoring-plan.md) — architecture cleanup sequence to prevent god files while preserving the current teaching prototype.

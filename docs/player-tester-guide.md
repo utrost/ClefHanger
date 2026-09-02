@@ -1,6 +1,6 @@
 # ClefHanger Player and Tester Guide
 
-This guide is for someone opening the current ClefHanger build and trying to use it, test it, or send useful feedback. For a product-level description of what a normal player is supposed to do, see [User Journey](./user-journey.md). For exact constants and implementation details, see [Current State Reference](./current-state-reference.md).
+This guide is for someone opening the current ClefHanger build and trying to use it, test it, or send useful feedback. For a product-level description of what a normal player is supposed to do, see [User Journey](./user-journey.md). For exact constants and implementation details, see [Current State Reference](./current-state-reference.md). For repeatable manual pass/fail cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## What ClefHanger is
 

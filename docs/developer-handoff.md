@@ -24,6 +24,7 @@ Important files:
 - `docs/user-journey.md`: product-level player journey and intended user actions.
 - `docs/current-state-reference.md`: exact current implementation reference.
 - `docs/player-tester-guide.md`: first-time player/tester guide.
+- `docs/human-test-handbook.md`: repeatable human-executable pass/fail test scripts for manual local, live, phone, PWA, and microphone validation.
 - `docs/smoke-checklist.md`: manual local/live smoke checklist.
 - `docs/refactoring-plan.md`: architecture cleanup plan for extracting renderers/core catalogs/platform adapters while avoiding god files.
 
@@ -322,6 +323,7 @@ Keep these docs aligned:
 - `docs/user-journey.md`: what a normal player is supposed to do.
 - `docs/current-state-reference.md`: exact current facts and constants.
 - `docs/player-tester-guide.md`: user/tester operating guide.
+- `docs/human-test-handbook.md`: repeatable human-executable test scripts.
 - `docs/smoke-checklist.md`: local/live verification steps.
 - `docs/developer-handoff.md`: how to safely continue coding.
 
