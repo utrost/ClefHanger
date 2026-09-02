@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.js",
-    "check": "npm test && node --check src/app.js && node --check src/core/game.js && node --check src/core/content.js && node --check src/core/scoring.js && node --check src/core/audio.js && node --check src/core/pitch.js && node --check src/core/mic-diagnostics.js && node --check src/core/learning.js && node --check src/core/lessons.js && node --check src/core/music-theory.js && node --check src/ui/staff-renderer.js && node --check src/platform/storage.js && node --check src/platform/microphone-session.js && node --check scripts/check-version-consistency.js && node scripts/check-version-consistency.js && node --check sw.js && python3 -m json.tool manifest.webmanifest >/dev/null && git diff --check",
+    "check": "npm test && node --check src/app.js && node --check src/core/game.js && node --check src/core/content.js && node --check src/core/scoring.js && node --check src/core/audio.js && node --check src/core/pitch.js && node --check src/core/mic-diagnostics.js && node --check src/core/learning.js && node --check src/core/lessons.js && node --check src/core/music-theory.js && node --check src/ui/staff-renderer.js && node --check src/platform/storage.js && node --check src/platform/microphone-session.js && node --check src/platform/mic-recording-diagnostic.js && node --check scripts/check-version-consistency.js && node scripts/check-version-consistency.js && node --check sw.js && python3 -m json.tool manifest.webmanifest >/dev/null && git diff --check",
     "serve": "python3 -m http.server 4173"
   },
   "devDependencies": {}

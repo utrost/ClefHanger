@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
+} from './core/content.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,28 +21,28 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
+} from './core/game.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
   buildMicrophoneListeningMessage,
   createMicrophoneState,
-  detectPitchFromRecordedAudio,
   detectPitchFromTimeDomain,
   evaluateVocalMatchFrame,
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
+} from './core/pitch.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
 
-const appVersion = 'clefhanger-slice49-microphone-session-adapter-2026-09-02';
+const appVersion = 'clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -363,76 +363,45 @@ async function startMicrophone() {
 }
 
 async function recordMicrophoneDiagnostic() {
-  if (!window.MediaRecorder) {
-    microphoneRecordingDiagnostic = 'Recording test: MediaRecorder is not available in this browser.';
-    render();
-    return { status: 'unavailable', message: microphoneRecordingDiagnostic };
-  }
-  if (!microphoneStream) {
-    microphoneRecordingDiagnostic = 'Recording test: tap Grant mic first, then Record 1s test.';
-    render();
-    return { status: 'no-stream', message: microphoneRecordingDiagnostic };
-  }
-
   microphoneRecordingDiagnostic = 'Recording test: recording for 1 second… sing any steady comfortable note now.';
   render();
-  try {
-    const chunks = [];
-    const recorder = new MediaRecorder(microphoneStream);
-    const stopped = new Promise((resolve, reject) => {
-      recorder.addEventListener('dataavailable', (event) => {
-        if (event.data?.size) chunks.push(event.data);
-      });
-      recorder.addEventListener('stop', resolve, { once: true });
-      recorder.addEventListener('error', () => reject(recorder.error || new Error('MediaRecorder failed')), { once: true });
-    });
-    recorder.start(250);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    recorder.requestData?.();
-    if (recorder.state !== 'inactive') recorder.stop();
-    await stopped;
-    const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
-    let message = `Recording test: captured ${blob.size} bytes.`;
-    let decodedRms = null;
-    let recordedFrequency = null;
-    let recordedPitch = null;
-    let decodedSamples = null;
-    let decodedSampleRate = null;
-    if (blob.size > 0) {
-      try {
-        const arrayBuffer = await blob.arrayBuffer();
-        const decoded = await getAudioContext().decodeAudioData(arrayBuffer.slice(0));
-        decodedSamples = decoded.getChannelData(0);
-        decodedSampleRate = decoded.sampleRate;
-        decodedRms = getCenteredRms(decodedSamples);
-        recordedFrequency = detectPitchFromRecordedAudio(decodedSamples, decoded.sampleRate);
-        recordedPitch = frequencyToNearestPitch(recordedFrequency);
-        message += ` Decoded level ${formatDiagnosticLevelPercent(decodedRms)}.`;
-        if (recordedPitch) {
-          const pitchLabel = `${recordedPitch.answer}${recordedPitch.octave}`;
-          microphoneDebugText = buildBeginnerMicMessage({ pitchLabel, frequency: recordedFrequency, decodedLevel: decodedRms, bytes: blob.size, advanced: true });
-          message += ` ${buildBeginnerMicMessage({ pitchLabel, frequency: recordedFrequency, decodedLevel: decodedRms, bytes: blob.size })}`;
-        } else {
-          message += ' No steady recorded pitch found.';
-        }
-      } catch {
-        message += ' Browser recorded data, but Web Audio could not decode it here.';
+  const result = await runMicrophoneRecordingDiagnostic({
+    stream: microphoneStream,
+    audioContext: getAudioContext(),
+    MediaRecorderClass: window.MediaRecorder,
+    BlobClass: window.Blob,
+  });
+
+  if (result.status === 'unavailable' || result.status === 'no-stream' || result.status === 'error') {
+    microphoneRecordingDiagnostic = result.message;
+    render();
+    return result;
+  }
+
+  let message = `Recording test: captured ${result.bytes} bytes.`;
+  if (result.bytes > 0) {
+    if (result.decodeFailed) {
+      message += ' Browser recorded data, but Web Audio could not decode it here.';
+    } else {
+      message += ` Decoded level ${formatDiagnosticLevelPercent(result.decodedRms)}.`;
+      if (result.recordedPitch) {
+        const pitchLabel = `${result.recordedPitch.answer}${result.recordedPitch.octave}`;
+        microphoneDebugText = buildBeginnerMicMessage({ pitchLabel, frequency: result.recordedFrequency, decodedLevel: result.decodedRms, bytes: result.bytes, advanced: true });
+        message += ` ${buildBeginnerMicMessage({ pitchLabel, frequency: result.recordedFrequency, decodedLevel: result.decodedRms, bytes: result.bytes })}`;
+      } else {
+        message += ' No steady recorded pitch found.';
       }
     }
-    if (blob.size === 0) {
-      const liveLevel = formatDiagnosticLevelPercent(microphoneState.inputLevel);
-      message = `Recording test: MediaRecorder returned 0 bytes. live mic level ${liveLevel}; try live Mic play anyway, or retest in Chrome/Safari if export stays empty.`;
-    }
-    else if (decodedRms === 0) message += ' Decoded audio is silent.';
-    lastMicRecordingEvidence = { bytes: blob.size, mimeType: blob.type, samples: decodedSamples, sampleRate: decodedSampleRate };
-    microphoneRecordingDiagnostic = message;
-    render();
-    return { status: 'ok', bytes: blob.size, decodedRms, recordedFrequency, recordedPitch, message };
-  } catch (error) {
-    microphoneRecordingDiagnostic = `Recording test failed: ${error?.message || String(error)}`;
-    render();
-    return { status: 'error', message: microphoneRecordingDiagnostic };
   }
+  if (result.bytes === 0) {
+    const liveLevel = formatDiagnosticLevelPercent(microphoneState.inputLevel);
+    message = `Recording test: MediaRecorder returned 0 bytes. live mic level ${liveLevel}; try live Mic play anyway, or retest in Chrome/Safari if export stays empty.`;
+  }
+  else if (result.decodedRms === 0) message += ' Decoded audio is silent.';
+  lastMicRecordingEvidence = result.evidence;
+  microphoneRecordingDiagnostic = message;
+  render();
+  return { status: 'ok', bytes: result.bytes, decodedRms: result.decodedRms, recordedFrequency: result.recordedFrequency, recordedPitch: result.recordedPitch, message };
 }
 
 function buildCurrentMicReport() {

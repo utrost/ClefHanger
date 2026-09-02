@@ -513,9 +513,11 @@ export async function startMicrophoneSession({ navigator, audioContext, analyser
 - `src/app.js` does not directly build the media graph.
 - Existing mic regression tests are converted, not weakened.
 
-### Slice 3.3 — Extract MediaRecorder diagnostic adapter
+### Slice 3.3 — Extract MediaRecorder diagnostic adapter — implemented
 
 **Objective:** isolate the 1-second Mic Lab recording flow from UI controls.
+
+**Implementation note:** landed in Slice 50 as `src/platform/mic-recording-diagnostic.js` with `tests/mic-recording-diagnostic.test.js`. `src/app.js` now delegates MediaRecorder construction/start/stop, chunk collection, blob creation, Web Audio decode handoff, decoded RMS, recorded-pitch extraction, and report evidence construction to `runMicrophoneRecordingDiagnostic(...)`; the app shell keeps only UI status copy, beginner-friendly message formatting, and report/export wiring.
 
 **Create:**
 
@@ -646,7 +648,7 @@ jobs:
 5. Slice 4.1 — version consistency check.
 6. Slice 3.1 — LocalStorage adapter.
 7. Slice 3.2 — microphone session adapter — implemented.
-8. Slice 3.3 — MediaRecorder diagnostic adapter.
+8. Slice 3.3 — MediaRecorder diagnostic adapter — implemented.
 9. Slice 4.2 — shell test conversion as needed.
 10. Slice 4.3 — minimal CI.
 

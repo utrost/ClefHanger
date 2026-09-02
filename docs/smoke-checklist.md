@@ -42,8 +42,8 @@ For exact current rules and constants, see [Current State Reference](./current-s
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice49-microphone-session-adapter`.
-- Verify `src/app.js`, `src/core/game.js`, `src/core/content.js`, `src/core/scoring.js`, `src/core/learning.js`, `src/core/lessons.js`, `src/core/audio.js`, `src/core/pitch.js`, `src/platform/storage.js`, `src/platform/microphone-session.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
+- Verify the HTML contains `clefhanger-slice50-mic-recording-diagnostic-adapter`.
+- Verify `src/app.js`, `src/core/game.js`, `src/core/content.js`, `src/core/scoring.js`, `src/core/learning.js`, `src/core/lessons.js`, `src/core/audio.js`, `src/core/pitch.js`, `src/platform/storage.js`, `src/platform/microphone-session.js`, `src/platform/mic-recording-diagnostic.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.
 - After first load, switch the browser offline and reload; the app shell should still open from the service worker cache.

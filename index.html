@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice49-microphone-session-adapter-2026-09-02">
+<html lang="en" data-app-version="clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -536,7 +536,7 @@
           <p>Sing the front note. ClefHanger accepts a steady matching pitch class within 50 cents, in any octave for now.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 49: microphone session adapter</p>
+        <p class="microcopy">Slice 50: mic recording diagnostic adapter</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -594,12 +594,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02')
+            .register('./sw.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02')
             .then((registration) => registration.update())
             .catch(() => {});
         });

@@ -10,6 +10,7 @@ test('settings expose microphone input and live calibration controls', () => {
   const html = read('index.html');
   const app = read('src/app.js');
   const microphoneSession = read('src/platform/microphone-session.js');
+  const micRecordingDiagnostic = read('src/platform/mic-recording-diagnostic.js');
   const staffRenderer = read('src/ui/staff-renderer.js');
 
   assert.match(html, /data-input-mode="microphone"/);
@@ -21,9 +22,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice49-microphone-session-adapter/);
-  assert.match(app, /const appVersion = 'clefhanger-slice49-microphone-session-adapter-2026-09-02'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice49-microphone-session-adapter-2026-09-02/);
+  assert.match(html, /data-app-version="clefhanger-slice50-mic-recording-diagnostic-adapter/);
+  assert.match(app, /const appVersion = 'clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -58,19 +59,19 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /downloadMicReport/);
   assert.match(app, /requestAnimationFrame\(\(timestamp\) => processMicrophoneFrame\(null, timestamp\)\)/);
   assert.doesNotMatch(app, /requestAnimationFrame\(processMicrophoneFrame\)/);
-  assert.match(app, /detectPitchFromRecordedAudio/);
+  assert.match(micRecordingDiagnostic, /detectPitchFromRecordedAudio/);
   assert.match(app, /buildBeginnerMicMessage/);
-  assert.match(app, /MediaRecorder/);
-  assert.match(app, /recorder\.start\(250\)/);
-  assert.match(app, /recorder\.requestData\?\.\(\)/);
+  assert.match(micRecordingDiagnostic, /MediaRecorderClass/);
+  assert.match(micRecordingDiagnostic, /recorder\.start\(timesliceMs\)/);
+  assert.match(micRecordingDiagnostic, /recorder\.requestData\?\.\(\)/);
   assert.match(app, /MediaRecorder returned 0 bytes/);
   assert.match(app, /live mic level/);
-  assert.match(app, /decodeAudioData/);
+  assert.match(micRecordingDiagnostic, /decodeAudioData/);
   assert.match(app, /getMicrophoneRecordingDiagnostic/);
   assert.match(microphoneSession, /navigatorObject\.mediaDevices\.getUserMedia/);
   assert.match(microphoneSession, /getBuiltInVocalMicrophoneConstraints\(\)/);
   assert.doesNotMatch(app, /getUserMedia\(\{ audio: true \}\)/);
-  assert.match(app, /formatDiagnosticLevelPercent\(decodedRms\)/);
+  assert.match(app, /formatDiagnosticLevelPercent\(result\.decodedRms\)/);
   assert.match(app, /selectInputMode: \(inputMode\)/);
   assert.match(app, /microphone/);
   assert.match(app, /processMicrophoneFrame/);

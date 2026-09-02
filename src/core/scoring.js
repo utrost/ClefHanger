@@ -1,4 +1,4 @@
-import { getDifficulty, getMode, getSpeed } from './content.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
+import { getDifficulty, getMode, getSpeed } from './content.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
 
 export function getSpeedBonus(speed = getSpeed('5')) {
   return speed.value >= 8 ? 40 : speed.value >= 6 ? 20 : 0;
