@@ -578,11 +578,18 @@ A complete ClefHanger deploy should:
    - `sw.js`
    - `src/app.js`
    - `src/core/audio.js`
+   - `src/core/content.js`
    - `src/core/game.js`
-   - `src/core/pitch.js`
-   - `src/core/mic-diagnostics.js`
    - `src/core/learning.js`
    - `src/core/lessons.js`
+   - `src/core/mic-diagnostics.js`
+   - `src/core/music-theory.js`
+   - `src/core/pitch.js`
+   - `src/core/scoring.js`
+   - `src/platform/mic-recording-diagnostic.js`
+   - `src/platform/microphone-session.js`
+   - `src/platform/storage.js`
+   - `src/ui/staff-renderer.js`
    - icons
    - current docs that should be publicly readable.
 4. Verify live markers with a cache-busting query.

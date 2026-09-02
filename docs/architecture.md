@@ -2,14 +2,22 @@
 
 ClefHanger should stay mobile-first and renderer-light. The first implementation should avoid coupling music rules, scoring, animation, and touch UI into one page script.
 
-## Target stack
+## Stack direction
+
+Current stack:
 
 - HTML5 application shell.
-- Tailwind CSS for responsive mobile layout.
-- JavaScript or TypeScript for game logic.
-- VexFlow for notation rendering.
-- Web Audio API analyser input with a dependency-free autocorrelation detector for microphone input; Pitchy remains a possible later upgrade.
+- Dependency-free CSS in `index.html` for responsive mobile layout.
+- Native JavaScript ES modules for game logic.
+- Inline SVG helpers for notation rendering.
+- Web Audio API analyser input with a dependency-free autocorrelation detector for microphone input.
 - LocalStorage and PWA support for offline progress.
+
+Possible later stack changes, only when the app needs them:
+
+- Vite/TypeScript for bundled development.
+- VexFlow for richer notation rendering.
+- Pitchy/noise-hardening if real phones need more robust pitch detection than the dependency-free first pass.
 
 ## Initial app shape
 
@@ -75,8 +83,7 @@ For the product-level player journey, see [User Journey](./user-journey.md). For
 
 Planned later implementation:
 
-- Accidentals as beginner learning cards, not only drill modes.
-- Intervals and rapid jumps.
+- Fuller accidental-specific lesson cards if real use shows the current accidental hints are not enough.
 - Pitchy/noise-hardening if real phones need more robust pitch detection than the dependency-free first pass.
 - VexFlow notation rendering upgrade once richer notation needs it.
 
