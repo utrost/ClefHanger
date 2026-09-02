@@ -9,6 +9,7 @@ function read(path) {
 test('settings expose microphone input and live calibration controls', () => {
   const html = read('index.html');
   const app = read('src/app.js');
+  const microphoneSession = read('src/platform/microphone-session.js');
   const staffRenderer = read('src/ui/staff-renderer.js');
 
   assert.match(html, /data-input-mode="microphone"/);
@@ -20,9 +21,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice48-storage-adapter/);
-  assert.match(app, /const appVersion = 'clefhanger-slice48-storage-adapter-2026-09-01'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice48-storage-adapter-2026-09-01/);
+  assert.match(html, /data-app-version="clefhanger-slice49-microphone-session-adapter/);
+  assert.match(app, /const appVersion = 'clefhanger-slice49-microphone-session-adapter-2026-09-02'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice49-microphone-session-adapter-2026-09-02/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -32,25 +33,25 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Export mic report/);
   assert.match(html, /id="mic-report-preview"/);
 
-  assert.match(app, /Microphone permission denied/);
-  assert.match(app, /tap the lock/);
-  assert.match(app, /Android Settings/);
-  assert.match(app, /navigator\.permissions\.query/);
-  assert.match(app, /checkMicrophonePermissionState/);
+  assert.match(microphoneSession, /Microphone permission denied/);
+  assert.match(microphoneSession, /tap the lock/);
+  assert.match(microphoneSession, /Android Settings/);
+  assert.match(microphoneSession, /navigatorObject\.permissions\.query/);
+  assert.match(microphoneSession, /queryMicrophonePermissionState/);
   assert.match(app, /formatMicrophoneError/);
   assert.match(app, /Requesting mic/);
   assert.match(app, /calibrationReadingText/);
-  assert.match(app, /withMicrophoneRequestTimeout/);
-  assert.match(app, /Microphone request timed out/);
+  assert.match(microphoneSession, /withMicrophoneRequestTimeout/);
+  assert.match(microphoneSession, /Microphone request timed out/);
   assert.match(app, /buildMicrophoneListeningMessage/);
   assert.match(app, /getCenteredRms/);
   assert.match(app, /silentFrameCount/);
-  assert.match(app, /microphoneSource/);
-  assert.match(app, /createMediaStreamSource\(microphoneStream\)/);
-  assert.match(app, /microphoneKeepAliveGain/);
-  assert.match(app, /createGain\(\)/);
-  assert.match(app, /connect\(context\.destination\)/);
-  assert.match(app, /getMicrophoneTrackState/);
+  assert.match(app, /microphoneSession/);
+  assert.match(microphoneSession, /createMediaStreamSource\(stream\)/);
+  assert.match(microphoneSession, /keepAliveGain/);
+  assert.match(microphoneSession, /createGain\(\)/);
+  assert.match(microphoneSession, /connect\(audioContext\.destination\)/);
+  assert.match(app, /getCurrentMicrophoneTrackState/);
   assert.match(app, /recordMicrophoneDiagnostic/);
   assert.match(app, /buildMicDiagnosticReport/);
   assert.match(app, /buildMicDiagnosticTextFile/);
@@ -66,8 +67,8 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /live mic level/);
   assert.match(app, /decodeAudioData/);
   assert.match(app, /getMicrophoneRecordingDiagnostic/);
-  assert.match(app, /navigator\.mediaDevices\.getUserMedia/);
-  assert.match(app, /getBuiltInVocalMicrophoneConstraints\(\)/);
+  assert.match(microphoneSession, /navigatorObject\.mediaDevices\.getUserMedia/);
+  assert.match(microphoneSession, /getBuiltInVocalMicrophoneConstraints\(\)/);
   assert.doesNotMatch(app, /getUserMedia\(\{ audio: true \}\)/);
   assert.match(app, /formatDiagnosticLevelPercent\(decodedRms\)/);
   assert.match(app, /selectInputMode: \(inputMode\)/);

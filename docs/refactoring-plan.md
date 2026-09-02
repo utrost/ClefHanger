@@ -459,9 +459,11 @@ export function createStorageAdapter(storage = globalThis.localStorage) {
 
 - `src/app.js` calls an adapter rather than directly scattering `localStorage` reads/writes.
 
-### Slice 3.2 — Extract microphone session adapter
+### Slice 3.2 — Extract microphone session adapter — implemented
 
 **Objective:** isolate browser microphone setup and analyser lifecycle from UI/rendering/scoring orchestration.
+
+**Implementation note:** landed in Slice 49 as `src/platform/microphone-session.js` with `tests/microphone-session.test.js`. `src/app.js` now delegates permission preflight, timeout-wrapped `getUserMedia`, built-in vocal constraints, source/analyser/zero-gain keepalive graph construction, track-state snapshots, and track cleanup to `startMicrophoneSession(...)`; the app shell keeps mic-frame processing, UI messages, scoring orchestration, and diagnostic report assembly.
 
 **Create:**
 
@@ -643,7 +645,7 @@ jobs:
 4. Slice 2.4 — decouple game reducer from learning copy.
 5. Slice 4.1 — version consistency check.
 6. Slice 3.1 — LocalStorage adapter.
-7. Slice 3.2 — microphone session adapter.
+7. Slice 3.2 — microphone session adapter — implemented.
 8. Slice 3.3 — MediaRecorder diagnostic adapter.
 9. Slice 4.2 — shell test conversion as needed.
 10. Slice 4.3 — minimal CI.

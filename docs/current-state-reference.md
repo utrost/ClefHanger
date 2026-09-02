@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice48-storage-adapter-2026-09-01`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
+This document describes what exists in code today in `clefhanger-slice49-microphone-session-adapter-2026-09-02`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md).
 
 ## Runtime shape
 
@@ -8,9 +8,9 @@ This document describes what exists in code today in `clefhanger-slice48-storage
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice48-storage-adapter-2026-09-01`.
-- Current visible slice marker: `Slice 48: storage adapter`.
-- Current service-worker cache: `clefhanger-pwa-v42`.
+- Current app marker: `clefhanger-slice49-microphone-session-adapter-2026-09-02`.
+- Current visible slice marker: `Slice 49: microphone session adapter`.
+- Current service-worker cache: `clefhanger-pwa-v43`.
 - Core/UI modules:
   - `src/core/content.js`: note/chord pools, selectable modes, speed/difficulty catalogs, answer-button definitions, and safe catalog lookups.
   - `src/core/scoring.js`: point calculation, speed/streak bonuses, accuracy, high-score keys, and round-summary data.
@@ -23,6 +23,7 @@ This document describes what exists in code today in `clefhanger-slice48-storage
   - `src/core/audio.js`: synthetic piano-like Web Audio voice and A4 reference tone.
   - `src/ui/staff-renderer.js`: SVG staff, note, chord, ledger-line, correction-label, and microphone ghost-note markup.
   - `src/platform/storage.js`: safe LocalStorage adapter for preferences, legacy fallback keys, high-score reads/writes, and unavailable-storage errors.
+  - `src/platform/microphone-session.js`: permission preflight, timeout-wrapped `getUserMedia`, built-in vocal constraints, Web Audio analyser/keepalive graph setup, track-state snapshots, and stop cleanup.
   - `scripts/check-version-consistency.js`: cache-busting guard for app version, module query strings, service-worker registration, cache name, and precached ES modules.
 
 ## Main user flow

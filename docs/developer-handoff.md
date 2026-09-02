@@ -96,9 +96,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice48-storage-adapter-2026-09-01`.
-- Service-worker cache: `clefhanger-pwa-v42`.
-- Visible marker: `Slice 48: storage adapter`.
+- App version: `clefhanger-slice49-microphone-session-adapter-2026-09-02`.
+- Service-worker cache: `clefhanger-pwa-v43`.
+- Visible marker: `Slice 49: microphone session adapter`.
 
 ## State ownership
 
@@ -119,9 +119,16 @@ Main state fields:
 `src/app.js` owns browser resources:
 
 - animation frame ids;
-- `AudioContext`;
-- microphone stream/source/analyser/keepalive gain/buffer;
+- `AudioContext` creation/reuse;
+- active microphone session reference and mic-frame-to-scoring orchestration;
 - DOM event listeners and assignments.
+
+`src/platform/microphone-session.js` owns browser microphone session setup:
+
+- permission preflight and timeout-wrapped `getUserMedia`;
+- built-in vocal capture constraints;
+- stream/source/analyser/zero-gain keepalive graph construction;
+- track-state snapshots and track cleanup.
 
 `src/platform/storage.js` owns LocalStorage access:
 
@@ -179,13 +186,14 @@ Current mic constants:
 - Display/scoring frequency range: 80–1000 Hz.
 - Minimum centered RMS: 0.0005.
 - Autocorrelation threshold: 0.72.
-- Analyser `fftSize`: 4096 in `src/app.js`.
+- Analyser `fftSize`: 4096 in `src/platform/microphone-session.js`.
 
 Important tests live in:
 
 - `tests/pitch-tracker.test.js`
 - `tests/mic-diagnostics.test.js`
 - `tests/heard-note-display.test.js`
+- `tests/microphone-session.test.js`
 - `tests/microphone-shell.test.js`
 
 Keep these behaviors unless a real-device report proves otherwise:
@@ -274,10 +282,10 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice48-storage-adapter'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice49-microphone-session-adapter'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v42'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v43'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

@@ -1,5 +1,5 @@
-import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
-export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice48-storage-adapter-2026-09-01';
+import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
+export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice49-microphone-session-adapter-2026-09-02';
 function explainPrompt(prompt) {
   if (!prompt) return 'Keep going.';
   if (prompt.label) return prompt.label;
