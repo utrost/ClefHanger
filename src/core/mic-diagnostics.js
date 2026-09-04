@@ -3,7 +3,7 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   microphoneInputLevelPercent,
-} from './pitch.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+} from './pitch.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
 
 export function summarizeAudioSamples(samples, sampleRate, { label = 'capture' } = {}) {
   const safeSamples = samples || new Float32Array();

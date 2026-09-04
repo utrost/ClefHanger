@@ -3,8 +3,8 @@ import {
   getClefPresentation,
   getLedgerLinesForStaffStep,
   getMode,
-} from '../core/game.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { createGhostNoteFromPitch } from '../core/music-theory.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+} from '../core/game.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { createGhostNoteFromPitch } from '../core/music-theory.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
 
 export function yForStaffStep(step) {
   return STAFF_LAYOUT.bottomLineY - step * STAFF_LAYOUT.halfStep;

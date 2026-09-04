@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice51-mic-octave-match-toggle-2026-09-02">
+<html lang="en" data-app-version="clefhanger-slice52-hide-answer-reveal-2026-09-04">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -276,7 +276,6 @@
       .tutorial-actions button, .play-style-button, #lesson-select, .hint-row { min-height: 36px; border-radius: 12px; }
       .play-style-button[data-active="true"] { background: var(--accent); color: #1d1300; }
       .hint-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.8rem; }
-      .note-button[data-correct-answer="true"] { outline: 3px solid var(--good); box-shadow: 0 0 0 4px rgba(98,230,167,0.18); }
       .queue-note[data-correction-active="true"] .active-note { filter: drop-shadow(0 0 8px rgba(98,230,167,0.55)); }
       .correction-label rect { fill: #17112b; stroke: var(--good); stroke-width: 3; }
       .correction-label text { fill: var(--good); stroke: none; text-anchor: middle; font-size: 20px; font-weight: 950; dominant-baseline: central; }
@@ -536,7 +535,7 @@
           <p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 51: mic octave match toggle</p>
+        <p class="microcopy">Slice 52: hide answer reveal</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -595,12 +594,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02')
+            .register('./sw.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04')
             .then((registration) => registration.update())
             .catch(() => {});
         });

@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice51-mic-octave-match-toggle-2026-09-02`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice52-hide-answer-reveal-2026-09-04`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Runtime shape
 
@@ -8,9 +8,9 @@ This document describes what exists in code today in `clefhanger-slice51-mic-oct
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice51-mic-octave-match-toggle-2026-09-02`.
-- Current visible slice marker: `Slice 51: mic octave match toggle`.
-- Current service-worker cache: `clefhanger-pwa-v45`.
+- Current app marker: `clefhanger-slice52-hide-answer-reveal-2026-09-04`.
+- Current visible slice marker: `Slice 52: hide answer reveal`.
+- Current service-worker cache: `clefhanger-pwa-v46`.
 - Core/UI modules:
   - `src/core/content.js`: note/chord pools, selectable modes, speed/difficulty catalogs, answer-button definitions, and safe catalog lookups.
   - `src/core/scoring.js`: point calculation, speed/streak bonuses, accuracy, high-score keys, and round-summary data.

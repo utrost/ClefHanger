@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+} from './core/content.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,9 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+} from './core/game.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -34,15 +34,15 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+} from './core/pitch.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
 
-const appVersion = 'clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+const appVersion = 'clefhanger-slice52-hide-answer-reveal-2026-09-04';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -221,9 +221,6 @@ function renderHud(nowMs) {
   microphoneRecordingDiagnosticEl.textContent = microphoneRecordingDiagnostic;
   microphoneDebugTextEl.textContent = microphoneDebugText;
   micReportPreviewEl.textContent = lastMicReport ? `Last report: ${lastMicReport.capture.label} · ${lastMicReport.interpretation}` : 'No exported report yet.';
-  for (const button of buttons.querySelectorAll('button')) {
-    button.setAttribute('data-correct-answer', state.activeNote?.answer === button.textContent ? 'true' : 'false');
-  }
   calibrationReadingEl.textContent = calibrationReadingText();
   calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 
@@ -502,7 +499,6 @@ function installButtons() {
     button.className = option.label.length === 1 ? 'note-button' : 'note-button accidental-button';
     button.textContent = option.label;
     button.setAttribute('aria-label', `Answer ${option.label}`);
-    button.setAttribute('data-correct-answer', state.activeNote?.answer === option.answer ? 'true' : 'false');
     button.addEventListener('click', () => handleAnswer(option.answer));
     buttons.append(button);
   }

@@ -97,9 +97,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice51-mic-octave-match-toggle-2026-09-02`.
-- Service-worker cache: `clefhanger-pwa-v45`.
-- Visible marker: `Slice 51: mic octave match toggle`.
+- App version: `clefhanger-slice52-hide-answer-reveal-2026-09-04`.
+- Service-worker cache: `clefhanger-pwa-v46`.
+- Visible marker: `Slice 52: hide answer reveal`.
 
 ## CI
 
@@ -302,11 +302,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice51-mic-octave-match-toggle'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice52-hide-answer-reveal'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v45'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v46'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

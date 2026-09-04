@@ -223,7 +223,7 @@ test('shell exposes beginner-friendly tutorial, practice, lesson, hint, and mic 
   assert.match(app, /getLessonIntroCard/);
   assert.match(app, /startPractice/);
   assert.match(app, /getScaffoldedAnswerOptions/);
-  assert.match(app, /data-correct-answer/);
+  assert.doesNotMatch(app, /data-correct-answer/);
   assert.match(staffRenderer, /correction-label/);
   assert.match(staffRenderer, /data-correction-active/);
 });
