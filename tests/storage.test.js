@@ -37,6 +37,7 @@ test('storage adapter reads safe preference defaults when storage is missing', (
     playStyle: 'practice',
     lessonId: 'first-steps',
     showHints: true,
+    matchAnyOctave: true,
     lessonIntroHidden: false,
     tutorialDismissed: false,
   });
@@ -51,6 +52,7 @@ test('storage adapter normalizes stored preferences and legacy keys', () => {
     [STORAGE_KEYS.selectedPlayStyle]: 'marathon',
     [STORAGE_KEYS.selectedLesson]: 'line-notes',
     [STORAGE_KEYS.showHints]: 'false',
+    [STORAGE_KEYS.matchAnyOctave]: 'false',
     [STORAGE_KEYS.lessonIntroHidden]: 'true',
     [STORAGE_KEYS.tutorialDismissed]: 'true',
   });
@@ -64,6 +66,7 @@ test('storage adapter normalizes stored preferences and legacy keys', () => {
     playStyle: 'practice',
     lessonId: 'line-notes',
     showHints: false,
+    matchAnyOctave: false,
     lessonIntroHidden: true,
     tutorialDismissed: true,
   });
@@ -80,6 +83,7 @@ test('storage adapter writes preferences through stable keys', () => {
   adapter.writePreference('selectedPlayStyle', 'rush');
   adapter.writePreference('selectedLesson', 'ledger-lines');
   adapter.writePreference('showHints', false);
+  adapter.writePreference('matchAnyOctave', false);
   adapter.writePreference('lessonIntroHidden', true);
   adapter.writePreference('tutorialDismissed', true);
 
@@ -91,6 +95,7 @@ test('storage adapter writes preferences through stable keys', () => {
     [STORAGE_KEYS.selectedPlayStyle]: 'rush',
     [STORAGE_KEYS.selectedLesson]: 'ledger-lines',
     [STORAGE_KEYS.showHints]: 'false',
+    [STORAGE_KEYS.matchAnyOctave]: 'false',
     [STORAGE_KEYS.lessonIntroHidden]: 'true',
     [STORAGE_KEYS.tutorialDismissed]: 'true',
   });

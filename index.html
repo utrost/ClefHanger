@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02">
+<html lang="en" data-app-version="clefhanger-slice51-mic-octave-match-toggle-2026-09-02">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -533,10 +533,10 @@
         <div id="microphone-panel" aria-label="Microphone answer status" hidden>
           <p id="microphone-status">Mic off. Grant mic to calibrate and sing answers.</p>
           <p id="heard-note" aria-live="polite">You played —</p>
-          <p>Sing the front note. ClefHanger accepts a steady matching pitch class within 50 cents, in any octave for now.</p>
+          <p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 50: mic recording diagnostic adapter</p>
+        <p class="microcopy">Slice 51: mic octave match toggle</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -573,6 +573,7 @@
         <section id="calibration-panel" class="settings-section" aria-label="Vocal calibration">
           <h3>Actual calibration / Mic Lab</h3>
           <p><strong>Sing any comfortable note</strong><br />Use Play A only as an optional reference; the recorder should decode low voices too.</p>
+          <label class="hint-row"><input id="match-any-octave" type="checkbox" checked /> Match any octave — low or high C counts as C</label>
           <label class="hint-row" for="mic-lab-label">Capture label
             <select id="mic-lab-label" aria-label="Mic Lab capture label">
               <option value="silence">Silence</option>
@@ -594,12 +595,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02')
+            .register('./sw.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02')
             .then((registration) => registration.update())
             .catch(() => {});
         });

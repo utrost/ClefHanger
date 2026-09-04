@@ -1,15 +1,15 @@
-import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+} from './content.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+} from './content.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 
 
 export const STAFF_LAYOUT = {

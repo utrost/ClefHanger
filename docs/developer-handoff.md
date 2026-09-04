@@ -97,9 +97,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02`.
-- Service-worker cache: `clefhanger-pwa-v44`.
-- Visible marker: `Slice 50: mic recording diagnostic adapter`.
+- App version: `clefhanger-slice51-mic-octave-match-toggle-2026-09-02`.
+- Service-worker cache: `clefhanger-pwa-v45`.
+- Visible marker: `Slice 51: mic octave match toggle`.
 
 ## CI
 
@@ -225,7 +225,7 @@ Keep these behaviors unless a real-device report proves otherwise:
 - distinguish live analyser evidence from MediaRecorder/decode evidence;
 - export reports as `.txt`, not `.json`, for Telegram friendliness;
 - keep Mic Lab raw details behind an advanced panel;
-- accept matching pitch class in any octave for beginner play;
+- accept matching pitch class in any octave while the persisted `matchAnyOctave` setting is checked;
 - do not score chord prompts from the mic.
 
 Use this public hook for browser smoke:
@@ -302,11 +302,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice50-mic-recording-diagnostic-adapter'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice51-mic-octave-match-toggle'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v44'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v45'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

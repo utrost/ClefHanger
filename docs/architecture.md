@@ -38,7 +38,7 @@ Current boundaries:
 - `src/core/learning.js`
   - Teaching feedback and visual correction overlay data from neutral game outcomes, accidental/interval hints, learning recommendations, beginner-friendly microphone messages, and lesson re-exports for compatibility.
 - `src/core/pitch.js`
-  - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
+  - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules including optional any-octave matching, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
 - `src/core/mic-diagnostics.js`
   - Renderer-free Mic Lab report contracts: live analyser summaries, decoded recording level/peak, pitch-window candidates, environment/track metadata, interpretation strings, and Telegram-friendly `.txt` JSON export metadata.
 - `src/ui/staff-renderer.js`
@@ -75,7 +75,7 @@ For the product-level player journey, see [User Journey](./user-journey.md). For
 - Mic Lab reports are exported as `.txt` JSON so phone/browser evidence can be sent back from Telegram and preserved as regression fixtures before changing pitch thresholds.
 - The live analyser loop schedules `requestAnimationFrame((timestamp) => processMicrophoneFrame(null, timestamp))` so the browser frame timestamp is not misread as a pitch-frequency override.
 - `getUserMedia` currently uses the built-in-vocal microphone constraints (`echoCancellation: false`, `noiseSuppression: false`, `autoGainControl: true`, mono). Android Firefox field reports showed the gain path gives usable voice levels while still avoiding browser cleanup that can remove steady musical tones as echo/noise.
-- Microphone mode can score sung natural-note prompts by pitch class, independent of octave, when the detected note stays within a forgiving 50-cent vocal tolerance for a short stability window. A post-hit debounce prevents repeated animation-frame scoring, and `window.clefhangerInjectPitch(frequency)` gives browser smoke tests a no-hardware pitch-injection seam. Chord singing is not scored yet.
+- Microphone mode can score sung natural-note prompts by pitch class, independent of octave while **Match any octave** is checked, when the detected note stays within a forgiving 50-cent vocal tolerance for a short stability window. A post-hit debounce prevents repeated animation-frame scoring, and `window.clefhangerInjectPitch(frequency)` gives browser smoke tests a no-hardware pitch-injection seam. Chord singing is not scored yet.
 - Correct-answer Web Audio playback using equal-tempered pitches and a simple piano-like additive voice.
 - 60-second rush round.
 - Mode-weighted scoring, slider-speed bonus, difficulty multiplier, streak bonuses, and per-mode/per-slider-speed/per-difficulty high-score persistence.

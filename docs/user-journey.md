@@ -210,7 +210,9 @@ In Sing/Play mode, the user should:
 
 The current microphone scoring is intentionally beginner-friendly:
 
-- any octave can match;
+- **Match any octave** is checked by default, so any octave can match;
+- a singer with a deeper voice can sing a low C for a written C;
+- unchecking **Match any octave** makes the octave strict;
 - the note name/pitch class must match;
 - the note must be roughly in tune;
 - the note must be stable for a short moment;

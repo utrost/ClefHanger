@@ -170,7 +170,8 @@ The staff also shows a translucent green ghost note for the detected pitch.
 Current scoring rule:
 
 - matching note name/pitch class scores;
-- any octave is accepted for now;
+- **Match any octave** is checked by default, so a low or high C counts as C;
+- if **Match any octave** is unchecked, the note must be in the written octave;
 - the note must be within about 50 cents;
 - the app waits briefly for the same note to be stable;
 - one held note is debounced so it does not clear several prompts at once;
@@ -249,7 +250,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 50: mic recording diagnostic adapter`.
+2. Confirm the page shows `Slice 51: mic octave match toggle`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus highlighted correct answer.
 5. Tap the correct answer and verify score increases and a pitch plays.
@@ -271,7 +272,7 @@ If the active prompt is A, this should score after the stability window. If the 
 ## Known rough edges
 
 - It is still a hand-made SVG notation prototype, not a full notation engine.
-- Microphone scoring is intentionally forgiving and octave-agnostic for beginner play.
+- Microphone scoring is intentionally forgiving and octave-agnostic by default for beginner play and deeper voices.
 - Chord singing is not designed yet.
 - Phone/browser microphone behavior varies; Mic Lab exists because real devices disagree.
 - All high scores are local to the browser/device.

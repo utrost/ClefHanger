@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;
@@ -127,7 +127,7 @@ export function buildMicrophoneListeningMessage({ listening, note, frequency, ce
   return null;
 }
 
-export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS } = {}) {
+export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS, matchAnyOctave = true } = {}) {
   const detected = frequencyToNearestPitch(frequency);
   if (!prompt || !detected) return { status: 'silent', answer: null, detected, cents: null };
   if (nowMs - lastAcceptedAtMs < debounceMs) return { status: 'debounce', answer: null, detected, cents: null };
@@ -138,6 +138,9 @@ export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs 
   const detectedSemitone = SEMITONES_FROM_C[detected.answer];
   const samePitchClass = targetSemitone !== undefined && targetSemitone === detectedSemitone;
   const cents = samePitchClass ? detected.cents : centsToNearestPitchClass({ frequency, targetSemitone });
+  if (samePitchClass && !matchAnyOctave && detected.octave !== prompt.octave) {
+    return { status: 'wrong-octave', answer: null, detected, cents };
+  }
   const inTune = cents !== null && Math.abs(cents) <= toleranceCents;
   if (samePitchClass && inTune) {
     return { status: 'match', answer: targetAnswer, detected, cents };
@@ -145,8 +148,8 @@ export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs 
   return { status: samePitchClass ? 'out-of-tune' : 'wrong-note', answer: null, detected, cents };
 }
 
-export function evaluateVocalMatchFrame({ prompt, frequency, nowMs, previousCandidate = null, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS, stableWindowMs = DEFAULT_STABLE_WINDOW_MS } = {}) {
-  const match = classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs, toleranceCents, debounceMs });
+export function evaluateVocalMatchFrame({ prompt, frequency, nowMs, previousCandidate = null, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS, stableWindowMs = DEFAULT_STABLE_WINDOW_MS, matchAnyOctave = true } = {}) {
+  const match = classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs, toleranceCents, debounceMs, matchAnyOctave });
   if (match.status === 'debounce') return { ...match, candidate: previousCandidate || null };
   if (match.status !== 'match') return { ...match, candidate: null };
 

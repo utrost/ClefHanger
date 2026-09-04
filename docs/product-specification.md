@@ -36,7 +36,7 @@ A 1-octave mini keyboard docked at the screen's bottom for users wanting to conn
 
 ### Sing/Play Microphone Tracking
 
-Microphone input listens for a steady monophonic pitch from humming, singing, violin, guitar, or another acoustic instrument. The detected pitch appears as a translucent green ghost note on the same staff, while the moving prompt remains the target. If the detected pitch class matches the prompt within a forgiving vocal tolerance and remains stable briefly, the note is cleared; any octave is accepted for now, and wrong or unstable pitches are visible but not spam-scored every animation frame.
+Microphone input listens for a steady monophonic pitch from humming, singing, violin, guitar, or another acoustic instrument. The detected pitch appears as a translucent green ghost note on the same staff, while the moving prompt remains the target. With **Match any octave** checked by default, a low or high C counts as C, which keeps Sing/Play usable for deeper and higher voices. If that setting is unchecked, the detected pitch must match the written octave. Wrong or unstable pitches are visible but not spam-scored every animation frame.
 
 ## 5. Tech Stack & Architecture
 

@@ -1,7 +1,7 @@
-import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 
 export const STORAGE_KEYS = {
   selectedMode: 'clefhanger.selectedMode.v3',
@@ -13,6 +13,7 @@ export const STORAGE_KEYS = {
   selectedPlayStyle: 'clefhanger.selectedPlayStyle.v1',
   selectedLesson: 'clefhanger.selectedLesson.v1',
   showHints: 'clefhanger.showHints.v1',
+  matchAnyOctave: 'clefhanger.matchAnyOctave.v1',
   lessonIntroHidden: 'clefhanger.lessonIntroHidden.v1',
   tutorialDismissed: 'clefhanger.tutorialDismissed.v1',
 };
@@ -72,6 +73,7 @@ export function createStorageAdapter(storage = undefined) {
       playStyle: normalizePlayStyle(getSafe(backingStorage, STORAGE_KEYS.selectedPlayStyle)),
       lessonId: getBeginnerLesson(selectedLesson || 'first-steps').id,
       showHints: normalizeBoolean(getSafe(backingStorage, STORAGE_KEYS.showHints), true),
+      matchAnyOctave: normalizeBoolean(getSafe(backingStorage, STORAGE_KEYS.matchAnyOctave), true),
       lessonIntroHidden: normalizeBoolean(getSafe(backingStorage, STORAGE_KEYS.lessonIntroHidden), false),
       tutorialDismissed: normalizeBoolean(getSafe(backingStorage, STORAGE_KEYS.tutorialDismissed), false),
     };

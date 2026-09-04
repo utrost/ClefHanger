@@ -2,7 +2,7 @@
 
 **Goal:** keep ClefHanger maintainable while the first teaching version grows, with no god files and no accidental coupling between notation, game state, learning copy, browser APIs, and microphone diagnostics.
 
-**Current baseline:** the app is a dependency-free static PWA using native ES modules. Local checks are green at the time this plan was refreshed (`npm run check`: 117 tests passing). The main architecture risk is not missing tests; it is continued feature work accumulating in `src/app.js` and broadening `src/core/game.js`.
+**Current baseline:** the app is a dependency-free static PWA using native ES modules. Local checks are green at the time this plan was refreshed (`npm run check`: 118 tests passing). The main architecture risk is not missing tests; it is continued feature work accumulating in `src/app.js` and broadening `src/core/game.js`.
 
 **Refactoring style:** small TDD slices, no rewrite, no bundler migration yet. Each slice should preserve behavior, update docs only where boundaries change, and finish with `npm run check` plus browser smoke if DOM/audio/mic code moved.
 

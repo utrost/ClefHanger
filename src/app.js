@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+} from './core/content.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,9 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+} from './core/game.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -34,15 +34,15 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+} from './core/pitch.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 
-const appVersion = 'clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02';
+const appVersion = 'clefhanger-slice51-mic-octave-match-toggle-2026-09-02';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -80,6 +80,7 @@ const lessonIntroBody = document.querySelector('#lesson-intro-body');
 const lessonIntroExamples = document.querySelector('#lesson-intro-examples');
 const lessonIntroDismissButton = document.querySelector('#lesson-intro-dismiss');
 const hintToggle = document.querySelector('#hint-toggle');
+const matchAnyOctaveToggle = document.querySelector('#match-any-octave');
 const microphoneDebugTextEl = document.querySelector('#microphone-debug-text');
 const scoreEl = document.querySelector('#score');
 const streakEl = document.querySelector('#streak');
@@ -108,6 +109,7 @@ let selectedInputMode = storedPreferences.inputMode;
 let selectedPlayStyle = storedPreferences.playStyle;
 let selectedLessonId = storedPreferences.lessonId;
 let showHints = storedPreferences.showHints;
+let matchAnyOctave = storedPreferences.matchAnyOctave;
 let lessonIntroHidden = storedPreferences.lessonIntroHidden;
 let tutorialStepIndex = 0;
 let state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: 1975, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId });
@@ -209,6 +211,7 @@ function renderHud(nowMs) {
   for (const button of playStyleButtons) button.dataset.active = button.dataset.playStyle === selectedPlayStyle ? 'true' : 'false';
   lessonSelect.value = selectedLessonId;
   hintToggle.checked = showHints;
+  matchAnyOctaveToggle.checked = matchAnyOctave;
   const roundEnded = state.phase === 'ended';
   buttons.hidden = roundEnded || selectedInputMode !== 'buttons';
   pianoStrip.hidden = roundEnded || selectedInputMode !== 'piano';
@@ -450,9 +453,10 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
     const calibration = buildCalibrationReading(frequency);
     microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, inputLevel, silentFrameCount: 0, trackState: getCurrentMicrophoneTrackState(), calibration };
     if (selectedInputMode === 'microphone' && ['running', 'practice'].includes(state.phase)) {
-      const match = evaluateVocalMatchFrame({ prompt: state.activeNote, frequency, nowMs, previousCandidate: microphoneState.vocalCandidate, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs });
+      const match = evaluateVocalMatchFrame({ prompt: state.activeNote, frequency, nowMs, previousCandidate: microphoneState.vocalCandidate, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs, matchAnyOctave });
       microphoneState = { ...microphoneState, vocalCandidate: match.candidate };
       if (match.status === 'pending-stable') microphoneDebugText = `Hold ${match.detected.answer} steady…`;
+      if (match.status === 'wrong-octave') microphoneDebugText = `That was ${match.detected.answer}${match.detected.octave}; turn on Match any octave if your voice is lower/higher than the written staff note.`;
       if (match.status === 'match') {
         microphoneState = { ...microphoneState, lastAcceptedAtMs: nowMs };
         handleAnswer(match.answer);
@@ -626,6 +630,12 @@ function installBeginnerControls() {
     storageAdapter.writePreference('showHints', showHints);
     render();
   });
+  matchAnyOctaveToggle.addEventListener('change', () => {
+    matchAnyOctave = matchAnyOctaveToggle.checked;
+    storageAdapter.writePreference('matchAnyOctave', matchAnyOctave);
+    microphoneState = { ...microphoneState, vocalCandidate: null };
+    render();
+  });
 }
 
 function installDifficulties() {
@@ -702,6 +712,13 @@ window.__clefHanger = {
     selectedInputMode = normalizeInputMode(inputMode);
     render();
   },
+  setMatchAnyOctave: (enabled) => {
+    matchAnyOctave = Boolean(enabled);
+    storageAdapter.writePreference('matchAnyOctave', matchAnyOctave);
+    render();
+  },
+  getMatchAnyOctave: () => matchAnyOctave,
+  getMicrophoneRecordingDiagnostic: () => microphoneRecordingDiagnostic,
   playPromptAudio,
   playCalibrationTone,
   startMicrophone,

@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice51-mic-octave-match-toggle-2026-09-02`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Runtime shape
 
@@ -8,9 +8,9 @@ This document describes what exists in code today in `clefhanger-slice50-mic-rec
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice50-mic-recording-diagnostic-adapter-2026-09-02`.
-- Current visible slice marker: `Slice 50: mic recording diagnostic adapter`.
-- Current service-worker cache: `clefhanger-pwa-v44`.
+- Current app marker: `clefhanger-slice51-mic-octave-match-toggle-2026-09-02`.
+- Current visible slice marker: `Slice 51: mic octave match toggle`.
+- Current service-worker cache: `clefhanger-pwa-v45`.
 - Core/UI modules:
   - `src/core/content.js`: note/chord pools, selectable modes, speed/difficulty catalogs, answer-button definitions, and safe catalog lookups.
   - `src/core/scoring.js`: point calculation, speed/streak bonuses, accuracy, high-score keys, and round-summary data.
@@ -18,7 +18,7 @@ This document describes what exists in code today in `clefhanger-slice50-mic-rec
   - `src/core/game.js`: game state, queues, neutral outcome metadata, reducer-style round/practice transitions, and compatibility re-exports for existing importers.
   - `src/core/music-theory.js`: accidentals, pitch-class semitones, equal-tempered prompt frequencies, staff-step mapping, and ghost-note data.
   - `src/core/learning.js`: teaching feedback/correction-overlay conversion from neutral outcomes, friendly mic messages, next-step learning recommendations, accidental learning hints, interval/jump hints, and lesson re-exports.
-  - `src/core/pitch.js`: microphone constraints, frequency-to-note conversion, cents math, calibration readouts, pitch detection, vocal match/scoring debounce.
+  - `src/core/pitch.js`: microphone constraints, frequency-to-note conversion, cents math, calibration readouts, pitch detection, vocal match/scoring debounce, and optional any-octave matching.
   - `src/core/mic-diagnostics.js`: decoded-audio summaries, recorded pitch windows, Mic Lab report JSON and `.txt` export.
   - `src/core/audio.js`: synthetic piano-like Web Audio voice and A4 reference tone.
   - `src/ui/staff-renderer.js`: SVG staff, note, chord, ledger-line, correction-label, and microphone ghost-note markup.
@@ -324,7 +324,7 @@ Missed notes:
 - A detected pitch reads as `You played A4 · 440 Hz · in tune` or with flat/sharp cents.
 - A translucent green ghost note shows the detected pitch on the staff.
 - The ghost note is diagnostic/readability; scoring uses the pitch classifier.
-- The player is told: `Sing the front note. ClefHanger accepts a steady matching pitch class within 50 cents, in any octave for now.`
+- The player is told: `Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents.`
 
 ## Microphone capture and scoring
 
@@ -395,7 +395,8 @@ Vocal scoring:
 - Default tolerance: 50 cents.
 - Stability window: 150 ms on the same answer.
 - Post-hit debounce: 650 ms.
-- Scoring compares pitch class/semitone and ignores octave for now.
+- Scoring compares pitch class/semitone and ignores octave while **Match any octave** is checked. This setting is checked by default for deeper/lower voices.
+- If **Match any octave** is unchecked, the detected note must also be in the written prompt octave; a same-name note in another octave returns `wrong-octave` and does not score.
 - Chord prompts return `unsupported-chord` and are not scored by microphone.
 - Wrong pitch class returns `wrong-note` but does not call `handleAnswer` from the mic loop.
 - Same pitch class outside tolerance returns `out-of-tune`.
@@ -532,6 +533,7 @@ Stored in `localStorage`:
 - `clefhanger.selectedPlayStyle.v1`
 - `clefhanger.selectedLesson.v1`
 - `clefhanger.showHints.v1`
+- `clefhanger.matchAnyOctave.v1`
 - `clefhanger.lessonIntroHidden.v1`
 - `clefhanger.tutorialDismissed.v1`
 - high scores under `clefhanger.highScore.<mode>.speed<speed>.<difficulty>.v5`
@@ -562,7 +564,7 @@ Current automated suite covers:
 - Core scoring and round lifecycle.
 - Mode-specific note pools, accidentals, chords, piano input mapping.
 - Audio voice plan and A4 calibration tone.
-- Microphone pitch conversion, calibration copy, constraints, pitch detector, low male voice recordings, quiet levels, recorded chunk diagnostics.
+- Microphone pitch conversion, calibration copy, constraints, pitch detector, low male voice recordings, quiet levels, any-octave matching, recorded chunk diagnostics.
 - Mic Lab report and Telegram-friendly `.txt` export.
 - Microphone shell and public smoke hook markers.
 
@@ -598,7 +600,7 @@ A complete ClefHanger deploy should:
 
 ## Current known limitations
 
-- Microphone scoring accepts any octave. This is intentional for beginner vocal play but not a full ear-training/octave drill.
+- Microphone scoring accepts any octave by default via the checked **Match any octave** setting. This is intentional for beginner vocal play and deeper/lower voices; unchecking it turns the mic path into a stricter written-octave check.
 - Microphone scoring supports single-note prompts only; chord singing is not implemented.
 - Detected pitch names use sharps; flat prompt scoring works by semitone equivalence.
 - The pitch detector is a small dependency-free autocorrelation implementation. Pitchy or another robust detector remains a possible future upgrade if field evidence warrants it.

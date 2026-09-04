@@ -90,7 +90,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 50: mic recording diagnostic adapter`.
+- Visible marker says `Slice 51: mic octave match toggle`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -437,13 +437,16 @@ Steps:
 1. Start Practice.
 2. Identify the front prompt note.
 3. Sing or play that note name/pitch class in any comfortable octave.
-4. Hold it steady briefly.
-5. Try a wrong note and an out-of-tune/bent note if practical.
+4. Confirm **Match any octave** is checked in Settings.
+5. Hold it steady briefly.
+6. If practical, uncheck **Match any octave** and sing the same note name in a different octave.
+7. Try a wrong note and an out-of-tune/bent note if practical.
 
 Expected:
 
-- Matching pitch class inside tolerance clears the prompt after the stability window.
-- Different octave can still score.
+- Matching pitch class inside tolerance clears the prompt after the stability window when **Match any octave** is checked.
+- Different octave can still score while **Match any octave** is checked.
+- Different octave does not score while **Match any octave** is unchecked.
 - Wrong pitch class is visible but does not call a wrong answer every frame.
 - Same pitch class outside tolerance reports out-of-tune and does not score until close enough.
 - One held note does not clear multiple prompts rapidly.
@@ -493,7 +496,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice50-mic-recording-diagnostic-adapter`.
+2. Confirm the HTML contains `clefhanger-slice51-mic-octave-match-toggle`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -512,7 +515,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v44`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v45`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:

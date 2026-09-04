@@ -118,6 +118,20 @@ test('scores microphone note answers by pitch class across octaves with forgivin
   assert.equal(beginnerVoiceNearBoundary.cents, 35);
 });
 
+test('can require the sung note to stay in the written octave when any-octave matching is disabled', () => {
+  const prompt = { answer: 'C', noteName: 'C', octave: 4 };
+  const lowVoiceC = classifyVocalMatch({ prompt, frequency: 130.81, nowMs: 1000, lastAcceptedAtMs: 0, matchAnyOctave: false });
+
+  assert.equal(lowVoiceC.status, 'wrong-octave');
+  assert.equal(lowVoiceC.answer, null);
+  assert.equal(lowVoiceC.detected.answer, 'C');
+  assert.equal(lowVoiceC.detected.octave, 3);
+
+  const writtenOctaveC = classifyVocalMatch({ prompt, frequency: 261.63, nowMs: 1000, lastAcceptedAtMs: 0, matchAnyOctave: false });
+  assert.equal(writtenOctaveC.status, 'match');
+  assert.equal(writtenOctaveC.answer, 'C');
+});
+
 test('debounces microphone scoring until the same in-tune pitch class is stable for a short window', () => {
   const prompt = { answer: 'A', noteName: 'A', octave: 4 };
   const first = evaluateVocalMatchFrame({ prompt, frequency: 440, nowMs: 1000, previousCandidate: null, lastAcceptedAtMs: 0 });

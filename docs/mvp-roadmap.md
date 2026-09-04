@@ -172,6 +172,14 @@ Verification:
 - Expose `window.clefhangerInjectPitch(frequency, nowMs?)` for deterministic browser smoke without a physical microphone.
 - Update docs and smoke checks so testers know chord singing is still out of scope.
 
+## Slice 8d.2a — Mic octave-match toggle — implemented
+
+- Add a checked-by-default **Match any octave** setting for Sing/Play input so deeper or higher voices can answer written notes by pitch class: low C, middle C, and high C all count as C.
+- Persist the setting in LocalStorage as `clefhanger.matchAnyOctave.v1`.
+- Keep the default beginner-friendly behavior octave-agnostic.
+- When unchecked, require the sung/played pitch to match the written prompt octave; same-name notes in another octave return `wrong-octave` and do not score.
+- Preserve the 50-cent tolerance, 150 ms stability window, 650 ms post-hit debounce, and chord-singing exclusion.
+
 ## Slice 8d.3 — Documentation consolidation — implemented
 
 - Add a full current-state reference for exact modes, lessons, scoring, mic rules, diagnostics, rendering, persistence, gates, deploy expectations, and limitations.
