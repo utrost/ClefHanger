@@ -60,7 +60,7 @@ For the product-level player journey, see [User Journey](./user-journey.md). For
 - Beginner lesson sequence: First steps, Line notes, Space notes, Ledger lines, Interval jumps, Mixed notes.
 - Tiny lesson intro cards for line, space, ledger-line, and interval-jump practice.
 - Scaffolded beginner answer tray, starting with only C/D/E, narrowing ledger-line practice to C/A, and using C/D/E/F/G for interval jumps.
-- Teaching feedback plus a visual correction overlay after wrong answers: the note is labelled on the staff and the correct button is highlighted.
+- Teaching feedback plus a visual correction overlay after wrong answers: the note is labelled on the staff; answer buttons are not pre-highlighted because that revealed the active answer in timed play.
 - Treble and bass clef.
 - Corrected SVG clef anchors for treble and bass.
 - Renderer-free ledger-line geometry for the first notes outside the treble staff.

@@ -110,7 +110,7 @@ When the app shows a correction:
 1. Pause on the correction for a moment.
 2. Read the note name.
 3. Notice whether it is on a line, space, or ledger line.
-4. Look at the highlighted answer button.
+4. Look at the correction label on the staff and the answer named in feedback.
 5. Answer again before changing settings.
 
 Do not tap randomly through corrections. The small pause is where the learning happens.

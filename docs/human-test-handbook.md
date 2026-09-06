@@ -164,13 +164,13 @@ Steps:
 1. Identify the active note if possible.
 2. Tap a deliberately wrong visible answer.
 3. Observe feedback, staff, and answer buttons.
-4. Tap the highlighted/correct answer.
+4. Tap the correct answer named by the feedback/staff correction label.
 
 Expected:
 
 - Feedback names the correct answer and gives a location hint.
 - Staff shows a small correction label near the note.
-- Correct answer button is highlighted.
+- Answer buttons are not pre-highlighted; the teaching cue lives in the feedback text and staff correction label.
 - The same prompt remains active after the wrong answer.
 - Tapping the correct answer advances to a new prompt.
 

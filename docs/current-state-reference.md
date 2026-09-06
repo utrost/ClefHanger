@@ -291,7 +291,8 @@ Wrong answers:
 - reset `streak` to 0;
 - keep the active note;
 - set beginner teaching feedback;
-- create a correction overlay frozen for 1,400 ms.
+- create a correction overlay frozen for 1,400 ms;
+- never mark the answer button with the current correct answer before the player acts.
 
 Missed notes:
 

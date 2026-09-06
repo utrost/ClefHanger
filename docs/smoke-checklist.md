@@ -19,7 +19,7 @@ For exact current rules and constants, see [Current State Reference](./current-s
 - Ledger lines practice should show only C/A answer buttons and notes on the first ledger lines below/above the treble staff.
 - Interval jumps practice should show C/D/E/F/G buttons; after one correct answer, the learning suggestion should describe same note, step, skip, or jump movement from the previous prompt.
 - Tap **Start practice**. The timer should show `∞`, the note should stay in place long enough to study it, and no sprint summary should appear.
-- Tap a wrong note in Practice. The feedback should name the correct answer, the staff should show a small correction label on the note, and the correct answer button should be highlighted.
+- Tap a wrong note in Practice. The feedback should name the correct answer and the staff should show a small correction label on the note; answer buttons should not be pre-highlighted before or after the miss.
 - Switch to **Rush** and tap **Start 60s sprint**.
 - A treble note or triad appears and moves toward the red cliff edge.
 - On Normal or Hard, extra upcoming notes appear as fainter previews; the front note remains the only answerable note.

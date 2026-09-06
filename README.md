@@ -24,15 +24,15 @@ The first playable slices proved the simplest complete loop:
 
 ## Current playable slice
 
-Slices through 50 are implemented as a dependency-free static PWA:
+Slices through 52 are implemented as a dependency-free static PWA:
 
 - Beginner-first practice flow: the app now starts in untimed Practice mode instead of throwing a new player straight into a rush.
 - First-run tutorial card with three small tips and a dismiss action.
-- Six beginner lessons: First steps, Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes.
+- Six beginner lessons: First steps, Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes. Narrow lessons intentionally hide irrelevant buttons: Line notes shows E/G/B/D/F, Space notes shows F/A/C/E, and Mixed notes shows all seven natural notes.
 - Tiny lesson intro cards for line, space, ledger-line, and interval-jump lessons before practice starts.
 - Adaptive beginner answer tray: First steps starts with only C, D, and E; ledger-line practice uses only C and A notes just outside the treble staff; Interval jumps uses C, D, E, F, and G while teaching same note, step, or skip movement.
 - Wrong answers teach instead of only rejecting: the app says what the note was and gives a short location hint such as `bottom line E`.
-- Visual correction overlay: after a wrong answer, the staff briefly labels the correct note and the correct answer button is highlighted.
+- Visual correction overlay: after a wrong answer, the staff briefly labels the correct note on the staff without pre-highlighting the answer button.
 
 - Treble-clef and bass-clef note/chord rush.
 - Corrected SVG clef placement: treble clef loop anchored on the G line, bass clef centered around the F line.

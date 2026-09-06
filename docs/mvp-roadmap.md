@@ -128,7 +128,7 @@ Verification:
 - Wrong answers now produce teaching feedback with the correct note and its simple staff location.
 - Practice mode keeps the current note active after a wrong answer.
 - The staff briefly labels the correct note directly beside the note head.
-- The correct answer button is highlighted so the next tap is obvious.
+- The staff briefly labels the correct note directly beside the note head. Slice 52 removed answer-button pre-highlighting because it revealed the answer during timed play.
 - The overlay contract is covered by tests in `tests/beginner-ux.test.js`.
 
 ## Slice 8a — Phone dogfood before broader content

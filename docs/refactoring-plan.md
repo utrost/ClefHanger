@@ -158,7 +158,7 @@ Manual smoke required because SVG/DOM output moved:
 1. Open local page.
 2. Start Practice.
 3. Verify note appears and moves.
-4. Answer wrong; verify correction overlay label and highlighted button.
+4. Answer wrong; verify correction overlay label and no answer-button pre-highlight.
 5. Switch to Chords; verify stacked notes render.
 6. Switch to Mic; verify ghost note can appear via `window.clefhangerInjectPitch(440)`.
 

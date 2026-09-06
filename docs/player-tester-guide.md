@@ -29,7 +29,7 @@ The current build is beginner-first:
 6. If you guess wrong, look at:
    - the feedback text;
    - the small correction label on the note;
-   - the highlighted correct button.
+   - the correction label on the staff.
 
 Practice has no timer. The timer shows `∞`.
 
@@ -252,7 +252,7 @@ Use this when checking a fresh deploy.
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
 2. Confirm the page shows `Slice 52: hide answer reveal`.
 3. Tap **Start practice**.
-4. Tap a wrong C/D/E answer and verify teaching feedback plus highlighted correct answer.
+4. Tap a wrong C/D/E answer and verify teaching feedback plus a staff correction label, with no answer-button pre-highlight.
 5. Tap the correct answer and verify score increases and a pitch plays.
 6. Open Settings.
 7. Switch to Piano, close Settings, and answer with a piano key.
