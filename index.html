@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice58-mobile-mic-polish-2026-09-10">
+<html lang="en" data-app-version="clefhanger-slice59-first-user-polish-2026-09-10">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -508,7 +508,7 @@
 
       <section id="tutorial-card" aria-label="Beginner tutorial">
         <h2>Start with a lesson</h2>
-        <p id="tutorial-text">Notes climb upward through A B C D E F G. Guess if you are unsure — ClefHanger shows the right note.</p>
+        <p id="tutorial-text">Sing or hum the note you see. Notes climb upward through A B C D E F G, then repeat.</p>
         <div class="tutorial-actions">
           <button id="tutorial-next" type="button">Next tip</button>
           <button id="tutorial-dismiss" type="button">Got it</button>
@@ -520,12 +520,13 @@
           <button class="play-style-button" type="button" data-play-style="practice" data-active="true">Practice</button>
           <button class="play-style-button" type="button" data-play-style="rush">Rush</button>
         </div>
+        <details id="rush-help"><summary>Rush is later</summary><p>Start in Practice. Use Rush when a tiny lesson feels easy.</p></details>
         <label class="hint-row" for="lesson-select">Tiny lesson
           <select id="lesson-select" aria-label="Beginner lesson"></select>
         </label>
         <section id="lesson-intro" aria-label="Selected lesson intro">
           <h3 id="lesson-intro-title">First steps</h3>
-          <p id="lesson-intro-body">Only three answer buttons. Learn the direction before the full alphabet appears.</p>
+          <p id="lesson-intro-body">Sing or hum C, D, or E. Buttons stay as a fallback while you learn the direction.</p>
           <p id="lesson-intro-examples">C · D · E</p>
           <div class="lesson-intro-actions"><button id="lesson-intro-dismiss" type="button">Hide lesson note</button></div>
         </section>
@@ -562,7 +563,7 @@
           <details id="mic-help"><summary>How Sing/Play scoring works</summary><p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p></details>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 58: mobile mic polish</p>
+        <p class="microcopy">Slice 59: first-user polish</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -621,12 +622,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice58-mobile-mic-polish-2026-09-10"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice59-first-user-polish-2026-09-10"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice58-mobile-mic-polish-2026-09-10')
+            .register('./sw.js?v=clefhanger-slice59-first-user-polish-2026-09-10')
             .then((registration) => registration.update())
             .catch(() => {});
         });

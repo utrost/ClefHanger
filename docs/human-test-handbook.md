@@ -90,7 +90,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 58: mobile mic polish`.
+- Visible marker says `Slice 59: first-user polish`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -496,7 +496,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice58-mobile-mic-polish`.
+2. Confirm the HTML contains `clefhanger-slice59-first-user-polish`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -515,7 +515,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v52`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v53`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:

@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice58-mobile-mic-polish-2026-09-10';
+import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice59-first-user-polish-2026-09-10';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;
@@ -161,7 +161,7 @@ export function buildMicrophoneReadiness({ permission = 'idle', listening = fals
     return {
       status: 'ready',
       title: `Good — I hear ${note.answer}${note.octave}`,
-      body: `I hear ${note.answer}${note.octave} at ${Math.round(frequency)} Hz. Now sing or play the front staff note.`,
+      body: 'Now sing or play the front staff note.',
       action: 'Ready',
       ready: true,
     };
@@ -224,13 +224,13 @@ export function buildMicrophoneScoringFeedback(match = {}, { prompt = null } = {
   }
   if (match.status === 'out-of-tune') {
     const direction = (match.cents || 0) > 0 ? 'too high' : 'too low';
-    return { status: direction === 'too high' ? 'too-high' : 'too-low', text: `${detected || target} is ${direction}; aim for ${target}.`, kind: 'warning' };
+    return { status: direction === 'too high' ? 'too-high' : 'too-low', text: `Almost ${target} — a little ${direction === 'too high' ? 'high' : 'low'}.`, kind: 'warning' };
   }
   if (match.status === 'wrong-octave') {
-    return { status: 'wrong-octave', text: `That was ${detected}; need ${target} in the written octave, or turn Match any octave back on.`, kind: 'warning' };
+    return { status: 'wrong-octave', text: `I hear ${detected} — need ${target} in the written octave, or turn Match any octave back on.`, kind: 'warning' };
   }
   if (match.status === 'wrong-note') {
-    return { status: 'wrong-note', text: `That was ${detected}; need ${target}.`, kind: 'warning' };
+    return { status: 'wrong-note', text: `I hear ${detected} — need ${target}.`, kind: 'warning' };
   }
   if (match.status === 'debounce') {
     return { status: 'debounce', text: `Good ${match.detected?.answer || ''} — wait for the next note.`, kind: 'neutral' };

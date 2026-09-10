@@ -94,8 +94,8 @@ test('microphone readiness turns technical mic state into friendly player states
   const ready = buildMicrophoneReadiness({ permission: 'granted', listening: true, inputLevel: 0.05, frequency: 125.98, note: { answer: 'B', octave: 2 } });
   assert.equal(ready.status, 'ready');
   assert.equal(ready.ready, true);
-  assert.match(ready.title, /Good/);
-  assert.match(ready.body, /I hear B2/);
+  assert.equal(ready.title, 'Good — I hear B2');
+  assert.equal(ready.body, 'Now sing or play the front staff note.');
 });
 
 test('classifies a sung note as an answer only inside tolerance and after debounce', () => {
@@ -187,9 +187,11 @@ test('microphone scoring feedback explains why a sung note did or did not score'
   });
   assert.match(buildMicrophoneScoringFeedback({ status: 'pending-stable', detected: { answer: 'D' } }, { prompt: { answer: 'D' } }).text, /Hold D steady/);
   assert.match(buildMicrophoneScoringFeedback({ status: 'match', detected: { answer: 'E', octave: 3 }, cents: 0 }, { prompt: { answer: 'E' } }).text, /Matched E/);
-  assert.match(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: 72 }, { prompt: { answer: 'E' } }).text, /too high/i);
-  assert.match(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: -64 }, { prompt: { answer: 'E' } }).text, /too low/i);
-  assert.match(buildMicrophoneScoringFeedback({ status: 'wrong-note', detected: { answer: 'G', octave: 2 } }, { prompt: { answer: 'E' } }).text, /That was G2; need E/);
+  assert.match(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: 72 }, { prompt: { answer: 'E' } }).text, /little high/i);
+  assert.match(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: -64 }, { prompt: { answer: 'E' } }).text, /little low/i);
+  assert.equal(buildMicrophoneScoringFeedback({ status: 'wrong-note', detected: { answer: 'G', octave: 2 } }, { prompt: { answer: 'E' } }).text, 'I hear G2 — need E.');
+  assert.equal(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: 72 }, { prompt: { answer: 'E' } }).text, 'Almost E — a little high.');
+  assert.equal(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: -64 }, { prompt: { answer: 'E' } }).text, 'Almost E — a little low.');
   assert.match(buildMicrophoneScoringFeedback({ status: 'unsupported-chord' }, { prompt: { kind: 'chord', answer: 'C-E-G' } }).text, /Chord singing is not yet supported/);
 });
 

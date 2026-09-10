@@ -280,3 +280,10 @@ ClefHanger's product center is now microphone-first sight-singing / acoustic-not
 1. Mic-first lesson wording for line/space/ledger practice.
 2. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
 2. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.
+
+
+## Slice 59: first-user polish
+
+- First screen starts with Sing/Play Practice wording, not guessing/rush language.
+- Mic ready and scoring feedback avoid repeating the same heard note twice.
+- Rush is presented as later, after a tiny lesson feels easy.
