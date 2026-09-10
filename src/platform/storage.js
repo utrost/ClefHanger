@@ -1,7 +1,7 @@
-import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10';
-import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10';
-import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10';
-import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10';
+import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
 
 export const STORAGE_KEYS = {
   selectedMode: 'clefhanger.selectedMode.v3',

@@ -195,14 +195,14 @@ Goal: make the user journey concrete enough that a beginner knows when to repeat
 Documentation/guideline work — implemented:
 
 - Add a "golden path" near the top of `docs/user-journey.md`:
-  - First steps / Practice / Notes.
-  - Line notes / Practice / Notes.
-  - Space notes / Practice / Notes.
-  - Ledger lines / Practice / Notes.
-  - Interval jumps / Practice / Notes.
-  - Mixed notes / Practice / Notes.
+  - First steps / Practice / Sing/Play.
+  - Line notes / Practice / Sing/Play.
+  - Space notes / Practice / Sing/Play.
+  - Ledger lines / Practice / Sing/Play.
+  - Interval jumps / Practice / Sing/Play.
+  - Mixed notes / Practice / Sing/Play.
   - The same material in Rush.
-  - Piano or Sing/Play only after the written-note loop is understood.
+  - Notes or Piano only as quiet fallback/debug paths.
 - Add a "when to move on" rule:
   - stay in Practice until roughly 8 of 10 feel easy;
   - try one Rush on the same lesson;
@@ -277,13 +277,18 @@ ClefHanger's product center is now microphone-first sight-singing / acoustic-not
 
 ### Next mic-first slices
 
-1. Mic-first lesson wording for line/space/ledger practice.
-2. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
+1. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
 2. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.
 
 
-## Slice 60: canonical user flow
+## Slice 60: canonical user flow — implemented
 
 - First screen starts with Sing/Play Practice wording, not guessing/rush language.
 - Mic ready and scoring feedback avoid repeating the same heard note twice.
 - Rush is presented as later, after a tiny lesson feels easy.
+
+## Slice 61 — Mic-first lesson cards — implemented
+
+- Rewrite Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes lesson cards so they tell the player what to notice and what to sing/hum.
+- Keep fallback answer trays available without making Notes the primary learning path.
+- Document the mic-first lesson-card contract in the current-state reference and protect it with tests.

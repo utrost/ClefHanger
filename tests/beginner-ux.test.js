@@ -41,17 +41,17 @@ test('beginner lessons start narrow before full seven-note quiz', () => {
 test('line, space, and ledger lessons have tiny intro cards before practice starts', () => {
   const lineIntro = getLessonIntroCard('line-notes');
   assert.equal(lineIntro.title, 'Line notes');
-  assert.match(lineIntro.body, /sit on the staff lines/i);
+  assert.match(lineIntro.body, /see the line/i);
   assert.deepEqual(lineIntro.examples, ['E', 'G', 'B', 'D', 'F']);
 
   const spaceIntro = getLessonIntroCard('space-notes');
   assert.equal(spaceIntro.title, 'Space notes');
-  assert.match(spaceIntro.body, /between the lines/i);
+  assert.match(spaceIntro.body, /sing the pitch/i);
   assert.deepEqual(spaceIntro.examples, ['F', 'A', 'C', 'E']);
 
   const ledgerIntro = getLessonIntroCard('ledger-notes');
   assert.equal(ledgerIntro.title, 'Ledger lines');
-  assert.match(ledgerIntro.body, /short extra line/i);
+  assert.match(ledgerIntro.body, /aim your voice/i);
   assert.deepEqual(ledgerIntro.examples, ['C', 'A']);
 });
 
@@ -59,11 +59,31 @@ test('line, space, and ledger lessons have tiny intro cards before practice star
 test('beginner lesson copy teaches singing first while keeping buttons as fallback', () => {
   const lessons = read('src/core/lessons.js');
   assert.match(lessons, /Sing or hum C, D, or E/);
-  assert.match(lessons, /sing or play E G B D F/);
-  assert.match(lessons, /sing or play F A C E/);
-  assert.match(lessons, /Sing or play the note with the short extra line/i);
+  assert.match(lessons, /sing it steadily: E G B D F/);
+  assert.match(lessons, /sing the pitch: F A C E/);
+  assert.match(lessons, /aim your voice/i);
   assert.doesNotMatch(lessons, /Only three answer buttons/);
   assert.doesNotMatch(lessons, /Tap the note name before the cliff/);
+});
+
+
+test('beginner lesson cards stay mic-first after the canonical flow', () => {
+  const lessons = read('src/core/lessons.js');
+  const currentState = read('docs/current-state-reference.md');
+  const roadmap = read('docs/mvp-roadmap.md');
+
+  assert.match(lessons, /Line notes[\s\S]*see the line[\s\S]*sing it steadily/i);
+  assert.match(lessons, /Space notes[\s\S]*space[\s\S]*sing the pitch/i);
+  assert.match(lessons, /Ledger lines[\s\S]*short extra line[\s\S]*aim your voice/i);
+  assert.match(lessons, /Interval jumps[\s\S]*hear the distance/i);
+  assert.match(lessons, /Mixed notes[\s\S]*all seven natural notes[\s\S]*gentle Sing\/Play/i);
+  assert.doesNotMatch(lessons, /Find the line note, then sing or play E G B D F/);
+  assert.doesNotMatch(lessons, /Find the space, then sing or play F A C E/);
+
+  assert.match(currentState, /Mic-first lesson cards/i);
+  assert.match(roadmap, /Slice 61 — Mic-first lesson cards — implemented/i);
+  assert.doesNotMatch(roadmap, /First steps \/ Practice \/ Notes/);
+  assert.doesNotMatch(roadmap, /Piano or Sing\/Play only after/);
 });
 
 test('scaffolded answer tray narrows buttons only for beginner treble lessons', () => {

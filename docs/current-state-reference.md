@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice60-canonical-user-flow-2026-09-10`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice61-mic-first-lesson-cards-2026-09-10`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Microphone-first scope
 
@@ -12,9 +12,9 @@ The current product direction is microphone-first: the default answer path is Si
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice60-canonical-user-flow-2026-09-10`.
-- Current visible slice marker: `Slice 60: canonical user flow`.
-- Current service-worker cache: `clefhanger-pwa-v54`.
+- Current app marker: `clefhanger-slice61-mic-first-lesson-cards-2026-09-10`.
+- Current visible slice marker: `Slice 61: mic-first lesson cards`.
+- Current service-worker cache: `clefhanger-pwa-v55`.
 - Core/UI modules:
   - `src/core/content.js`: note/chord pools, selectable modes, speed/difficulty catalogs, answer-button definitions, and safe catalog lookups.
   - `src/core/scoring.js`: point calculation, speed/streak bonuses, accuracy, high-score keys, and round-summary data.
@@ -135,6 +135,10 @@ Modes are defined in `GAME_MODES`.
 
 Beginner lessons apply to Treble + Beginner difficulty. Other modes/difficulties use their full answer options.
 
+### Mic-first lesson cards
+
+Slice 61 keeps the beginner lesson cards aligned with the canonical Sing/Play workflow: each card tells the player what to notice on the staff, what to sing or hum, and when to keep Notes/Piano as a fallback rather than the main path.
+
 ### First steps
 
 - Lesson id: `first-steps`.
@@ -147,7 +151,7 @@ Beginner lessons apply to Treble + Beginner difficulty. Other modes/difficulties
 
 - Lesson id: `line-notes`.
 - Label: Line notes.
-- Intro: treble staff lines are E G B D F from bottom to top.
+- Intro: see the staff line first, then sing it steadily: E G B D F from bottom to top.
 - Answer buttons: E, G, B, D, F.
 - Prompt filter: note names E, G, B, D, F.
 
@@ -155,7 +159,7 @@ Beginner lessons apply to Treble + Beginner difficulty. Other modes/difficulties
 
 - Lesson id: `space-notes`.
 - Label: Space notes.
-- Intro: treble spaces spell FACE from bottom to top.
+- Intro: see the space between the lines first, then sing the pitch: F A C E from bottom to top.
 - Answer buttons: F, A, C, E.
 - Prompt filter: note names F, A, C, E.
 
@@ -163,7 +167,7 @@ Beginner lessons apply to Treble + Beginner difficulty. Other modes/difficulties
 
 - Lesson id: `ledger-notes`.
 - Label: Ledger lines.
-- Intro: ledger notes sit just outside the staff; short extra lines are part of the note.
+- Intro: notice the short extra line outside the staff, then aim your voice at C or A.
 - Answer buttons: C, A.
 - Prompt filter: note names C/A and staff steps -2/10.
 
@@ -171,7 +175,7 @@ Beginner lessons apply to Treble + Beginner difficulty. Other modes/difficulties
 
 - Lesson id: `interval-jumps`.
 - Label: Interval jumps.
-- Intro: compare the current note to the last one as same note, step, or skip before thinking about the full mixed set.
+- Intro: hear the distance from the last note as same note, step, or skip before thinking about the full mixed set.
 - Answer buttons: C, D, E, F, G.
 - Prompt filter: note names C, D, E, F, G on staff steps -2 through 2.
 - Learning suggestion: once there is a previous completed prompt, `buildIntervalLearningHint(...)` describes same-note repeats, one-step movement, skips over one note, or larger jumps.
@@ -180,6 +184,7 @@ Beginner lessons apply to Treble + Beginner difficulty. Other modes/difficulties
 
 - Lesson id: `mixed`.
 - Label: Mixed notes.
+- Copy: all seven natural notes in gentle Sing/Play practice before Rush.
 - Answer buttons: C, D, E, F, G, A, B.
 - Prompt pool: full Treble pool.
 
