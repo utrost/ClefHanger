@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice53-microphone-first-2026-09-10">
+<html lang="en" data-app-version="clefhanger-slice54-mic-readiness-2026-09-10">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -352,6 +352,25 @@
         padding: 8px 9px;
       }
 
+      #mic-readiness {
+        display: grid;
+        gap: 4px;
+        padding: 9px;
+        border-radius: 16px;
+        background: rgba(245, 197, 66, 0.12);
+        border: 1px solid rgba(245, 197, 66, 0.28);
+      }
+
+      #mic-readiness[data-ready="true"] {
+        background: rgba(98, 230, 167, 0.14);
+        border-color: rgba(98, 230, 167, 0.38);
+      }
+
+      #mic-readiness-title {
+        color: var(--ink);
+        font-weight: 950;
+      }
+
       #calibration-panel p, #microphone-panel p { margin: 0; color: var(--muted); font-size: 0.78rem; }
 
       #heard-note {
@@ -530,13 +549,17 @@
         <div id="note-buttons" aria-label="Answer buttons"></div>
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
         <div id="microphone-panel" aria-label="Microphone answer status">
+          <section id="mic-readiness" aria-label="Mic readiness" data-status="mic-off" data-ready="false">
+            <div id="mic-readiness-title">Check your mic</div>
+            <p id="mic-readiness-body">Tap Check mic, then sing or hum any comfortable steady note.</p>
+          </section>
           <p id="microphone-status">Mic off. Check mic, then sing one steady comfortable note.</p>
           <button id="start-microphone-main" type="button">Check mic</button>
           <p id="heard-note" aria-live="polite">You played —</p>
           <p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 53: microphone first</p>
+        <p class="microcopy">Slice 54: mic readiness</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -595,12 +618,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice53-microphone-first-2026-09-10"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice54-mic-readiness-2026-09-10"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice53-microphone-first-2026-09-10')
+            .register('./sw.js?v=clefhanger-slice54-mic-readiness-2026-09-10')
             .then((registration) => registration.update())
             .catch(() => {});
         });

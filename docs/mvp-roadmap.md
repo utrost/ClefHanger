@@ -259,19 +259,21 @@ Verification — implemented:
 
 ## Slice 9 — Microphone-first reorientation — in progress
 
+- Friendly mic readiness card: implemented in Slice 54. The main Sing/Play panel now translates mic-off, permission-blocked, listening, no-level, no-pitch, and ready states into player-facing copy.
+
 ClefHanger's product center is now microphone-first sight-singing / acoustic-note reading. Sing/Play is the default input; Notes and Piano are fallback modes for quiet practice, accessibility, and debugging.
 
-### Current slice
+### Landed in Slice 53/54
 
 - Make Sing/Play the default first-run input.
 - Put a simple **Check mic** action on the main play surface instead of requiring Settings first.
 - Keep Match any octave on by default for beginner voices.
 - Keep gameplay one active note at a time in the microphone-first beginner path.
+- Show a friendly mic-readiness card for mic off, permission blocked, listening, no audio level, no steady pitch, and ready/detected-note states.
 
 ### Next mic-first slices
 
-1. Friendly mic readiness card: allowed / blocked / silent / noisy / steady pitch detected.
-2. Better scoring states: listening, heard note, hold steady, matched, too high/too low.
-3. Mic-first lesson wording for line/space/ledger practice.
-4. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
-5. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.
+1. Better scoring states: listening, heard note, hold steady, matched, too high/too low.
+2. Mic-first lesson wording for line/space/ledger practice.
+3. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
+4. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.

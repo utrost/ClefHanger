@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   buildCalibrationReading,
   buildMicrophoneListeningMessage,
+  buildMicrophoneReadiness,
   centsBetween,
   classifyVocalMatch,
   createMicrophoneState,
@@ -72,6 +73,28 @@ test('builds calibration readings around concert A', () => {
   assert.equal(sharp.status, 'sharp');
   assert.ok(sharp.cents > 40);
   assert.match(sharp.message, /sharp/i);
+});
+
+
+test('microphone readiness turns technical mic state into friendly player states', () => {
+  assert.deepEqual(buildMicrophoneReadiness({ permission: 'idle', listening: false }), {
+    status: 'mic-off',
+    title: 'Check your mic',
+    body: 'Tap Check mic, then sing or hum any comfortable steady note.',
+    action: 'Check mic',
+    ready: false,
+  });
+
+  assert.equal(buildMicrophoneReadiness({ permission: 'requesting' }).status, 'requesting');
+  assert.match(buildMicrophoneReadiness({ permission: 'blocked', error: 'permission denied' }).body, /permission denied/);
+  assert.match(buildMicrophoneReadiness({ permission: 'granted', listening: true, inputLevel: 0, silentFrameCount: 20 }).body, /I can.t hear anything/i);
+  assert.match(buildMicrophoneReadiness({ permission: 'granted', listening: true, inputLevel: 0.04, silentFrameCount: 20 }).body, /Hold one steady note/i);
+
+  const ready = buildMicrophoneReadiness({ permission: 'granted', listening: true, inputLevel: 0.05, frequency: 125.98, note: { answer: 'B', octave: 2 } });
+  assert.equal(ready.status, 'ready');
+  assert.equal(ready.ready, true);
+  assert.match(ready.title, /Good/);
+  assert.match(ready.body, /I hear B2/);
 });
 
 test('classifies a sung note as an answer only inside tolerance and after debounce', () => {

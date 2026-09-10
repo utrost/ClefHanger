@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;
@@ -108,6 +108,89 @@ export function microphoneInputLevelPercent(inputLevel) {
   const percent = inputLevel * 100;
   if (percent < 1) return Math.max(0, Math.min(100, Math.round(percent * 10) / 10));
   return Math.max(0, Math.min(100, Math.round(percent)));
+}
+
+export function buildMicrophoneReadiness({ permission = 'idle', listening = false, note = null, frequency = null, inputLevel = 0, silentFrameCount = 0, trackState = 'live', error = null } = {}) {
+  const levelPercent = microphoneInputLevelPercent(inputLevel);
+  if (permission === 'requesting') {
+    return {
+      status: 'requesting',
+      title: 'Waiting for permission',
+      body: 'Use the browser prompt to allow the microphone for ClefHanger.',
+      action: 'Waiting…',
+      ready: false,
+    };
+  }
+  if (permission === 'blocked') {
+    return {
+      status: 'blocked',
+      title: 'Mic permission blocked',
+      body: `Permission denied: ${error || 'open site settings and allow the microphone, then tap Check mic again.'}`,
+      action: 'Retry',
+      ready: false,
+    };
+  }
+  if (!listening) {
+    return {
+      status: 'mic-off',
+      title: 'Check your mic',
+      body: 'Tap Check mic, then sing or hum any comfortable steady note.',
+      action: 'Check mic',
+      ready: false,
+    };
+  }
+  if (trackState === 'muted') {
+    return {
+      status: 'muted',
+      title: 'Mic is muted',
+      body: 'The browser or phone says the microphone track is muted. Check system mic settings, then try again.',
+      action: 'Retry',
+      ready: false,
+    };
+  }
+  if (trackState === 'ended') {
+    return {
+      status: 'ended',
+      title: 'Mic stopped',
+      body: 'The microphone track ended. Tap Stop mic, then Check mic again.',
+      action: 'Check mic',
+      ready: false,
+    };
+  }
+  if (note && frequency) {
+    return {
+      status: 'ready',
+      title: `Good — I hear ${note.answer}${note.octave}`,
+      body: `I hear ${note.answer}${note.octave} at ${Math.round(frequency)} Hz. Now sing or play the front staff note.`,
+      action: 'Ready',
+      ready: true,
+    };
+  }
+  if (silentFrameCount > 8) {
+    if (levelPercent < 1) {
+      return {
+        status: 'no-level',
+        title: 'Listening, but quiet',
+        body: "I can't hear anything yet. Check that the phone mic is uncovered and try a little closer.",
+        action: 'Listening…',
+        ready: false,
+      };
+    }
+    return {
+      status: 'no-pitch',
+      title: 'I hear sound',
+      body: `Hold one steady note so I can find the pitch. Level ${levelPercent}%.`,
+      action: 'Listening…',
+      ready: false,
+    };
+  }
+  return {
+    status: 'listening',
+    title: 'Listening…',
+    body: `Sing or hum one steady comfortable note. Level ${levelPercent}%.`,
+    action: 'Listening…',
+    ready: false,
+  };
 }
 
 export function buildMicrophoneListeningMessage({ listening, note, frequency, cents, inputLevel = 0, silentFrameCount = 0, trackState = 'live' } = {}) {

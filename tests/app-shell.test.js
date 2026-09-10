@@ -15,8 +15,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice53-microphone-first-2026-09-10"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice53-microphone-first-2026-09-10'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice54-mic-readiness-2026-09-10"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice54-mic-readiness-2026-09-10'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
@@ -55,8 +55,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice53-microphone-first/);
-  assert.match(html, /Slice 53: microphone first/);
+  assert.match(html, /data-app-version="clefhanger-slice54-mic-readiness/);
+  assert.match(html, /Slice 54: mic readiness/);
 });
 
 test('first-run shell presents Sing/Play as the default primary answer path', () => {
@@ -68,10 +68,17 @@ test('first-run shell presents Sing/Play as the default primary answer path', ()
   assert.match(html, /data-input-mode="microphone" data-active="true">Sing\/Play/);
   assert.match(html, /<div id="microphone-panel" aria-label="Microphone answer status">/);
   assert.match(html, /id="start-microphone-main"/);
+  assert.match(html, /id="mic-readiness"/);
+  assert.match(html, /id="mic-readiness-title"/);
+  assert.match(html, /id="mic-readiness-body"/);
   assert.match(html, /Check mic/);
   assert.match(html, /Buttons stay available as a quiet fallback/);
   assert.match(app, /startMicrophoneMainButton/);
+  assert.match(app, /buildMicrophoneReadiness/);
+  assert.match(app, /micReadinessTitleEl/);
   assert.match(app, /startMicrophoneMainButton\.addEventListener\('click', startMicrophone\)/);
+  assert.match(app, /clefhangerInjectPitch: \(frequency, nowMs = performance\.now\(\)\) => \{/);
+  assert.match(app, /permission: 'granted', listening: true/);
 });
 
 test('answer buttons do not reveal the current correct answer before the player acts', () => {
@@ -99,7 +106,7 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v47/);
+  assert.match(sw, /clefhanger-pwa-v48/);
   for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }

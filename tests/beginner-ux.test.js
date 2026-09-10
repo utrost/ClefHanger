@@ -205,6 +205,7 @@ test('docs define the microphone-first product direction and roadmap', () => {
   assert.match(readme, /microphone-first/i);
   assert.match(readme, /Buttons and piano remain fallback/i);
   assert.match(roadmap, /Slice 9 — Microphone-first reorientation — in progress/i);
+  assert.match(roadmap, /Friendly mic readiness card: implemented/i);
   assert.match(roadmap, /Sing\/Play is the default input/i);
   assert.match(spec, /Primary answer path: microphone/i);
   assert.match(guide, /Start with Sing\/Play/i);
