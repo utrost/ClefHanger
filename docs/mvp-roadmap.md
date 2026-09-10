@@ -221,7 +221,7 @@ App behavior — implemented:
   - low Rush accuracy: repeat in Practice;
   - high Rush accuracy: try the next lesson;
   - repeated misses: lower speed or return to a narrower lesson;
-  - microphone unstable: switch to Notes first, then troubleshoot Sing/Play separately.
+  - microphone unstable: use the main **Check mic** path first, then fall back to Notes only when needed.
 - Keep recommendations gentle and optional; avoid locking lesson progression behind scores.
 - Keep it deterministic and testable from reducer/run summary data.
 
@@ -255,3 +255,23 @@ Verification — implemented:
 - Whether moving notation is readable on small screens.
 - Whether seven note buttons are faster and less frustrating than a piano strip for beginners.
 - Pitch detection accuracy in ordinary phone environments.
+
+
+## Slice 9 — Microphone-first reorientation — in progress
+
+ClefHanger's product center is now microphone-first sight-singing / acoustic-note reading. Sing/Play is the default input; Notes and Piano are fallback modes for quiet practice, accessibility, and debugging.
+
+### Current slice
+
+- Make Sing/Play the default first-run input.
+- Put a simple **Check mic** action on the main play surface instead of requiring Settings first.
+- Keep Match any octave on by default for beginner voices.
+- Keep gameplay one active note at a time in the microphone-first beginner path.
+
+### Next mic-first slices
+
+1. Friendly mic readiness card: allowed / blocked / silent / noisy / steady pitch detected.
+2. Better scoring states: listening, heard note, hold steady, matched, too high/too low.
+3. Mic-first lesson wording for line/space/ledger practice.
+4. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
+5. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.

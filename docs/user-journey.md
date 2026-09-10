@@ -61,6 +61,9 @@ The app should make the next useful action obvious:
 
 ## The golden path
 
+ClefHanger is now microphone-first: the intended path is to answer by singing, humming, or playing the note.
+
+
 Start simple and add only one challenge at a time:
 
 1. **First steps / Practice / Notes**.

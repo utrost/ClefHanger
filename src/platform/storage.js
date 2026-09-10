@@ -1,7 +1,7 @@
-import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 
 export const STORAGE_KEYS = {
   selectedMode: 'clefhanger.selectedMode.v3',
@@ -69,7 +69,7 @@ export function createStorageAdapter(storage = undefined) {
       modeId: getMode(selectedMode || 'basics').id,
       speedId: getSpeed(selectedSpeed || '5').id,
       difficultyId: getDifficulty(selectedDifficulty || 'beginner').id,
-      inputMode: normalizeMicrophoneInputMode(selectedInputMode || 'buttons'),
+      inputMode: normalizeMicrophoneInputMode(selectedInputMode || 'microphone'),
       playStyle: normalizePlayStyle(getSafe(backingStorage, STORAGE_KEYS.selectedPlayStyle)),
       lessonId: getBeginnerLesson(selectedLesson || 'first-steps').id,
       showHints: normalizeBoolean(getSafe(backingStorage, STORAGE_KEYS.showHints), true),

@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 
-ClefHanger is a mobile-first, bite-sized sight-reading game designed for singers, acoustic instrumentalists, and beginners who want to master sheet music on the go without sitting at a keyboard.
+ClefHanger is a microphone-first, mobile, bite-sized sight-reading game designed for singers, acoustic instrumentalists, and beginners who want to master sheet music on the go without sitting at a keyboard.
 
 ## 2. Target Audience & Core Needs
 
@@ -25,6 +25,8 @@ Designed for standard phone screen aspect ratios, enabling single-handed phone u
 The original rush remains a 60-second game round for quick practice. New users start in untimed Practice mode first, so they can learn one small note group without a cliff timer.
 
 ## 4. Mobile Input Modes — No Hardware Required
+
+Primary answer path: microphone. The intended player action is to sing, hum, or play one steady note; buttons and piano are fallback, quiet-practice, accessibility, and debugging controls.
 
 ### Oversized Note Buttons
 

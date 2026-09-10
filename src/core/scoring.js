@@ -1,4 +1,4 @@
-import { getDifficulty, getMode, getSpeed } from './content.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { getDifficulty, getMode, getSpeed } from './content.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 
 export function getSpeedBonus(speed = getSpeed('5')) {
   return speed.value >= 8 ? 40 : speed.value >= 6 ? 20 : 0;

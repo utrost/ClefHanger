@@ -6,9 +6,9 @@ test('version consistency check accepts the current cache-busted PWA markers', (
   const result = validateVersionConsistency({ rootDir: new URL('..', import.meta.url) });
 
   assert.deepEqual(result.errors, []);
-  assert.equal(result.appVersion, 'clefhanger-slice52-hide-answer-reveal-2026-09-04');
-  assert.equal(result.sliceMarker, 'Slice 52: hide answer reveal');
-  assert.equal(result.cacheName, 'clefhanger-pwa-v46');
+  assert.equal(result.appVersion, 'clefhanger-slice53-microphone-first-2026-09-10');
+  assert.equal(result.sliceMarker, 'Slice 53: microphone first');
+  assert.equal(result.cacheName, 'clefhanger-pwa-v47');
   assert.ok(result.checkedFiles.includes('index.html'));
   assert.ok(result.checkedFiles.includes('src/app.js'));
   assert.ok(result.checkedFiles.includes('sw.js'));
@@ -17,16 +17,16 @@ test('version consistency check accepts the current cache-busted PWA markers', (
 test('version consistency check catches stale ES-module query strings', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice52-hide-answer-reveal-2026-09-04">
+<html data-app-version="clefhanger-slice53-microphone-first-2026-09-10">
   <body>
-    <p class="microcopy">Slice 52: hide answer reveal</p>
+    <p class="microcopy">Slice 53: microphone first</p>
     <script type="module" src="./src/app.js?v=old-version"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04')</script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice53-microphone-first-2026-09-10')</script>
   </body>
 </html>`,
-    'src/app.js': `import './core/game.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-const appVersion = 'clefhanger-slice52-hide-answer-reveal-2026-09-04';`,
-    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v46';
+    'src/app.js': `import './core/game.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+const appVersion = 'clefhanger-slice53-microphone-first-2026-09-10';`,
+    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v47';
 const APP_SHELL = ['./', './index.html', './src/app.js'];`,
   };
 
@@ -38,16 +38,16 @@ const APP_SHELL = ['./', './index.html', './src/app.js'];`,
 test('version consistency check catches service-worker asset drift', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice52-hide-answer-reveal-2026-09-04">
+<html data-app-version="clefhanger-slice53-microphone-first-2026-09-10">
   <body>
-    <p class="microcopy">Slice 52: hide answer reveal</p>
-    <script type="module" src="./src/app.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04')</script>
+    <p class="microcopy">Slice 53: microphone first</p>
+    <script type="module" src="./src/app.js?v=clefhanger-slice53-microphone-first-2026-09-10"></script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice53-microphone-first-2026-09-10')</script>
   </body>
 </html>`,
-    'src/app.js': `import './core/game.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-const appVersion = 'clefhanger-slice52-hide-answer-reveal-2026-09-04';`,
-    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v46';
+    'src/app.js': `import './core/game.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+const appVersion = 'clefhanger-slice53-microphone-first-2026-09-10';`,
+    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v47';
 const APP_SHELL = ['./', './index.html'];`,
   };
 

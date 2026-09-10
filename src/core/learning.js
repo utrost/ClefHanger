@@ -1,5 +1,5 @@
-import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 function explainPrompt(prompt) {
   if (!prompt) return 'Keep going.';
   if (prompt.label) return prompt.label;
@@ -128,7 +128,7 @@ export function buildLearningRecommendation({
   bestStreak = 0,
   accuracy,
   speedId = '5',
-  inputMode = 'buttons',
+  inputMode = 'microphone',
   microphoneStable = true,
 } = {}) {
   const lesson = getBeginnerLesson(lessonId);
@@ -141,8 +141,8 @@ export function buildLearningRecommendation({
   if (inputMode === 'microphone' && !microphoneStable) {
     return {
       kind: 'mic-fallback',
-      text: 'Mic is not steady yet. Use Notes first, then troubleshoot Sing/Play separately.',
-      action: 'switch-to-notes',
+      text: 'Mic is not steady yet. Tap Check mic and hold one comfortable note; Notes remain a fallback in Settings.',
+      action: 'check-mic',
     };
   }
 

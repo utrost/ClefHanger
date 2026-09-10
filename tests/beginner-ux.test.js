@@ -196,6 +196,21 @@ test('user journey documents the learning contract before adding more notation',
   assert.match(journey, /Pause.*correction/);
 });
 
+test('docs define the microphone-first product direction and roadmap', () => {
+  const readme = read('README.md');
+  const roadmap = read('docs/mvp-roadmap.md');
+  const spec = read('docs/product-specification.md');
+  const guide = read('docs/player-tester-guide.md');
+
+  assert.match(readme, /microphone-first/i);
+  assert.match(readme, /Buttons and piano remain fallback/i);
+  assert.match(roadmap, /Slice 9 — Microphone-first reorientation — in progress/i);
+  assert.match(roadmap, /Sing\/Play is the default input/i);
+  assert.match(spec, /Primary answer path: microphone/i);
+  assert.match(guide, /Start with Sing\/Play/i);
+});
+
+
 test('shell exposes a non-blocking learning coach line', () => {
   const html = read('index.html');
   const app = read('src/app.js');

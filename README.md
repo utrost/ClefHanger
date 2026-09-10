@@ -1,6 +1,6 @@
 # ClefHanger
 
-ClefHanger is a mobile-first, bite-sized sight-reading game for singers, acoustic instrumentalists, choir members, and beginners who want to learn staff notation without a keyboard or MIDI hardware.
+ClefHanger is a microphone-first, mobile, bite-sized sight-reading game for singers, acoustic instrumentalists, choir members, and beginners who want to connect staff notation to a note they actually produce.
 
 ## Core idea
 
@@ -8,25 +8,27 @@ Notes move horizontally across a musical staff toward a cliff edge. The player m
 
 ## MVP focus
 
-The first playable slices proved the simplest complete loop:
+The MVP is now microphone-first:
 
 1. Show one treble-clef note on a staff.
-2. Move it toward the cliff edge.
-3. Let the player answer with large mobile note buttons: C D E F G A B.
-4. Score correct, wrong, and missed notes.
-5. End after a 60-second sprint.
+2. Ask the player to sing, hum, or play the note.
+3. Show what the microphone heard before and during scoring.
+4. Score a steady matching pitch class, with **Match any octave** on by default for beginner voices.
+5. Keep Practice mode friendly, untimed, and one-note-at-a-time before optional rush play.
 
 ## Input modes
 
-- Oversized note buttons for thumb-first play.
-- A one-octave touch piano strip.
-- Microphone pitch detection for singers and acoustic instruments, with a staff ghost note showing what the app thinks was played.
+- Primary: microphone pitch detection for singing, humming, or steady monophonic acoustic instruments, with a staff ghost note showing what the app thinks was played.
+- Fallback: oversized note buttons for quiet/accessibility/debug play.
+- Fallback: a one-octave touch piano strip.
+
+Buttons and piano remain fallback input modes; they are no longer the product center.
 
 ## Current playable slice
 
-Slices through 52 are implemented as a dependency-free static PWA:
+Slices through 53 are implemented as a dependency-free static PWA:
 
-- Beginner-first practice flow: the app now starts in untimed Practice mode instead of throwing a new player straight into a rush.
+- Microphone-first practice flow: the app starts in untimed Practice mode with Sing/Play as the default input and a visible main-screen **Check mic** action.
 - First-run tutorial card with three small tips and a dismiss action.
 - Six beginner lessons: First steps, Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes. Narrow lessons intentionally hide irrelevant buttons: Line notes shows E/G/B/D/F, Space notes shows F/A/C/E, and Mixed notes shows all seven natural notes.
 - Tiny lesson intro cards for line, space, ledger-line, and interval-jump lessons before practice starts.
@@ -39,11 +41,11 @@ Slices through 52 are implemented as a dependency-free static PWA:
 - Ledger-line geometry renders short extra lines only for notes outside the staff, including middle C below and A above the treble staff.
 - 60-second sprint timer with a centered ending splash at time-up showing score, accuracy, correct/wrong/missed counts, best streak, and a one-tap replay button.
 - Five practice modes: Treble, Bass, Sharps #, Flats ♭, Chords.
-- Settings dialog keeps mode, speed, difficulty, input choice, and calibration out of the main play surface.
+- Settings dialog keeps mode, speed, difficulty, fallback input choice, and advanced Mic Lab controls out of the main play surface while the main screen keeps the basic mic check visible.
 - Speed slider: 1–10, from slow practice to fast rush.
 - Difficulty ladder: Beginner, Easy, Normal, Hard.
 - Concurrent note queues: one note on Beginner/Easy, two on Normal, three on Hard; only the front note is answerable.
-- Toggleable input: large note buttons, a one-octave on-screen piano strip, or Sing/Play microphone input for humming, singing, violin, guitar, or other steady monophonic instruments.
+- Default input: Sing/Play microphone input for humming, singing, violin, guitar, or other steady monophonic instruments. Large note buttons and the piano strip remain fallback modes in Settings.
 - Sing/Play input draws a translucent green ghost note on the staff at the detected pitch, plus a `You played A4 · 440 Hz · in tune` style readout. When **Match any octave** is checked, the default beginner-friendly behavior treats a low or high C as C; the detected pitch class still needs to match the front staff note and stay inside the forgiving vocal tolerance for a short stability window. Enharmonic flat prompts such as `D♭` can be scored from a detector readout named `C♯` when the frequency is correct.
 - Actual vocal calibration: grant mic access, sing any steady comfortable note to see detected note/frequency/cents; concert A is only an optional reference tone.
 - Mic input shows a plain `You played A4 · 440 Hz · in tune` style readout so the singer can see what the phone heard even before it scores. Real-device recognition is still under active testing when a phone/browser hears a piano or voice but does not lock a steady pitch.

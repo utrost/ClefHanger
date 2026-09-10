@@ -1,6 +1,10 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice52-hide-answer-reveal-2026-09-04`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice53-microphone-first-2026-09-10`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+
+## Microphone-first scope
+
+The current product direction is microphone-first: the default answer path is Sing/Play, with Notes and Piano retained as fallback modes. Current scoring accepts steady natural-note pitch classes with Match any octave on by default; chord singing remains out of scope.
 
 ## Runtime shape
 
@@ -8,9 +12,9 @@ This document describes what exists in code today in `clefhanger-slice52-hide-an
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice52-hide-answer-reveal-2026-09-04`.
-- Current visible slice marker: `Slice 52: hide answer reveal`.
-- Current service-worker cache: `clefhanger-pwa-v46`.
+- Current app marker: `clefhanger-slice53-microphone-first-2026-09-10`.
+- Current visible slice marker: `Slice 53: microphone first`.
+- Current service-worker cache: `clefhanger-pwa-v47`.
 - Core/UI modules:
   - `src/core/content.js`: note/chord pools, selectable modes, speed/difficulty catalogs, answer-button definitions, and safe catalog lookups.
   - `src/core/scoring.js`: point calculation, speed/streak bonuses, accuracy, high-score keys, and round-summary data.
@@ -34,7 +38,7 @@ New sessions default to:
 - Mode: Treble.
 - Difficulty: Beginner.
 - Speed: 5.
-- Input: Notes.
+- Input: Sing/Play.
 - Play style: Practice.
 - Lesson: First steps.
 - Hints: on.
@@ -219,7 +223,7 @@ Current thresholds and messages:
 - Rush at or above 80% accuracy with another beginner lesson available: suggest the next lesson.
 - Rush at or above 80% accuracy with no next lesson: suggest changing only one setting for more challenge.
 - Rush with many misses at higher speed: suggest lowering speed on the same lesson.
-- Microphone mode without stable pitch: suggest using Notes first and troubleshooting Sing/Play separately.
+- Microphone mode without stable pitch: suggest using **Check mic** and holding one comfortable note; Notes remain a fallback in Settings.
 - Sharp/flat prompts in Sharps or Flats mode: explain that the accidental uses the same staff spot as the natural note, then raises or lowers it by one small step.
 - Interval jumps lesson prompts after the first completed answer: compare the current prompt against the previous prompt as same note, step up/down, skip up/down, or larger jump.
 

@@ -33,7 +33,7 @@ test('storage adapter reads safe preference defaults when storage is missing', (
     modeId: 'basics',
     speedId: '5',
     difficultyId: 'beginner',
-    inputMode: 'buttons',
+    inputMode: 'microphone',
     playStyle: 'practice',
     lessonId: 'first-steps',
     showHints: true,

@@ -4,7 +4,7 @@ This guide is for someone opening the current ClefHanger build and trying to use
 
 ## What ClefHanger is
 
-ClefHanger is a small mobile-first sight-reading game. Notes move across a staff toward a cliff. You name the front note before it falls.
+ClefHanger is a small microphone-first sight-reading game. Notes move across a staff toward a cliff. You sing, hum, or play the front note before it falls.
 
 The current build is beginner-first:
 
@@ -15,6 +15,9 @@ The current build is beginner-first:
 - Rush mode is still available for 60-second timed play.
 
 ## First run
+
+Start with Sing/Play. Tap **Check mic**, sing or hum any comfortable steady note, then play the first Practice lesson. Use Notes or Piano from Settings only when you need a quiet fallback or a debugging comparison.
+
 
 1. Open `https://simiono.com/clefhanger/`.
 2. Leave the default settings alone at first:
@@ -250,7 +253,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 52: hide answer reveal`.
+2. Confirm the page shows `Slice 53: microphone first`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus a staff correction label, with no answer-button pre-highlight.
 5. Tap the correct answer and verify score increases and a pitch plays.

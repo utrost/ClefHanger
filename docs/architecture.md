@@ -2,6 +2,10 @@
 
 ClefHanger should stay mobile-first and renderer-light. The first implementation should avoid coupling music rules, scoring, animation, and touch UI into one page script.
 
+## Microphone-first architecture focus
+
+The application should treat microphone capture, readiness, pitch matching, and singer feedback as first-class product seams. Button and piano paths remain useful fallback adapters, not the primary architecture driver.
+
 ## Stack direction
 
 Current stack:

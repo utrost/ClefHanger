@@ -1,15 +1,15 @@
-import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+} from './content.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+} from './content.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 
 
 export const STAFF_LAYOUT = {

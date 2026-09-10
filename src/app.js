@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+} from './core/content.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,9 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+} from './core/game.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -34,21 +34,22 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04';
+} from './core/pitch.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice53-microphone-first-2026-09-10';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice53-microphone-first-2026-09-10';
 
-const appVersion = 'clefhanger-slice52-hide-answer-reveal-2026-09-04';
+const appVersion = 'clefhanger-slice53-microphone-first-2026-09-10';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
 const calibrationPanel = document.querySelector('#calibration-panel');
 const playCalibrationToneButton = document.querySelector('#play-calibration-tone');
 const startMicrophoneButton = document.querySelector('#start-microphone');
+const startMicrophoneMainButton = document.querySelector('#start-microphone-main');
 const stopMicrophoneButton = document.querySelector('#stop-microphone');
 const recordMicrophoneDiagnosticButton = document.querySelector('#record-microphone-diagnostic');
 const exportMicReportButton = document.querySelector('#export-mic-report');
@@ -655,6 +656,7 @@ startButton.addEventListener('click', beginRound);
 summaryRestartButton.addEventListener('click', beginRound);
 playCalibrationToneButton.addEventListener('click', playCalibrationTone);
 startMicrophoneButton.addEventListener('click', startMicrophone);
+startMicrophoneMainButton.addEventListener('click', startMicrophone);
 stopMicrophoneButton.addEventListener('click', stopMicrophone);
 recordMicrophoneDiagnosticButton.addEventListener('click', recordMicrophoneDiagnostic);
 exportMicReportButton.addEventListener('click', downloadMicReport);

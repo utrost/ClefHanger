@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice52-hide-answer-reveal-2026-09-04">
+<html lang="en" data-app-version="clefhanger-slice53-microphone-first-2026-09-10">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -366,7 +366,7 @@
         gap: 7px;
       }
 
-      #play-calibration-tone, #start-microphone, #stop-microphone, #record-microphone-diagnostic, #export-mic-report {
+      #play-calibration-tone, #start-microphone, #start-microphone-main, #stop-microphone, #record-microphone-diagnostic, #export-mic-report {
         min-height: 34px;
         border: 0;
         border-radius: 14px;
@@ -465,7 +465,7 @@
       <header>
         <div>
           <h1>ClefHanger</h1>
-          <p class="tagline">Name notes, bass notes, accidentals, and chords before they drop. <a class="site-link" href="https://simiono.com/">simiono</a></p>
+          <p class="tagline">Sing, hum, or play the staff note before it drops. <a class="site-link" href="https://simiono.com/">simiono</a></p>
         </div>
         <div class="timer-card" aria-live="polite"><small>seconds</small><span id="timer">60</span></div>
       </header>
@@ -479,7 +479,7 @@
       <section class="settings-summary" aria-label="Current practice settings">
         <div>
           <small>Today’s Sprint</small>
-          <div id="settings-line">Treble · Beginner · Speed 5 · Notes</div>
+          <div id="settings-line">Treble · Beginner · Speed 5 · Sing/Play</div>
         </div>
         <button id="open-settings" type="button">Settings</button>
       </section>
@@ -513,7 +513,7 @@
       <section class="stage" aria-label="Treble clef rush playfield">
         <div id="staff"></div>
         <div id="feedback" aria-live="polite">Tap Start when ready.</div>
-        <p id="learning-coach" aria-label="Learning suggestion" aria-live="polite">Golden path: Practice · Beginner · Notes. Change one thing at a time.</p>
+        <p id="learning-coach" aria-label="Learning suggestion" aria-live="polite">Golden path: Practice · Beginner · Sing/Play. Use buttons only as a quiet fallback.</p>
         <aside id="summary" class="ending-splash" aria-label="Rush result" hidden>
           <div>
             <h2 id="summary-title">Time! Sprint complete</h2>
@@ -529,13 +529,14 @@
         <button id="start-round" type="button">Start practice</button>
         <div id="note-buttons" aria-label="Answer buttons"></div>
         <div id="piano-strip" aria-label="Piano keyboard answers" hidden></div>
-        <div id="microphone-panel" aria-label="Microphone answer status" hidden>
-          <p id="microphone-status">Mic off. Grant mic to calibrate and sing answers.</p>
+        <div id="microphone-panel" aria-label="Microphone answer status">
+          <p id="microphone-status">Mic off. Check mic, then sing one steady comfortable note.</p>
+          <button id="start-microphone-main" type="button">Check mic</button>
           <p id="heard-note" aria-live="polite">You played —</p>
-          <p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents.</p>
+          <p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 52: hide answer reveal</p>
+        <p class="microcopy">Slice 53: microphone first</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -564,9 +565,9 @@
         <section class="settings-section" aria-label="Input setting">
           <h3>Input</h3>
           <div id="input-mode-buttons" class="input-mode-row" aria-label="Input mode buttons">
-            <button class="input-mode-button" type="button" data-input-mode="buttons" data-active="true">Notes</button>
+            <button class="input-mode-button" type="button" data-input-mode="microphone" data-active="true">Sing/Play</button>
+            <button class="input-mode-button" type="button" data-input-mode="buttons">Notes</button>
             <button class="input-mode-button" type="button" data-input-mode="piano">Piano</button>
-            <button class="input-mode-button" type="button" data-input-mode="microphone">Sing/Play</button>
           </div>
         </section>
         <section id="calibration-panel" class="settings-section" aria-label="Vocal calibration">
@@ -594,12 +595,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice53-microphone-first-2026-09-10"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice52-hide-answer-reveal-2026-09-04')
+            .register('./sw.js?v=clefhanger-slice53-microphone-first-2026-09-10')
             .then((registration) => registration.update())
             .catch(() => {});
         });
