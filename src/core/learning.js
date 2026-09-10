@@ -1,5 +1,5 @@
-import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice56-mic-first-lessons-2026-09-10';
-export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice56-mic-first-lessons-2026-09-10';
+import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice57-mic-report-fixtures-2026-09-10';
+export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice57-mic-report-fixtures-2026-09-10';
 function explainPrompt(prompt) {
   if (!prompt) return 'Keep going.';
   if (prompt.label) return prompt.label;

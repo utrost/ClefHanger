@@ -1,0 +1,61 @@
+{
+  "schema": "clefhanger-mic-report-v1",
+  "appVersion": "clefhanger-slice36-android-recorder-2026-09-01",
+  "capturedAt": "2026-09-01T12:08:25.724Z",
+  "capture": { "label": "voice" },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Android 16; Mobile; rv:154.0) Gecko/154.0 Firefox/154.0",
+    "url": "https://simiono.com/clefhanger/?verify=735b5d1"
+  },
+  "audioContext": { "sampleRate": 48000, "state": "running" },
+  "track": {
+    "readyState": "live",
+    "muted": false,
+    "enabled": true,
+    "settings": {
+      "autoGainControl": true,
+      "channelCount": 1,
+      "echoCancellation": false,
+      "noiseSuppression": false
+    }
+  },
+  "live": {
+    "levelPercent": 1,
+    "inputLevel": 0.012943780671430719,
+    "frequency": 133.70473537604457,
+    "pitch": { "note": "C3", "answer": "C", "cents": 38 },
+    "trackState": "live"
+  },
+  "recording": {
+    "bytes": 17033,
+    "mimeType": "audio/webm",
+    "audio": {
+      "label": "voice",
+      "sampleRate": 48000,
+      "sampleCount": 48000,
+      "durationMs": 1000,
+      "rms": 0.052000148061457425,
+      "rmsPercent": 5,
+      "peak": 0.15386514365673065,
+      "peakPercent": 15
+    },
+    "pitch": {
+      "status": "pitch-detected",
+      "best": {
+        "startMs": 896,
+        "frequency": 125.98425196850394,
+        "roundedFrequency": 126,
+        "note": "B2",
+        "answer": "B",
+        "cents": 35,
+        "inputLevel": 0.05862381565796557,
+        "levelPercent": 6
+      },
+      "candidates": [
+        { "startMs": 0, "frequency": 122.44897959183673, "note": "B2", "answer": "B", "cents": -14, "levelPercent": 4 },
+        { "startMs": 896, "frequency": 125.98425196850394, "note": "B2", "answer": "B", "cents": 35, "levelPercent": 6 }
+      ]
+    }
+  },
+  "interpretation": "live-pitch-detected"
+}

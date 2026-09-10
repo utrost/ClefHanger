@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
@@ -62,6 +63,24 @@ test('diagnostic report keeps live analyser separate from MediaRecorder evidence
   assert.equal(report.recording.pitch.best.note, 'C4');
   assert.equal(report.track.readyState, 'live');
   assert.equal(report.interpretation, 'recording-pitch-detected-live-silent');
+});
+
+
+test('checked-in Android Firefox voice fixture is usable microphone evidence', () => {
+  const fixture = JSON.parse(readFileSync(new URL('./fixtures/mic-reports/android-firefox-voice-b2-c3-2026-09-01.json', import.meta.url), 'utf8'));
+
+  assert.equal(fixture.schema, 'clefhanger-mic-report-v1');
+  assert.match(fixture.environment.userAgent, /Android 16/);
+  assert.match(fixture.environment.userAgent, /Firefox/);
+  assert.equal(fixture.track.settings.autoGainControl, true);
+  assert.equal(fixture.track.settings.echoCancellation, false);
+  assert.equal(fixture.track.settings.noiseSuppression, false);
+  assert.equal(fixture.recording.bytes, 17033);
+  assert.equal(fixture.recording.audio.rmsPercent, 5);
+  assert.equal(fixture.recording.pitch.status, 'pitch-detected');
+  assert.equal(fixture.recording.pitch.best.note, 'B2');
+  assert.equal(fixture.live.pitch.note, 'C3');
+  assert.equal(fixture.interpretation, 'live-pitch-detected');
 });
 
 test('mic diagnostic export is a Telegram-friendly text JSON file', () => {
