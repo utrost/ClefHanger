@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
+} from './core/content.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,29 +21,30 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
+} from './core/game.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
   buildMicrophoneListeningMessage,
   buildMicrophoneReadiness,
+  buildMicrophoneScoringFeedback,
   createMicrophoneState,
   detectPitchFromTimeDomain,
   evaluateVocalMatchFrame,
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
+} from './core/pitch.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
 
-const appVersion = 'clefhanger-slice54-mic-readiness-2026-09-10';
+const appVersion = 'clefhanger-slice55-mic-scoring-feedback-2026-09-10';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -462,9 +463,9 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
     microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, inputLevel, silentFrameCount: 0, trackState: getCurrentMicrophoneTrackState(), calibration };
     if (selectedInputMode === 'microphone' && ['running', 'practice'].includes(state.phase)) {
       const match = evaluateVocalMatchFrame({ prompt: state.activeNote, frequency, nowMs, previousCandidate: microphoneState.vocalCandidate, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs, matchAnyOctave });
+      const scoringFeedback = buildMicrophoneScoringFeedback(match, { prompt: state.activeNote });
       microphoneState = { ...microphoneState, vocalCandidate: match.candidate };
-      if (match.status === 'pending-stable') microphoneDebugText = `Hold ${match.detected.answer} steady…`;
-      if (match.status === 'wrong-octave') microphoneDebugText = `That was ${match.detected.answer}${match.detected.octave}; turn on Match any octave if your voice is lower/higher than the written staff note.`;
+      microphoneDebugText = scoringFeedback.text;
       if (match.status === 'match') {
         microphoneState = { ...microphoneState, lastAcceptedAtMs: nowMs };
         handleAnswer(match.answer);

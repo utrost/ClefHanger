@@ -4,6 +4,7 @@ import {
   buildCalibrationReading,
   buildMicrophoneListeningMessage,
   buildMicrophoneReadiness,
+  buildMicrophoneScoringFeedback,
   centsBetween,
   classifyVocalMatch,
   createMicrophoneState,
@@ -175,6 +176,21 @@ test('debounces microphone scoring until the same in-tune pitch class is stable 
   const cooldown = evaluateVocalMatchFrame({ prompt, frequency: 442, nowMs: 1200, previousCandidate: stable.candidate, lastAcceptedAtMs: 1160 });
   assert.equal(cooldown.status, 'debounce');
   assert.equal(cooldown.answer, null);
+});
+
+
+test('microphone scoring feedback explains why a sung note did or did not score', () => {
+  assert.deepEqual(buildMicrophoneScoringFeedback({ status: 'silent' }, { prompt: { answer: 'E' } }), {
+    status: 'listening',
+    text: 'Listening for E… sing or play one steady note.',
+    kind: 'neutral',
+  });
+  assert.match(buildMicrophoneScoringFeedback({ status: 'pending-stable', detected: { answer: 'D' } }, { prompt: { answer: 'D' } }).text, /Hold D steady/);
+  assert.match(buildMicrophoneScoringFeedback({ status: 'match', detected: { answer: 'E', octave: 3 }, cents: 0 }, { prompt: { answer: 'E' } }).text, /Matched E/);
+  assert.match(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: 72 }, { prompt: { answer: 'E' } }).text, /too high/i);
+  assert.match(buildMicrophoneScoringFeedback({ status: 'out-of-tune', detected: { answer: 'E', octave: 3 }, cents: -64 }, { prompt: { answer: 'E' } }).text, /too low/i);
+  assert.match(buildMicrophoneScoringFeedback({ status: 'wrong-note', detected: { answer: 'G', octave: 2 } }, { prompt: { answer: 'E' } }).text, /That was G2; need E/);
+  assert.match(buildMicrophoneScoringFeedback({ status: 'unsupported-chord' }, { prompt: { kind: 'chord', answer: 'C-E-G' } }).text, /Chord singing is not yet supported/);
 });
 
 test('microphone mode is a first-class input option with permission state', () => {

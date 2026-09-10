@@ -6,9 +6,9 @@ test('version consistency check accepts the current cache-busted PWA markers', (
   const result = validateVersionConsistency({ rootDir: new URL('..', import.meta.url) });
 
   assert.deepEqual(result.errors, []);
-  assert.equal(result.appVersion, 'clefhanger-slice54-mic-readiness-2026-09-10');
-  assert.equal(result.sliceMarker, 'Slice 54: mic readiness');
-  assert.equal(result.cacheName, 'clefhanger-pwa-v48');
+  assert.equal(result.appVersion, 'clefhanger-slice55-mic-scoring-feedback-2026-09-10');
+  assert.equal(result.sliceMarker, 'Slice 55: mic scoring feedback');
+  assert.equal(result.cacheName, 'clefhanger-pwa-v49');
   assert.ok(result.checkedFiles.includes('index.html'));
   assert.ok(result.checkedFiles.includes('src/app.js'));
   assert.ok(result.checkedFiles.includes('sw.js'));
@@ -17,16 +17,16 @@ test('version consistency check accepts the current cache-busted PWA markers', (
 test('version consistency check catches stale ES-module query strings', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice54-mic-readiness-2026-09-10">
+<html data-app-version="clefhanger-slice55-mic-scoring-feedback-2026-09-10">
   <body>
-    <p class="microcopy">Slice 54: mic readiness</p>
+    <p class="microcopy">Slice 55: mic scoring feedback</p>
     <script type="module" src="./src/app.js?v=old-version"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice54-mic-readiness-2026-09-10')</script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10')</script>
   </body>
 </html>`,
-    'src/app.js': `import './core/game.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-const appVersion = 'clefhanger-slice54-mic-readiness-2026-09-10';`,
-    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v48';
+    'src/app.js': `import './core/game.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+const appVersion = 'clefhanger-slice55-mic-scoring-feedback-2026-09-10';`,
+    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v49';
 const APP_SHELL = ['./', './index.html', './src/app.js'];`,
   };
 
@@ -38,16 +38,16 @@ const APP_SHELL = ['./', './index.html', './src/app.js'];`,
 test('version consistency check catches service-worker asset drift', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice54-mic-readiness-2026-09-10">
+<html data-app-version="clefhanger-slice55-mic-scoring-feedback-2026-09-10">
   <body>
-    <p class="microcopy">Slice 54: mic readiness</p>
-    <script type="module" src="./src/app.js?v=clefhanger-slice54-mic-readiness-2026-09-10"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice54-mic-readiness-2026-09-10')</script>
+    <p class="microcopy">Slice 55: mic scoring feedback</p>
+    <script type="module" src="./src/app.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10"></script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10')</script>
   </body>
 </html>`,
-    'src/app.js': `import './core/game.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
-const appVersion = 'clefhanger-slice54-mic-readiness-2026-09-10';`,
-    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v48';
+    'src/app.js': `import './core/game.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
+const appVersion = 'clefhanger-slice55-mic-scoring-feedback-2026-09-10';`,
+    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v49';
 const APP_SHELL = ['./', './index.html'];`,
   };
 

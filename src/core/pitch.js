@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice54-mic-readiness-2026-09-10';
+import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;
@@ -208,6 +208,34 @@ export function buildMicrophoneListeningMessage({ listening, note, frequency, ce
   }
   if (listening) return `Listening: checking mic input… level ${levelPercent}%`;
   return null;
+}
+
+export function buildMicrophoneScoringFeedback(match = {}, { prompt = null } = {}) {
+  const target = prompt?.answer || (prompt ? answerLabel(prompt.noteName, prompt.accidental) : 'the note');
+  const detected = match.detected ? `${match.detected.answer}${match.detected.octave ?? ''}` : null;
+  if (match.status === 'unsupported-chord') {
+    return { status: 'unsupported-chord', text: 'Chord singing is not yet supported. Use Notes or Piano for chord mode.', kind: 'warning' };
+  }
+  if (match.status === 'pending-stable') {
+    return { status: 'hold-steady', text: `Hold ${match.detected?.answer || target} steady…`, kind: 'neutral' };
+  }
+  if (match.status === 'match') {
+    return { status: 'matched', text: `Matched ${target}!`, kind: 'correct' };
+  }
+  if (match.status === 'out-of-tune') {
+    const direction = (match.cents || 0) > 0 ? 'too high' : 'too low';
+    return { status: direction === 'too high' ? 'too-high' : 'too-low', text: `${detected || target} is ${direction}; aim for ${target}.`, kind: 'warning' };
+  }
+  if (match.status === 'wrong-octave') {
+    return { status: 'wrong-octave', text: `That was ${detected}; need ${target} in the written octave, or turn Match any octave back on.`, kind: 'warning' };
+  }
+  if (match.status === 'wrong-note') {
+    return { status: 'wrong-note', text: `That was ${detected}; need ${target}.`, kind: 'warning' };
+  }
+  if (match.status === 'debounce') {
+    return { status: 'debounce', text: `Good ${match.detected?.answer || ''} — wait for the next note.`, kind: 'neutral' };
+  }
+  return { status: 'listening', text: `Listening for ${target}… sing or play one steady note.`, kind: 'neutral' };
 }
 
 export function classifyVocalMatch({ prompt, frequency, nowMs, lastAcceptedAtMs = 0, toleranceCents = DEFAULT_TOLERANCE_CENTS, debounceMs = DEFAULT_DEBOUNCE_MS, matchAnyOctave = true } = {}) {

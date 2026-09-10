@@ -22,9 +22,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Grant mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice54-mic-readiness/);
-  assert.match(app, /const appVersion = 'clefhanger-slice54-mic-readiness-2026-09-10'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice54-mic-readiness-2026-09-10/);
+  assert.match(html, /data-app-version="clefhanger-slice55-mic-scoring-feedback/);
+  assert.match(app, /const appVersion = 'clefhanger-slice55-mic-scoring-feedback-2026-09-10'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice55-mic-scoring-feedback-2026-09-10/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -82,7 +82,7 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /evaluateVocalMatchFrame/);
   assert.match(app, /matchAnyOctave/);
   assert.match(app, /vocalCandidate/);
-  assert.match(app, /pending-stable/);
+  assert.match(app, /buildMicrophoneScoringFeedback/);
   assert.match(staffRenderer, /createGhostNoteFromPitch/);
   assert.match(staffRenderer, /class=\"ghost-note\"/);
   assert.match(staffRenderer, /Ghost note you played/);

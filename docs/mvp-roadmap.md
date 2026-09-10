@@ -270,10 +270,10 @@ ClefHanger's product center is now microphone-first sight-singing / acoustic-not
 - Keep Match any octave on by default for beginner voices.
 - Keep gameplay one active note at a time in the microphone-first beginner path.
 - Show a friendly mic-readiness card for mic off, permission blocked, listening, no audio level, no steady pitch, and ready/detected-note states.
+- Show mic scoring feedback for listening, hold-steady, matched, too-high, too-low, wrong-note, wrong-octave, and unsupported-chord states.
 
 ### Next mic-first slices
 
-1. Better scoring states: listening, heard note, hold steady, matched, too high/too low.
-2. Mic-first lesson wording for line/space/ledger practice.
-3. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
-4. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.
+1. Mic-first lesson wording for line/space/ledger practice.
+2. Preserve real phone reports as fixtures and add more Android Chrome/iOS Safari evidence.
+3. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.
