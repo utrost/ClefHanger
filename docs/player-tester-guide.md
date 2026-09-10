@@ -24,14 +24,16 @@ Start with Sing/Play. Tap **Check mic**, sing or hum any comfortable steady note
    - Treble
    - Beginner
    - Speed 5
-   - Notes
+   - Sing/Play
    - First steps
 3. Read the tiny lesson card.
-4. Tap **Start practice**.
-5. Use the C/D/E buttons.
-6. If you guess wrong, look at:
+4. Tap **Check mic** and allow microphone permission.
+5. Sing or hum any comfortable steady note until the app shows what it hears.
+6. Tap **Start practice**.
+7. Sing or hum the visible C/D/E prompt.
+8. If you sing the wrong pitch, look at:
    - the feedback text;
-   - the small correction label on the note;
+   - the heard-note readout;
    - the correction label on the staff.
 
 Practice has no timer. The timer shows `∞`.
@@ -137,7 +139,7 @@ Speed is a 1–10 slider.
 
 ### Notes
 
-This is the default and the best mode for first testing.
+This is the quiet fallback and the best mode for checking the visual game loop without microphone permission.
 
 - Large touch buttons.
 - Lesson-aware narrowing in beginner Treble.
@@ -155,10 +157,9 @@ Use this if you want to connect staff notes to a tiny keyboard shape.
 
 Use this to hum, sing, or play a steady single note on a monophonic instrument.
 
-- Select **Sing/Play** in Settings.
-- Tap **Grant mic**.
+- Sing/Play is the default.
+- Tap **Check mic** in the main panel or Settings.
 - Allow the browser permission prompt.
-- Close Settings if needed.
 - Start Practice or Rush.
 - Sing or play the front note.
 
@@ -253,7 +254,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 59: first-user polish`.
+2. Confirm the page shows `Slice 60: canonical user flow`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus a staff correction label, with no answer-button pre-highlight.
 5. Tap the correct answer and verify score increases and a pitch plays.

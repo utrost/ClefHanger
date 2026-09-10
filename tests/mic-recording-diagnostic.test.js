@@ -101,7 +101,7 @@ test('runMicrophoneRecordingDiagnostic reports unavailable and no-stream without
   }
   assert.deepEqual(
     await runMicrophoneRecordingDiagnostic({ MediaRecorderClass: Recorder, stream: null }),
-    { status: 'no-stream', message: 'Recording test: tap Grant mic first, then Record 1s test.' },
+    { status: 'no-stream', message: 'Recording test: tap Check mic first, then Record 1s test.' },
   );
   assert.equal(constructed, false);
 });

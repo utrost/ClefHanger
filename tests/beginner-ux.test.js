@@ -223,6 +223,27 @@ test('docs define the microphone-first product direction and roadmap', () => {
 });
 
 
+test('docs keep one canonical Sing Play first-user workflow', () => {
+  const journey = read('docs/user-journey.md');
+  const guide = read('docs/player-tester-guide.md');
+  const handbook = read('docs/human-test-handbook.md');
+  const smoke = read('docs/smoke-checklist.md');
+
+  for (const doc of [journey, guide, handbook, smoke]) {
+    assert.match(doc, /Check mic/i);
+    assert.match(doc, /Start practice/i);
+  }
+
+  assert.match(journey, /Canonical first-user workflow/i);
+  assert.match(journey, /Sing\/Play\/Practice\/First steps/i);
+  assert.doesNotMatch(journey, /First steps \/ Practice \/ Notes/);
+  assert.doesNotMatch(journey, /Sing\/Play\? First prove the same lesson with Notes/);
+  assert.doesNotMatch(guide, /Speed 5\n\s*- Notes/);
+  assert.doesNotMatch(guide, /Use the C\/D\/E buttons/);
+  assert.doesNotMatch([journey, guide, handbook, smoke].join('\n'), /Grant mic/);
+});
+
+
 test('shell exposes a non-blocking learning coach line', () => {
   const html = read('index.html');
   const app = read('src/app.js');

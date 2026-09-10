@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice59-first-user-polish-2026-09-10';
+import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;
@@ -196,7 +196,7 @@ export function buildMicrophoneReadiness({ permission = 'idle', listening = fals
 export function buildMicrophoneListeningMessage({ listening, note, frequency, cents, inputLevel = 0, silentFrameCount = 0, trackState = 'live' } = {}) {
   const levelPercent = microphoneInputLevelPercent(inputLevel);
   if (listening && trackState === 'muted') return 'Listening: microphone track is muted by the browser/OS.';
-  if (listening && trackState === 'ended') return 'Listening stopped: microphone track ended. Tap Stop mic, then Grant mic.';
+  if (listening && trackState === 'ended') return 'Listening stopped: microphone track ended. Tap Stop mic, then Check mic.';
   if (listening && note) {
     const centsText = cents === null ? '' : ` (${cents > 0 ? '+' : ''}${cents}¢)`;
     return `Listening: ${note.answer}${note.octave} ${Math.round(frequency)} Hz${centsText} · level ${levelPercent}%`;

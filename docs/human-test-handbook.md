@@ -90,7 +90,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 59: first-user polish`.
+- Visible marker says `Slice 60: canonical user flow`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -129,15 +129,15 @@ Purpose: prove a new beginner can start without configuration.
 Setup:
 
 - Reload the app.
-- If previous preferences interfere, reset to Treble, Beginner, Speed 5, Notes, First steps, Practice.
+- If previous preferences interfere, reset to Treble, Beginner, Speed 5, Sing/Play, First steps, Practice.
 
 Steps:
 
 1. Confirm Practice is selected.
 2. Confirm First steps lesson is selected.
-3. Confirm answer buttons are only C, D, and E.
+3. Confirm the microphone panel is visible and **Check mic** is available.
 4. Read the tiny lesson/tutorial card.
-5. Tap **Start practice**.
+5. Tap **Check mic** if testing with real audio, then tap **Start practice**.
 
 Expected:
 
@@ -156,23 +156,23 @@ Purpose: prove wrong answers teach instead of only punishing.
 
 Setup:
 
-- Treble, Beginner, First steps, Practice, Notes input.
-- Start Practice.
+- Treble, Beginner, First steps, Practice, Sing/Play input.
+- Tap **Check mic** if testing with real audio, then start Practice.
 
 Steps:
 
 1. Identify the active note if possible.
-2. Tap a deliberately wrong visible answer.
-3. Observe feedback, staff, and answer buttons.
-4. Tap the correct answer named by the feedback/staff correction label.
+2. Sing or play a deliberately wrong pitch, or switch to Notes fallback and tap a deliberately wrong visible answer.
+3. Observe feedback, staff, heard-note readout, and fallback answer buttons when visible.
+4. Sing/play the correct pitch, or tap the correct fallback answer named by the feedback/staff correction label.
 
 Expected:
 
 - Feedback names the correct answer and gives a location hint.
 - Staff shows a small correction label near the note.
-- Answer buttons are not pre-highlighted; the teaching cue lives in the feedback text and staff correction label.
+- Fallback answer buttons are not pre-highlighted; the teaching cue lives in the feedback text and staff correction label.
 - The same prompt remains active after the wrong answer.
-- Tapping the correct answer advances to a new prompt.
+- Singing/playing the correct pitch or tapping the correct fallback answer advances to a new prompt.
 
 Evidence:
 
@@ -184,11 +184,11 @@ Purpose: prove correct answers score, advance, and play a pitch.
 
 Setup:
 
-- Notes input, Practice started.
+- Sing/Play input, Practice started. Use Notes only as the fallback comparison path.
 
 Steps:
 
-1. Tap the correct answer for the active prompt.
+1. Sing or play the correct pitch for the active prompt, or tap the correct answer in Notes fallback.
 2. Watch score/streak/feedback.
 3. Listen for the short piano-like pitch cue.
 
@@ -210,7 +210,7 @@ Purpose: prove the beginner ramp exposes the intended material.
 
 Steps:
 
-1. In Treble + Beginner + Practice + Notes, select **First steps**.
+1. In Treble + Beginner + Practice + Sing/Play, select **First steps**.
 2. Confirm C/D/E buttons.
 3. Select **Line notes**.
 4. Confirm E/G/B/D/F buttons and an intro card.
@@ -376,7 +376,7 @@ Setup:
 Steps:
 
 1. Open Settings.
-2. Tap **Grant mic**.
+2. Tap **Check mic**.
 3. Observe the calibration/status line immediately.
 4. Respond to browser permission prompt.
 5. Close Settings and inspect the main mic panel.
@@ -496,7 +496,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice59-first-user-polish`.
+2. Confirm the HTML contains `clefhanger-slice60-canonical-user-flow`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -515,7 +515,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v53`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v54`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:

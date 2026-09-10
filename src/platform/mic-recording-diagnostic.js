@@ -21,7 +21,7 @@ export async function runMicrophoneRecordingDiagnostic({
     return { status: 'unavailable', message: 'Recording test: MediaRecorder is not available in this browser.' };
   }
   if (!stream) {
-    return { status: 'no-stream', message: 'Recording test: tap Grant mic first, then Record 1s test.' };
+    return { status: 'no-stream', message: 'Recording test: tap Check mic first, then Record 1s test.' };
   }
 
   try {

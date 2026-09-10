@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice59-first-user-polish-2026-09-10">
+<html lang="en" data-app-version="clefhanger-slice60-canonical-user-flow-2026-09-10">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -563,7 +563,7 @@
           <details id="mic-help"><summary>How Sing/Play scoring works</summary><p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p></details>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 59: first-user polish</p>
+        <p class="microcopy">Slice 60: canonical user flow</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -610,7 +610,7 @@
             </select>
           </label>
           <div class="mic-actions">
-            <button id="start-microphone" type="button">Grant mic</button>
+            <button id="start-microphone" type="button">Check mic</button>
             <button id="stop-microphone" type="button">Stop mic</button>
             <button id="play-calibration-tone" type="button">Play A</button>
             <button id="record-microphone-diagnostic" type="button">Record 1s test</button>
@@ -618,16 +618,16 @@
           </div>
           <p id="mic-report-preview" aria-live="polite">No exported report yet.</p>
           <p id="microphone-recording-diagnostic" aria-live="polite">Recording test: not run yet.</p>
-          <p id="calibration-reading" aria-live="polite">Grant mic, then sing any steady comfortable note; Play A is only a reference.</p>
+          <p id="calibration-reading" aria-live="polite">Check mic, then sing any steady comfortable note; Play A is only a reference.</p>
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice59-first-user-polish-2026-09-10"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice59-first-user-polish-2026-09-10')
+            .register('./sw.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10')
             .then((registration) => registration.update())
             .catch(() => {});
         });

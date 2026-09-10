@@ -16,66 +16,73 @@ Typical users:
 - an acoustic instrumentalist with no MIDI gear nearby;
 - someone on a phone who wants a one-minute practice round.
 
-The current app should not feel like a theory exam. It should feel like a tiny arcade drill that gradually teaches what the notes are.
+The app should not feel like a theory exam. It should feel like a tiny arcade drill that gradually teaches what the notes are.
 
-## The intended first session
+## Canonical first-user workflow
 
-A first-time user should be able to do this:
+The canonical first-user workflow is **Sing/Play/Practice/First steps**.
+
+A first-time user should be able to do this without opening Settings:
 
 1. Open `https://simiono.com/clefhanger/` on a phone.
-2. Read the short tutorial card.
+2. Read the short tutorial card: sing or hum the note you see.
 3. Stay with the default setup:
    - Practice style;
    - Treble mode;
    - Beginner difficulty;
+   - Speed 5;
    - First steps lesson;
-   - Notes input.
-4. Tap **Start practice**.
-5. Look at the note on the staff.
-6. Choose one of the visible answer buttons.
-7. If the answer is wrong, use the feedback to learn:
-   - the correct note name;
-   - where the note sits on the staff;
-   - which button would have been correct.
-8. Keep practicing without a timer until C, D, and E feel familiar.
+   - Sing/Play input.
+4. Tap **Check mic**.
+5. Allow microphone permission if the browser asks.
+6. Sing or hum any comfortable steady note so the app can show what it hears.
+7. Tap **Start practice**.
+8. Look at the front staff note.
+9. Sing, hum, or play that note steadily.
+10. Read the feedback:
+    - `Good — I hear E4` means the mic path is alive;
+    - `I hear G2 — need E` means adjust pitch toward the shown note;
+    - `Almost E — a little high/low` means keep the note name and adjust tuning.
+11. Repeat until C, D, and E feel familiar.
+12. Use Notes or Piano only as a quiet fallback, comparison, or debugging path.
 
-The user is not expected to configure anything before the first practice run.
+The user is not expected to configure anything before the first practice run. The only permission step is the microphone prompt.
 
 ## The basic loop
 
-In every round, the user does the same core action:
+In every practice attempt, the user does the same core action:
 
 1. See the front note on the staff.
-2. Name it before it falls or before moving on.
+2. Make one steady pitch for that note.
 3. Receive immediate feedback.
-4. Hear correct answers as pitch.
+4. Adjust pitch or repeat.
 5. Build recognition through repetition.
 
 The app should make the next useful action obvious:
 
-- if practice has not started, start practice;
-- if a note is visible, answer the visible/front note;
-- if the answer was wrong, read the correction and try again;
-- if the lesson feels easy, switch lesson or try Rush;
-- if using microphone mode, watch what note the phone thinks it heard.
+- if the mic is off, tap **Check mic**;
+- if practice has not started, tap **Start practice**;
+- if a note is visible, sing/hum/play the visible front note;
+- if the app hears the wrong note, adjust pitch instead of speaking the note name;
+- if the lesson feels easy, try Rush on the same lesson;
+- if the environment is noisy, use Notes or Piano as a fallback.
 
 ## The golden path
 
-ClefHanger is now microphone-first: the intended path is to answer by singing, humming, or playing the note.
-
+ClefHanger is microphone-first: the intended path is to answer by singing, humming, or playing the note.
 
 Start simple and add only one challenge at a time:
 
-1. **First steps / Practice / Notes**.
-2. **Line notes / Practice / Notes**.
-3. **Space notes / Practice / Notes**.
-4. **Ledger lines / Practice / Notes**.
-5. **Interval jumps / Practice / Notes**.
-6. **Mixed notes / Practice / Notes**.
+1. **First steps / Practice / Sing/Play**.
+2. **Line notes / Practice / Sing/Play**.
+3. **Space notes / Practice / Sing/Play**.
+4. **Ledger lines / Practice / Sing/Play**.
+5. **Interval jumps / Practice / Sing/Play**.
+6. **Mixed notes / Practice / Sing/Play**.
 7. **The same material in Rush**.
-8. **Piano or Sing/Play** only after the written-note loop is understood.
+8. **Notes or Piano fallback** only when the room, browser, or voice makes microphone work impractical.
 
-This path keeps the question clear: first learn the staff position, then add speed, then add a different input style.
+This path keeps the question clear: first connect the staff position to a sung/played pitch, then add speed, then optionally try a different input style.
 
 ## When to move on
 
@@ -88,7 +95,7 @@ Use this loose learning contract:
 - If one note keeps causing mistakes, return to the lesson that isolates that note group.
 - Do not increase lesson breadth, speed, and difficulty at the same time.
 
-These numbers are guide rails, not exams. The app now shows a small learning suggestion after answers and Rush summaries to help choose the next useful step without making progress feel locked.
+These numbers are guide rails, not exams. The app shows a small learning suggestion after answers and Rush summaries to help choose the next useful step without locking progress.
 
 ## Change one thing at a time
 
@@ -96,27 +103,27 @@ Settings can change several things at once: lesson, mode, speed, difficulty, and
 
 Good changes:
 
-- New lesson? Keep Beginner + Notes.
-- Trying Rush? Keep the same lesson.
+- New lesson? Keep Beginner + Sing/Play.
+- Trying Rush? Keep the same lesson and input.
 - Trying Piano? Keep the same lesson and difficulty.
-- Trying Sing/Play? First prove the same lesson with Notes.
+- Trying Notes? Treat it as fallback/debug, not the main path.
 - Raising speed? Do not also raise difficulty.
 
-If the app suddenly feels too hard, return to Practice + Beginner + Notes input.
+If the app suddenly feels too hard, return to Practice + Beginner + First steps + Sing/Play. If the room is too noisy, use Notes fallback for that session.
 
 ## How to use mistakes
 
-A wrong answer is part of the lesson.
+A wrong note is part of the lesson.
 
 When the app shows a correction:
 
-1. Pause on the correction for a moment.
+1. **Pause on the correction** for a moment.
 2. Read the note name.
 3. Notice whether it is on a line, space, or ledger line.
-4. Look at the correction label on the staff and the answer named in feedback.
-5. Answer again before changing settings.
+4. Look at the ghost note and the feedback text.
+5. Sing or play again before changing settings.
 
-Do not tap randomly through corrections. The small pause is where the learning happens.
+Do not rush through corrections. The small pause is where the learning happens.
 
 ## What the user should do in Practice
 
@@ -125,10 +132,12 @@ Practice is the default learning mode.
 The user should:
 
 1. Pick one lesson.
-2. Answer slowly.
-3. Treat wrong answers as hints.
-4. Repeat until the note positions become familiar.
-5. Move to a broader lesson only when the current one feels boring.
+2. Tap **Check mic** if the mic is not already ready.
+3. Tap **Start practice**.
+4. Sing or hum slowly.
+5. Treat wrong notes as hints.
+6. Repeat until the note positions become familiar.
+7. Move to a broader lesson only when the current one feels boring.
 
 Recommended order:
 
@@ -139,7 +148,7 @@ Recommended order:
 5. **Interval jumps** — C through G with same-note, step, and skip hints.
 6. **Mixed notes** — all seven natural note names.
 
-Practice is not about score. It is about recognizing the note quickly enough that Rush will later feel playful instead of stressful.
+Practice is not about score. It is about recognizing the note and producing a steady matching pitch quickly enough that Rush will later feel playful instead of stressful.
 
 ## What the user should do in Rush
 
@@ -150,7 +159,7 @@ The user should switch to Rush when a lesson feels familiar in Practice.
 In Rush, the user should:
 
 1. Watch the front note, not the preview notes behind it.
-2. Answer before the note reaches the cliff.
+2. Sing or play before the note reaches the cliff.
 3. Accept that missed notes reset the streak.
 4. Try to improve score and accuracy over short 60-second rounds.
 5. Replay immediately if the round felt close.
@@ -159,54 +168,54 @@ Rush is for fluency and recall speed. It is not the best place to learn a brand-
 
 ## What the user should do with input modes
 
-### Notes input
+### Sing/Play input
 
 Use this first.
 
-The user taps large note-name buttons. This is the intended default because it works on every phone and requires no permissions.
-
-Use Notes input when:
-
-- trying the app for the first time;
-- learning a new lesson;
-- testing whether the visual game loop works;
-- playing somewhere noisy.
-
-### Piano input
-
-Use this when the user wants to connect staff notes to a keyboard shape.
-
-The user taps a tiny one-octave piano strip instead of note-name buttons.
-
-Use Piano input when:
-
-- note names are already somewhat familiar;
-- the user wants to see where C, D, E, F, G, A, B sit on a keyboard;
-- practicing Sharps or Flats, where black keys matter and the suggestion line explains how `♯` and `♭` modify the same staff position.
-
-### Sing/Play input
-
-Use this when the user wants to answer by making sound.
-
-The user grants microphone permission, then sings, hums, whistles, or plays one steady note on an acoustic instrument.
+The user taps **Check mic**, allows permission, then sings, hums, whistles, or plays one steady note on a monophonic instrument.
 
 Use Sing/Play input when:
 
-- the user wants ear/voice connection, not only symbol recognition;
-- the environment is quiet enough;
+- trying the app for the first time in a reasonably quiet place;
+- learning a lesson through ear/voice connection;
 - the user can hold one steady note briefly;
 - the prompt is a single note, not a chord.
 
 The user should not speak note names into the microphone. The microphone listens for pitch, not speech.
 
+### Notes input
+
+Use this as a fallback.
+
+The user taps large note-name buttons. This works without audio or microphone permission.
+
+Use Notes input when:
+
+- the room is noisy;
+- microphone permission is blocked;
+- testing whether the visual game loop works;
+- comparing a suspected microphone scoring issue against a known-good touch path.
+
+### Piano input
+
+Use this when the user wants to connect staff notes to a keyboard shape.
+
+The user taps a tiny one-octave piano strip instead of singing or tapping note-name buttons.
+
+Use Piano input when:
+
+- note names are already somewhat familiar;
+- the user wants to see where C, D, E, F, G, A, B sit on a keyboard;
+- practicing Sharps or Flats, where black keys matter.
+
 ## What the user should do when singing or playing
 
 In Sing/Play mode, the user should:
 
-1. Select **Sing/Play** in Settings.
-2. Tap **Grant mic**.
-3. Allow microphone permission in the browser.
-4. Start Practice.
+1. Tap **Check mic**.
+2. Allow microphone permission in the browser.
+3. Sing or hum any comfortable steady note until the app says what it hears.
+4. Tap **Start practice**.
 5. Sing or play the note shown on the staff.
 6. Watch the green ghost note and `You played ...` readout.
 7. Hold the note briefly and steadily.
@@ -242,11 +251,11 @@ The user should not start with Hard unless they already read notes comfortably.
 For a beginner, success is not a huge score. Success looks like:
 
 - recognizing C, D, and E without guessing;
+- connecting a written note to a sung/hummed pitch;
 - knowing whether a note is on a line, space, or ledger line;
-- using wrong-answer feedback instead of feeling blocked;
+- using microphone feedback instead of feeling blocked;
 - moving from Practice to Rush for the same lesson;
-- improving accuracy over several short rounds;
-- optionally singing or playing the note and seeing the ghost note line up.
+- improving accuracy over several short rounds.
 
 For a returning user, success looks like:
 
@@ -273,30 +282,18 @@ Those can become future features, but they are not part of the current user jour
 
 If the user does not know how to practice sight reading yet, use this simple three-session path:
 
-1. **Session 1:** First steps in Practice until C/D/E feel predictable, then one Rush on First steps.
+1. **Session 1:** First steps in Practice with Sing/Play until C/D/E feel predictable, then one Rush on First steps.
 2. **Session 2:** Line notes and Space notes separately in Practice. Do not mix them too early.
-3. **Session 3:** Mixed notes in Practice, then Rush if accuracy is around 80% or better.
+3. **Session 3:** Mixed notes in Practice, then Rush if accuracy is above about 80%.
 
-After that, the user can cycle weak lessons, try Piano, or try Sing/Play.
+If a session goes badly, repeat the same lesson rather than adding more settings.
 
-## A good 5-minute practice session
+## Fallback workflow
 
-1. Open the app.
-2. Practice **First steps** for one minute.
-3. Switch to **Line notes** or **Space notes**.
-4. Practice until the corrections feel repetitive.
-5. Run one **Rush** round on the same material.
-6. If using Sing/Play, repeat one Practice run by singing or humming the notes.
-7. Stop while it still feels light.
+If the canonical Sing/Play path fails because of noise, permission, or browser behavior:
 
-ClefHanger is meant to be used often in tiny sessions, not as a long study grind.
-
-## If the user gets stuck
-
-- Too many wrong answers: go back to Practice and a narrower lesson.
-- Notes move too fast: lower speed or use Beginner.
-- Preview notes are confusing: use Beginner or Easy, where only one note appears.
-- Microphone does not score: switch back to Notes input first, then troubleshoot microphone separately.
-- Chords are confusing: return to Treble natural notes; chord mode is a later challenge.
-
-The escape hatch should always be simple: Practice + Beginner + Notes input.
+1. Switch to **Notes** input.
+2. Keep the same lesson and Practice mode.
+3. Prove the visual note-reading loop still works.
+4. Export a Mic Lab report if the microphone path needs debugging.
+5. Return to Sing/Play when the environment is quiet or the browser issue is fixed.

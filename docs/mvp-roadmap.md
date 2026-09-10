@@ -282,7 +282,7 @@ ClefHanger's product center is now microphone-first sight-singing / acoustic-not
 2. Defer chord singing and advanced accidental drills until the natural-note voice loop feels good.
 
 
-## Slice 59: first-user polish
+## Slice 60: canonical user flow
 
 - First screen starts with Sing/Play Practice wording, not guessing/rush language.
 - Mic ready and scoring feedback avoid repeating the same heard note twice.

@@ -3,8 +3,8 @@ import {
   getClefPresentation,
   getLedgerLinesForStaffStep,
   getMode,
-} from '../core/game.js?v=clefhanger-slice59-first-user-polish-2026-09-10';
-import { createGhostNoteFromPitch } from '../core/music-theory.js?v=clefhanger-slice59-first-user-polish-2026-09-10';
+} from '../core/game.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10';
+import { createGhostNoteFromPitch } from '../core/music-theory.js?v=clefhanger-slice60-canonical-user-flow-2026-09-10';
 
 export function yForStaffStep(step) {
   return STAFF_LAYOUT.bottomLineY - step * STAFF_LAYOUT.halfStep;
