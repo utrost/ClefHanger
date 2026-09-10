@@ -26,7 +26,7 @@ test('first-run tutorial is tiny, concrete, and beginner-safe', () => {
   assert.equal(steps.length, 3);
   assert.match(steps[0].body, /Notes climb upward/i);
   assert.match(steps[1].body, /treble staff/i);
-  assert.match(steps[2].body, /Guess/i);
+  assert.match(steps[2].body, /Sing|Guess|try/i);
 });
 
 test('beginner lessons start narrow before full seven-note quiz', () => {
@@ -51,8 +51,19 @@ test('line, space, and ledger lessons have tiny intro cards before practice star
 
   const ledgerIntro = getLessonIntroCard('ledger-notes');
   assert.equal(ledgerIntro.title, 'Ledger lines');
-  assert.match(ledgerIntro.body, /short extra lines/i);
+  assert.match(ledgerIntro.body, /short extra line/i);
   assert.deepEqual(ledgerIntro.examples, ['C', 'A']);
+});
+
+
+test('beginner lesson copy teaches singing first while keeping buttons as fallback', () => {
+  const lessons = read('src/core/lessons.js');
+  assert.match(lessons, /Sing or hum C, D, or E/);
+  assert.match(lessons, /sing or play E G B D F/);
+  assert.match(lessons, /sing or play F A C E/);
+  assert.match(lessons, /Sing or play the note with the short extra line/i);
+  assert.doesNotMatch(lessons, /Only three answer buttons/);
+  assert.doesNotMatch(lessons, /Tap the note name before the cliff/);
 });
 
 test('scaffolded answer tray narrows buttons only for beginner treble lessons', () => {

@@ -3,7 +3,7 @@ export const BEGINNER_LESSONS = [
     id: 'first-steps',
     label: 'First steps',
     title: 'Start with C, D, E',
-    body: 'Only three answer buttons. Learn the direction before the full alphabet appears.',
+    body: 'Sing or hum C, D, or E. The fallback buttons stay small while you learn the direction.',
     answers: ['C', 'D', 'E'],
     noteNames: ['C', 'D', 'E'],
   },
@@ -11,10 +11,10 @@ export const BEGINNER_LESSONS = [
     id: 'line-notes',
     label: 'Line notes',
     title: 'Treble line notes',
-    body: 'E, G, B, D, F sit on the five staff lines.',
+    body: 'Find the line note, then sing or play E G B D F.',
     intro: {
       title: 'Line notes',
-      body: 'Line notes sit on the staff lines. In treble, the lines are E G B D F from bottom to top.',
+      body: 'Line notes sit on the staff lines. In treble, sing or play E G B D F from bottom to top.',
       examples: ['E', 'G', 'B', 'D', 'F'],
     },
     answers: ['E', 'G', 'B', 'D', 'F'],
@@ -24,10 +24,10 @@ export const BEGINNER_LESSONS = [
     id: 'space-notes',
     label: 'Space notes',
     title: 'Treble space notes',
-    body: 'F, A, C, E spell FACE in the spaces.',
+    body: 'Find the space, then sing or play F A C E.',
     intro: {
       title: 'Space notes',
-      body: 'Space notes sit between the lines. In treble, the spaces spell FACE from bottom to top.',
+      body: 'Space notes sit between the lines. In treble, sing or play F A C E from bottom to top.',
       examples: ['F', 'A', 'C', 'E'],
     },
     answers: ['F', 'A', 'C', 'E'],
@@ -37,10 +37,10 @@ export const BEGINNER_LESSONS = [
     id: 'ledger-notes',
     label: 'Ledger lines',
     title: 'Above and below the staff',
-    body: 'Some notes need short extra lines when they sit just outside the staff.',
+    body: 'Sing or play the note with the short extra line just outside the staff.',
     intro: {
       title: 'Ledger lines',
-      body: 'Ledger notes sit just outside the staff. The short extra lines are part of the note, not decoration.',
+      body: 'Ledger notes sit just outside the staff. Sing or play the note with the short extra line; it is part of the note, not decoration.',
       examples: ['C', 'A'],
     },
     answers: ['C', 'A'],
@@ -51,7 +51,7 @@ export const BEGINNER_LESSONS = [
     id: 'interval-jumps',
     label: 'Interval jumps',
     title: 'Same, step, or skip',
-    body: 'Watch how the next note moves from the last one: repeat, one step, or a skip.',
+    body: 'Sing the next note by watching how it moves: repeat, one step, or a skip.',
     intro: {
       title: 'Interval jumps',
       body: 'Do not think chord theory yet. Compare this note to the last one: same note, one step up/down, or a skip over one note.',
@@ -65,7 +65,7 @@ export const BEGINNER_LESSONS = [
     id: 'mixed',
     label: 'Mixed notes',
     title: 'All natural notes',
-    body: 'Now mix all seven note names at gentle speed.',
+    body: 'Now sing or play all seven natural note names at gentle speed.',
     answers: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
     noteNames: ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
   },
@@ -73,9 +73,9 @@ export const BEGINNER_LESSONS = [
 
 export function buildTutorialSteps() {
   return [
-    { title: 'Notes move upward', body: 'Notes climb upward through A B C D E F G, then repeat.' },
+    { title: 'Notes move upward', body: 'Sing or hum the note you see. Notes climb upward through A B C D E F G, then repeat.' },
     { title: 'Treble staff anchor', body: 'This is a treble staff. The curl wraps the G line; nearby notes step up or down from there.' },
-    { title: 'Guess safely', body: 'Tap the note name before the cliff. Guess if you are unsure — ClefHanger shows the right note.' },
+    { title: 'Sing safely', body: 'Sing, hum, or play one steady note before the cliff. If you are unsure, try it — ClefHanger shows the right note.' },
   ];
 }
 
