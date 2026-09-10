@@ -97,9 +97,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice57-mic-report-fixtures-2026-09-10`.
-- Service-worker cache: `clefhanger-pwa-v51`.
-- Visible marker: `Slice 57: mic report fixtures`.
+- App version: `clefhanger-slice58-mobile-mic-polish-2026-09-10`.
+- Service-worker cache: `clefhanger-pwa-v52`.
+- Visible marker: `Slice 58: mobile mic polish`.
 
 ## CI
 
@@ -302,11 +302,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice57-mic-report-fixtures'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice58-mobile-mic-polish'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v51'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v52'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

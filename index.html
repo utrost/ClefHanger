@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice57-mic-report-fixtures-2026-09-10">
+<html lang="en" data-app-version="clefhanger-slice58-mobile-mic-polish-2026-09-10">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -467,8 +467,11 @@
 
       @media (max-width: 720px) {
         body { padding-inline: 8px; }
-        main { min-height: 100svh; }
-        .stage { min-height: 30svh; }
+        main { min-height: 100svh; gap: 7px; }
+        .stage { min-height: 28svh; padding-block: 10px; }
+        #microphone-panel { gap: 6px; padding: 7px 8px; }
+        #mic-readiness { padding: 7px; }
+        #mic-help summary, #microphone-debug summary { font-size: 0.78rem; }
         .note-button { min-height: max(48px, 7svh); }
         .accidental-button { min-height: 36px; }
       }
@@ -556,10 +559,10 @@
           <p id="microphone-status">Mic off. Check mic, then sing one steady comfortable note.</p>
           <button id="start-microphone-main" type="button">Check mic</button>
           <p id="heard-note" aria-live="polite">You played —</p>
-          <p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p>
+          <details id="mic-help"><summary>How Sing/Play scoring works</summary><p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p></details>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 57: mic report fixtures</p>
+        <p class="microcopy">Slice 58: mobile mic polish</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -618,12 +621,12 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice57-mic-report-fixtures-2026-09-10"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice58-mobile-mic-polish-2026-09-10"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice57-mic-report-fixtures-2026-09-10')
+            .register('./sw.js?v=clefhanger-slice58-mobile-mic-polish-2026-09-10')
             .then((registration) => registration.update())
             .catch(() => {});
         });

@@ -273,6 +273,7 @@ ClefHanger's product center is now microphone-first sight-singing / acoustic-not
 - Show mic scoring feedback for listening, hold-steady, matched, too-high, too-low, wrong-note, wrong-octave, and unsupported-chord states.
 - Rewrite beginner lessons and tutorial copy around Sing/Play first, with buttons/piano as fallbacks.
 - Preserve the Android Firefox B2/C3 voice mic report as a checked-in regression fixture.
+- Compact the mobile Sing/Play panel by keeping scoring help collapsed and tightening the mic card spacing on phone widths.
 
 ### Next mic-first slices
 

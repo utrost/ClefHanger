@@ -3,7 +3,7 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   microphoneInputLevelPercent,
-} from './pitch.js?v=clefhanger-slice57-mic-report-fixtures-2026-09-10';
+} from './pitch.js?v=clefhanger-slice58-mobile-mic-polish-2026-09-10';
 
 export function summarizeAudioSamples(samples, sampleRate, { label = 'capture' } = {}) {
   const safeSamples = samples || new Float32Array();
