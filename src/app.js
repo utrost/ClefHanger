@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+} from './core/content.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -23,9 +23,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+} from './core/game.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -38,18 +38,18 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
 
-const appVersion = 'clefhanger-slice66-practice-skip-2026-09-16';
+const appVersion = 'clefhanger-slice67-shortcut-launch-2026-09-16';
 const appBackground = document.querySelector('#app-background');
 const staff = document.querySelector('#staff');
 const notationStage = document.querySelector('#notation-stage');
@@ -117,7 +117,7 @@ const difficultyLabelEl = document.querySelector('#difficulty-label');
 const difficultyHelpEl = document.querySelector('#difficulty-help');
 
 const storageAdapter = createStorageAdapter();
-const storedPreferences = storageAdapter.readPreferences();
+const storedPreferences = resolveStartupPreferences(storageAdapter.readPreferences(), window.location.search);
 let selectedModeId = storedPreferences.modeId;
 let selectedSpeedId = storedPreferences.speedId;
 let selectedDifficultyId = storedPreferences.difficultyId;

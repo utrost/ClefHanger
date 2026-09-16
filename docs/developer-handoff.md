@@ -97,9 +97,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice66-practice-skip-2026-09-16`.
-- Service-worker cache: `clefhanger-pwa-v60`.
-- Visible marker: `Slice 66: practice skip`.
+- App version: `clefhanger-slice67-shortcut-launch-2026-09-16`.
+- Service-worker cache: `clefhanger-pwa-v61`.
+- Visible marker: `Slice 67: shortcut launch`.
 
 ## CI
 
@@ -302,11 +302,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice66-practice-skip'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice67-shortcut-launch'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v60'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v61'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

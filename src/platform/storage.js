@@ -1,7 +1,7 @@
-import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice66-practice-skip-2026-09-16';
-import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
 
 export const STORAGE_KEYS = {
   selectedMode: 'clefhanger.selectedMode.v3',
@@ -17,6 +17,14 @@ export const STORAGE_KEYS = {
   lessonIntroHidden: 'clefhanger.lessonIntroHidden.v1',
   tutorialDismissed: 'clefhanger.tutorialDismissed.v1',
 };
+
+export function resolveStartupPreferences(storedPreferences, search = '') {
+  const requestedMode = new URLSearchParams(search).get('mode');
+  const validRequestedMode = requestedMode && getMode(requestedMode).id === requestedMode;
+  return validRequestedMode
+    ? { ...storedPreferences, modeId: requestedMode }
+    : storedPreferences;
+}
 
 function getSafe(storage, key) {
   try {

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clefhanger-pwa-v60';
+const CACHE_NAME = 'clefhanger-pwa-v61';
 const APP_SHELL = [
   './',
   './index.html',
@@ -56,6 +56,6 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         return response;
       })
-      .catch(() => caches.match(request)),
+      .catch(() => caches.match(request, { ignoreSearch: true })),
   );
 });

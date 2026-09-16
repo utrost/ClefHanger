@@ -38,23 +38,23 @@
   ],
   "shortcuts": [
     {
-      "name": "Treble sprint",
+      "name": "Treble mode",
       "short_name": "Treble",
-      "description": "Start ClefHanger in treble-note practice.",
-      "url": "./",
+      "description": "Open natural treble notes with your saved Practice or Rush setting.",
+      "url": "./?mode=basics",
       "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Bass sprint",
+      "name": "Bass mode",
       "short_name": "Bass",
-      "description": "Start ClefHanger in bass-note practice.",
+      "description": "Open natural bass-clef notes with your saved Practice or Rush setting.",
       "url": "./?mode=bass",
       "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
     },
     {
-      "name": "Sharp sprint",
+      "name": "Sharps mode",
       "short_name": "Sharps",
-      "description": "Start ClefHanger in sharp-note practice.",
+      "description": "Open treble sharp notes with your saved Practice or Rush setting.",
       "url": "./?mode=sharps",
       "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }]
     }

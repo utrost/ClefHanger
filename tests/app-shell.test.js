@@ -15,8 +15,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice66-practice-skip-2026-09-16"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice66-practice-skip-2026-09-16'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice67-shortcut-launch-2026-09-16"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice67-shortcut-launch-2026-09-16'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
@@ -58,8 +58,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice66-practice-skip/);
-  assert.match(html, /Slice 66: practice skip/);
+  assert.match(html, /data-app-version="clefhanger-slice67-shortcut-launch/);
+  assert.match(html, /Slice 67: shortcut launch/);
 });
 
 test('rush summary is a focus-managed modal isolated from the background game', () => {
@@ -177,15 +177,30 @@ test('manifest and service worker describe an installable subpath-safe app shell
   assert.equal(manifest.scope, './');
   assert.deepEqual(manifest.icons.map((icon) => `${icon.sizes}:${icon.type}`).sort(), ['192x192:image/png', '192x192:image/svg+xml', '512x512:image/png', '512x512:image/svg+xml']);
   assert.deepEqual(manifest.categories, ['games', 'education', 'music']);
-  assert.deepEqual(manifest.shortcuts.map((shortcut) => shortcut.url), ['./', './?mode=bass', './?mode=sharps']);
+  assert.deepEqual(manifest.shortcuts.map(({ name, short_name, description, url }) => ({ name, short_name, description, url })), [
+    { name: 'Treble mode', short_name: 'Treble', description: 'Open natural treble notes with your saved Practice or Rush setting.', url: './?mode=basics' },
+    { name: 'Bass mode', short_name: 'Bass', description: 'Open natural bass-clef notes with your saved Practice or Rush setting.', url: './?mode=bass' },
+    { name: 'Sharps mode', short_name: 'Sharps', description: 'Open treble sharp notes with your saved Practice or Rush setting.', url: './?mode=sharps' },
+  ]);
   for (const icon of ['./icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(statSync(new URL(`../${icon.slice(2)}`, import.meta.url)).size > 1000, `${icon} exists`);
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v60/);
+  assert.match(sw, /clefhanger-pwa-v61/);
   for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }
   assert.match(sw, /request\.mode === 'navigate'/);
+  assert.match(sw, /fetch\(request\)\.catch\(\(\) => caches\.match\('\.\/index\.html'\)\)/, 'offline navigation keeps the direct shortcut URL and its query in the address bar');
+  assert.match(sw, /caches\.match\(request, \{ ignoreSearch: true \}\)/, 'versioned module requests fall back to the precached unversioned app shell offline');
+});
+
+test('startup applies the direct launch query after LocalStorage preferences', () => {
+  const app = read('src/app.js');
+  const docs = read('docs/current-state-reference.md');
+
+  assert.match(app, /resolveStartupPreferences\(storageAdapter\.readPreferences\(\), window\.location\.search\)/);
+  assert.match(docs, /A valid `\?mode=` launch query takes precedence over the stored LocalStorage mode/);
+  assert.match(docs, /browser, installed shortcut, and offline navigation/);
 });

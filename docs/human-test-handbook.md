@@ -91,7 +91,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 66: practice skip`.
+- Visible marker says `Slice 67: shortcut launch`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -503,7 +503,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice66-practice-skip`.
+2. Confirm the HTML contains `clefhanger-slice67-shortcut-launch`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -522,7 +522,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v60`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v61`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:

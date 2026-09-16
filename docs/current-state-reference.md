@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice66-practice-skip-2026-09-16`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice67-shortcut-launch-2026-09-16`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Microphone-first scope
 
@@ -12,9 +12,11 @@ The current product direction is microphone-first: the default answer path is Si
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice66-practice-skip-2026-09-16`.
-- Current visible slice marker: `Slice 66: practice skip`.
-- Current service-worker cache: `clefhanger-pwa-v60`.
+- Current app marker: `clefhanger-slice67-shortcut-launch-2026-09-16`.
+- Current visible slice marker: `Slice 67: shortcut launch`.
+- Current service-worker cache: `clefhanger-pwa-v61`.
+
+A valid `?mode=` launch query takes precedence over the stored LocalStorage mode for that launch without overwriting the saved preference. The relative manifest URLs use the same contract for browser, installed shortcut, and offline navigation; missing or invalid mode values safely retain the stored mode.
 
 Accessibility announcements use separate responsibilities: notation changes remain in the notation status region, while game and microphone events use a dedicated semantic announcer. Timer and raw pitch readouts are visual, cached updates; pitch acquisition/loss, scoring outcomes, microphone readiness/errors, and round completion are announced once per event.
 - Core/UI modules:

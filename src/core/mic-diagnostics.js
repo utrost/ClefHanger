@@ -3,7 +3,7 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   microphoneInputLevelPercent,
-} from './pitch.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+} from './pitch.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
 
 export function summarizeAudioSamples(samples, sampleRate, { label = 'capture' } = {}) {
   const safeSamples = samples || new Float32Array();

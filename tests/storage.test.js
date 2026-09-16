@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
-import { createStorageAdapter, STORAGE_KEYS } from '../src/platform/storage.js';
+import { createStorageAdapter, resolveStartupPreferences, STORAGE_KEYS } from '../src/platform/storage.js';
 import { getHighScoreKey } from '../src/core/scoring.js';
 
 function createFakeStorage(initial = {}) {
@@ -119,6 +119,35 @@ test('storage adapter swallows unavailable storage errors', () => {
   assert.doesNotThrow(() => adapter.writeHighScore(100, 'basics', '5', 'beginner'));
   assert.equal(adapter.readHighScore('basics', '5', 'beginner'), 0);
   assert.equal(adapter.readPreferences().modeId, 'basics');
+});
+
+test('a bass shortcut query overrides a stored Treble preference', () => {
+  const stored = createStorageAdapter(createFakeStorage({
+    [STORAGE_KEYS.selectedMode]: 'basics',
+    [STORAGE_KEYS.selectedPlayStyle]: 'rush',
+  })).readPreferences();
+
+  const launched = resolveStartupPreferences(stored, '?mode=bass');
+  assert.equal(launched.modeId, 'bass');
+  assert.equal(launched.playStyle, 'rush', 'mode shortcuts retain the saved Practice or Rush style');
+});
+
+test('a sharps shortcut query overrides a stored Bass preference', () => {
+  const stored = createStorageAdapter(createFakeStorage({
+    [STORAGE_KEYS.selectedMode]: 'bass',
+  })).readPreferences();
+
+  assert.equal(resolveStartupPreferences(stored, '?mode=sharps').modeId, 'sharps');
+});
+
+test('invalid and missing launch modes safely retain the stored preference', () => {
+  const stored = createStorageAdapter(createFakeStorage({
+    [STORAGE_KEYS.selectedMode]: 'bass',
+  })).readPreferences();
+
+  assert.equal(resolveStartupPreferences(stored, '?mode=not-a-mode').modeId, 'bass');
+  assert.equal(resolveStartupPreferences(stored, '?verify=offline').modeId, 'bass');
+  assert.deepEqual(resolveStartupPreferences(stored, '?mode=not-a-mode'), stored);
 });
 
 test('app composition root uses storage adapter instead of direct localStorage calls', () => {
