@@ -10,6 +10,7 @@ test('settings expose microphone input and live calibration controls', () => {
   const html = read('index.html');
   const app = read('src/app.js');
   const microphoneSession = read('src/platform/microphone-session.js');
+  const serviceWorker = read('sw.js');
   const micRecordingDiagnostic = read('src/platform/mic-recording-diagnostic.js');
   const staffRenderer = read('src/ui/staff-renderer.js');
 
@@ -22,9 +23,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Check mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice61-mic-first-lesson-cards/);
-  assert.match(app, /const appVersion = 'clefhanger-slice61-mic-first-lesson-cards-2026-09-10'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10/);
+  assert.match(html, /data-app-version="clefhanger-slice62-microphone-lifecycle/);
+  assert.match(app, /const appVersion = 'clefhanger-slice62-microphone-lifecycle-2026-09-16'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice62-microphone-lifecycle-2026-09-16/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -73,6 +74,7 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /getMicrophoneRecordingDiagnostic/);
   assert.match(microphoneSession, /navigatorObject\.mediaDevices\.getUserMedia/);
   assert.match(microphoneSession, /getBuiltInVocalMicrophoneConstraints\(\)/);
+  assert.match(serviceWorker, /\.\/src\/platform\/microphone-controller\.js/);
   assert.doesNotMatch(app, /getUserMedia\(\{ audio: true \}\)/);
   assert.match(app, /formatDiagnosticLevelPercent\(result\.decodedRms\)/);
   assert.match(app, /selectInputMode: \(inputMode\)/);

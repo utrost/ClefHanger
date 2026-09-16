@@ -36,8 +36,9 @@ function collectVersionQueries(text) {
 
 function appImportToSwAsset(specifier) {
   const bare = specifier.split('?')[0];
-  if (bare.startsWith('./core/')) return `./src/${bare.slice(2)}`;
-  if (bare.startsWith('./ui/')) return `./src/${bare.slice(2)}`;
+  if (bare.startsWith('./core/') || bare.startsWith('./ui/') || bare.startsWith('./platform/')) {
+    return `./src/${bare.slice(2)}`;
+  }
   if (bare.startsWith('./src/')) return bare;
   return null;
 }

@@ -28,12 +28,23 @@ export function getMicrophoneTrackState(stream) {
   return track.enabled === false ? 'disabled' : 'live';
 }
 
-export function withMicrophoneRequestTimeout(requestPromise, timeoutMs = 8000) {
+export function withMicrophoneRequestTimeout(requestPromise, timeoutMs = 8000, onLateResolve = () => {}) {
+  let settled = false;
   let timeoutId;
   const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = setTimeout(() => reject(new Error('Microphone request timed out. In Chrome, check Site settings → Microphone for simiono.com.')), timeoutMs);
+    timeoutId = setTimeout(() => {
+      settled = true;
+      reject(new Error('Microphone request timed out. In Chrome, check Site settings → Microphone for simiono.com.'));
+    }, timeoutMs);
   });
-  return Promise.race([requestPromise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+  const observedRequest = requestPromise.then((value) => {
+    if (settled) onLateResolve(value);
+    return value;
+  });
+  return Promise.race([observedRequest, timeoutPromise]).finally(() => {
+    settled = true;
+    clearTimeout(timeoutId);
+  });
 }
 
 export async function startMicrophoneSession({
@@ -53,6 +64,7 @@ export async function startMicrophoneSession({
   const stream = await withMicrophoneRequestTimeout(
     navigatorObject.mediaDevices.getUserMedia(getBuiltInVocalMicrophoneConstraints()),
     timeoutMs,
+    stopMicrophoneSession,
   );
 
   try {
@@ -68,15 +80,16 @@ export async function startMicrophoneSession({
     analyser.connect(keepAliveGain);
     keepAliveGain.connect(audioContext.destination);
 
-    return {
+    const session = {
       stream,
       source,
       analyser,
       keepAliveGain,
       buffer,
       getTrackState: () => getMicrophoneTrackState(stream),
-      stop: () => stopMicrophoneSession({ stream }),
+      stop: () => stopMicrophoneSession(session),
     };
+    return session;
   } catch (error) {
     stopMicrophoneSession({ stream });
     throw error;
@@ -85,6 +98,9 @@ export async function startMicrophoneSession({
 
 export function stopMicrophoneSession(sessionOrStream) {
   const stream = sessionOrStream?.stream || sessionOrStream;
+  sessionOrStream?.source?.disconnect?.();
+  sessionOrStream?.analyser?.disconnect?.();
+  sessionOrStream?.keepAliveGain?.disconnect?.();
   if (stream?.getTracks) {
     for (const track of stream.getTracks()) track.stop();
   }

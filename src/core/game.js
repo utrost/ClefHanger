@@ -1,15 +1,15 @@
-import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+} from './content.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+} from './content.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
 
 
 export const STAFF_LAYOUT = {

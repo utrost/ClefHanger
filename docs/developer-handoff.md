@@ -97,9 +97,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice61-mic-first-lesson-cards-2026-09-10`.
-- Service-worker cache: `clefhanger-pwa-v55`.
-- Visible marker: `Slice 61: mic-first lesson cards`.
+- App version: `clefhanger-slice62-microphone-lifecycle-2026-09-16`.
+- Service-worker cache: `clefhanger-pwa-v56`.
+- Visible marker: `Slice 62: microphone lifecycle`.
 
 ## CI
 
@@ -302,11 +302,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice61-mic-first-lesson-cards'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice62-microphone-lifecycle'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v55'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v56'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

@@ -31,9 +31,9 @@ function createFakeStream(track = createFakeTrack()) {
 function createFakeAudioContext() {
   const calls = [];
   const destination = { kind: 'destination' };
-  const source = { connect: (target) => calls.push(['source.connect', target.kind]) };
-  const analyser = { kind: 'analyser', fftSize: 0, connect: (target) => calls.push(['analyser.connect', target.kind]) };
-  const keepAliveGain = { kind: 'gain', gain: { value: 1 }, connect: (target) => calls.push(['gain.connect', target.kind]) };
+  const source = { connect: (target) => calls.push(['source.connect', target.kind]), disconnect: () => calls.push(['source.disconnect']) };
+  const analyser = { kind: 'analyser', fftSize: 0, connect: (target) => calls.push(['analyser.connect', target.kind]), disconnect: () => calls.push(['analyser.disconnect']) };
+  const keepAliveGain = { kind: 'gain', gain: { value: 1 }, connect: (target) => calls.push(['gain.connect', target.kind]), disconnect: () => calls.push(['gain.disconnect']) };
   return {
     state: 'suspended',
     sampleRate: 48000,
@@ -91,6 +91,11 @@ test('startMicrophoneSession requests built-in vocal constraints and retains the
   session.stop();
   assert.equal(track.stopped, true);
   assert.equal(session.getTrackState(), 'ended');
+  assert.deepEqual(audioContext.calls.slice(-3), [
+    ['source.disconnect'],
+    ['analyser.disconnect'],
+    ['gain.disconnect'],
+  ]);
 });
 
 test('startMicrophoneSession preflights denied permission without calling getUserMedia', async () => {
@@ -125,4 +130,24 @@ test('formatMicrophoneError keeps Android site-settings guidance for denied perm
   assert.match(message, /tap the lock/);
   assert.match(message, /Android Settings/);
   assert.equal(formatMicrophoneError(new Error('AudioContext unavailable')), 'AudioContext unavailable');
+});
+
+test('a getUserMedia stream resolving after timeout is stopped', async () => {
+  let resolveRequest;
+  const request = new Promise((resolve) => { resolveRequest = resolve; });
+  const track = createFakeTrack();
+  const stream = createFakeStream(track);
+  const navigatorObject = {
+    permissions: { async query() { return { state: 'prompt' }; } },
+    mediaDevices: { getUserMedia() { return request; } },
+  };
+
+  await assert.rejects(
+    startMicrophoneSession({ navigatorObject, audioContext: createFakeAudioContext(), timeoutMs: 1 }),
+    /timed out/,
+  );
+  resolveRequest(stream);
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  assert.equal(track.stopped, true);
 });

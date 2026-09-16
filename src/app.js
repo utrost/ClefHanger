@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+} from './core/content.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,9 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+} from './core/game.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -36,15 +36,16 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+} from './core/pitch.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
 
-const appVersion = 'clefhanger-slice61-mic-first-lesson-cards-2026-09-10';
+const appVersion = 'clefhanger-slice62-microphone-lifecycle-2026-09-16';
 const staff = document.querySelector('#staff');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
@@ -131,6 +132,16 @@ let microphoneRecordingDiagnostic = 'Recording test: not run yet.';
 let microphoneDebugText = 'No recording details yet.';
 let lastMicRecordingEvidence = null;
 let lastMicReport = null;
+const microphoneController = createMicrophoneController({
+  startSession: (options) => startMicrophoneSession(options),
+  onStop: () => {
+    if (microphoneRafId !== null) cancelAnimationFrame(microphoneRafId);
+    microphoneRafId = null;
+    clearMicrophoneSession();
+    microphoneState = { ...microphoneState, permission: 'idle', listening: false, trackState: 'none', frequency: null, note: null, cents: null, inputLevel: 0, vocalCandidate: null };
+    render();
+  },
+});
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return storageAdapter.readHighScore(modeId, speedId, difficultyId);
@@ -228,6 +239,10 @@ function renderHud(nowMs) {
   micReadinessTitleEl.textContent = micReadiness.title;
   micReadinessBodyEl.textContent = micReadiness.body;
   startMicrophoneMainButton.textContent = micReadiness.action;
+  const microphoneStarting = microphoneState.permission === 'requesting';
+  startMicrophoneButton.disabled = microphoneStarting;
+  startMicrophoneMainButton.disabled = microphoneStarting;
+  stopMicrophoneButton.disabled = !microphoneStarting && getCurrentMicrophoneTrackState() === 'none';
   microphoneStatusEl.textContent = microphoneStatusText();
   heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
   microphoneRecordingDiagnosticEl.textContent = microphoneRecordingDiagnostic;
@@ -341,12 +356,7 @@ function clearMicrophoneSession() {
 }
 
 function stopMicrophone() {
-  if (microphoneRafId !== null) cancelAnimationFrame(microphoneRafId);
-  microphoneRafId = null;
-  microphoneSession?.stop?.();
-  clearMicrophoneSession();
-  microphoneState = { ...microphoneState, listening: false, trackState: 'none' };
-  render();
+  microphoneController.stop();
 }
 
 async function startMicrophone() {
@@ -354,10 +364,15 @@ async function startMicrophone() {
     if (!navigator.mediaDevices?.getUserMedia) {
       throw new Error('getUserMedia unavailable');
     }
+    const context = getAudioContext();
+    const sessionRequest = microphoneController.start({ navigatorObject: navigator, audioContext: context });
     microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null, inputLevel: 0, silentFrameCount: 0, trackState: 'none', vocalCandidate: null };
     render();
-    const context = getAudioContext();
-    microphoneSession = await startMicrophoneSession({ navigatorObject: navigator, audioContext: context });
+    const session = await startAndPublishMicrophoneSession({
+      start: () => sessionRequest,
+      publish: (currentSession) => { microphoneSession = currentSession; },
+    });
+    if (!session) return false;
     microphoneStream = microphoneSession.stream;
     microphoneAnalyser = microphoneSession.analyser;
     microphoneBuffer = microphoneSession.buffer;
@@ -366,8 +381,7 @@ async function startMicrophone() {
     render();
     return true;
   } catch (error) {
-    microphoneSession?.stop?.();
-    clearMicrophoneSession();
+    microphoneController.stop();
     microphoneState = { ...microphoneState, permission: 'blocked', listening: false, trackState: 'none', error: formatMicrophoneError(error) };
     render();
     return false;
@@ -553,6 +567,7 @@ function installInputModes() {
   for (const button of inputModeButtons.querySelectorAll('button')) {
     button.addEventListener('click', () => {
       selectedInputMode = normalizeInputMode(button.dataset.inputMode);
+      microphoneController.selectInputMode(selectedInputMode);
       storageAdapter.writePreference('selectedInputMode', selectedInputMode);
       render();
     });
@@ -674,6 +689,7 @@ exportMicReportButton.addEventListener('click', downloadMicReport);
 openSettingsButton.addEventListener('click', openSettings);
 closeSettingsButton.addEventListener('click', closeSettings);
 installInputModes();
+microphoneController.installLifecycleHandlers();
 installModes();
 installSpeedSlider();
 installDifficulties();
@@ -719,6 +735,7 @@ window.__clefHanger = {
   },
   selectInputMode: (inputMode) => {
     selectedInputMode = normalizeInputMode(inputMode);
+    microphoneController.selectInputMode(selectedInputMode);
     render();
   },
   setMatchAnyOctave: (enabled) => {
