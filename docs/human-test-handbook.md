@@ -66,6 +66,7 @@ A build should not be called ready if any critical case fails:
 - HT-08 Rush reaches a usable summary.
 - HT-10 input switching shows exactly one answer surface.
 - HT-12 microphone permission path gives visible progress or an actionable error.
+- HT-19 screen-reader announcements stay understandable and do not repeat with animation frames.
 - HT-16 live deploy assets and cache markers are coherent.
 
 ## Test cases
@@ -90,7 +91,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 63: accessible notation`.
+- Visible marker says `Slice 64: semantic announcements`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -496,7 +497,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice63-accessible-notation`.
+2. Confirm the HTML contains `clefhanger-slice64-semantic-announcements`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -515,7 +516,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v57`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v58`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:

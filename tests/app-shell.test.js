@@ -15,13 +15,14 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice63-accessible-notation-2026-09-16"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice63-accessible-notation-2026-09-16'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice64-semantic-announcements-2026-09-16"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice64-semantic-announcements-2026-09-16'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
   assert.match(html, /<section class="stage" id="notation-stage" aria-label="Treble clef · Treble mode · Practice playfield">/);
   assert.match(html, /id="notation-prompt"[^>]+role="status"[^>]+aria-live="polite"[^>]+aria-atomic="true"/);
+  assert.match(html, /id="game-announcer"[^>]+role="status"[^>]+aria-live="polite"[^>]+aria-atomic="true"/);
   assert.match(html, /id="feedback"/);
   assert.match(html, /id="summary"/);
   assert.match(html, /id="summary-title"/);
@@ -57,8 +58,37 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice63-accessible-notation/);
-  assert.match(html, /Slice 63: accessible notation/);
+  assert.match(html, /data-app-version="clefhanger-slice64-semantic-announcements/);
+  assert.match(html, /Slice 64: semantic announcements/);
+});
+
+test('live regions have explicit responsibilities and volatile visual readouts are not live', () => {
+  const html = read('index.html');
+  const app = read('src/app.js');
+
+  assert.doesNotMatch(html, /class="timer-card"[^>]+aria-live/);
+  for (const id of ['feedback', 'learning-coach', 'heard-note', 'mic-report-preview', 'microphone-recording-diagnostic', 'calibration-reading']) {
+    assert.doesNotMatch(html, new RegExp(`id="${id}"[^>]+aria-live`));
+  }
+  assert.match(app, /createSemanticPresenter/);
+  assert.match(app, /semanticPresenter\.updateTimer/);
+  assert.match(app, /semanticPresenter\.updatePitch/);
+  assert.match(app, /kind: 'correct'/);
+  assert.match(app, /kind: 'wrong'/);
+  assert.match(app, /kind: 'missed'/);
+  assert.match(app, /kind: 'microphone-ready'/);
+  assert.match(app, /kind: 'microphone-error'/);
+  assert.match(app, /kind: 'round-ended'/);
+});
+
+test('a terminal miss is announced before the round-ended summary in the same render', () => {
+  const app = read('src/app.js');
+  const renderHud = app.slice(app.indexOf('function renderHud('), app.indexOf('\nfunction render(', app.indexOf('function renderHud(')));
+  const missedAnnouncement = renderHud.indexOf("kind: 'missed'");
+  const roundEndedAnnouncement = renderHud.indexOf("kind: 'round-ended'");
+
+  assert.ok(missedAnnouncement >= 0, 'renderHud announces missed-note events');
+  assert.ok(roundEndedAnnouncement > missedAnnouncement, 'the round summary is the final terminal game announcement');
 });
 
 test('first-run shell presents Sing/Play as the default primary answer path', () => {
@@ -127,7 +157,7 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v57/);
+  assert.match(sw, /clefhanger-pwa-v58/);
   for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }

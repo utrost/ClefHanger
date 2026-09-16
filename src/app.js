@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+} from './core/content.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,9 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+} from './core/game.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -36,16 +36,17 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { renderStaffSvg, syncLiveRegionText, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
 
-const appVersion = 'clefhanger-slice63-accessible-notation-2026-09-16';
+const appVersion = 'clefhanger-slice64-semantic-announcements-2026-09-16';
 const staff = document.querySelector('#staff');
 const notationStage = document.querySelector('#notation-stage');
 const notationPrompt = document.querySelector('#notation-prompt');
@@ -96,6 +97,7 @@ const streakEl = document.querySelector('#streak');
 const timerEl = document.querySelector('#timer');
 const feedbackEl = document.querySelector('#feedback');
 const learningCoachEl = document.querySelector('#learning-coach');
+const gameAnnouncerEl = document.querySelector('#game-announcer');
 const summaryEl = document.querySelector('#summary');
 const summaryTitleEl = document.querySelector('#summary-title');
 const summaryContextEl = document.querySelector('#summary-context');
@@ -134,6 +136,8 @@ let microphoneRecordingDiagnostic = 'Recording test: not run yet.';
 let microphoneDebugText = 'No recording details yet.';
 let lastMicRecordingEvidence = null;
 let lastMicReport = null;
+let microphoneSessionNumber = 0;
+const semanticPresenter = createSemanticPresenter({ announcementElement: gameAnnouncerEl });
 const microphoneController = createMicrophoneController({
   startSession: (options) => startMicrophoneSession(options),
   onStop: () => {
@@ -180,9 +184,9 @@ function calibrationReadingText() {
 function renderLessonIntro() {
   const intro = getLessonIntroCard(selectedLessonId);
   lessonIntro.hidden = lessonIntroHidden;
-  lessonIntroTitle.textContent = intro.title;
-  lessonIntroBody.textContent = intro.body;
-  lessonIntroExamples.textContent = intro.examples.join(' · ');
+  syncElementText(lessonIntroTitle, intro.title);
+  syncElementText(lessonIntroBody, intro.body);
+  syncElementText(lessonIntroExamples, intro.examples.join(' · '));
 }
 
 function currentLearningRecommendation() {
@@ -213,25 +217,25 @@ function renderHud(nowMs) {
   const mode = getMode(selectedModeId);
   const speed = getSpeed(selectedSpeedId);
   const difficulty = getDifficulty(selectedDifficultyId);
-  scoreEl.textContent = String(state.score);
-  streakEl.textContent = String(state.streak);
-  syncLiveRegionText(timerEl, String(getRemainingSeconds(state, nowMs)));
-  syncLiveRegionText(feedbackEl, state.feedback.text);
+  syncElementText(scoreEl, state.score);
+  syncElementText(streakEl, state.streak);
+  semanticPresenter.updateTimer(timerEl, getRemainingSeconds(state, nowMs));
+  syncElementText(feedbackEl, state.feedback.text);
   feedbackEl.dataset.kind = state.feedback.kind;
   const learningRecommendation = currentLearningRecommendation();
-  syncLiveRegionText(learningCoachEl, learningRecommendation.text);
+  syncElementText(learningCoachEl, learningRecommendation.text);
   learningCoachEl.dataset.kind = learningRecommendation.kind;
-  bestEl.textContent = String(getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
-  modeLabelEl.textContent = mode.label;
-  modeHelpEl.textContent = mode.help;
-  speedLabelEl.textContent = speed.label;
+  syncElementText(bestEl, getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
+  syncElementText(modeLabelEl, mode.label);
+  syncElementText(modeHelpEl, mode.help);
+  syncElementText(speedLabelEl, speed.label);
   speedSlider.value = speed.id;
-  difficultyLabelEl.textContent = difficulty.label;
-  difficultyHelpEl.textContent = difficulty.help;
+  syncElementText(difficultyLabelEl, difficulty.label);
+  syncElementText(difficultyHelpEl, difficulty.help);
   const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Sing/Play' : 'Notes';
   const lesson = getBeginnerLesson(selectedLessonId);
-  settingsLineEl.textContent = `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel} · ${selectedPlayStyle === 'practice' ? lesson.label : 'Rush'}`;
-  startButton.textContent = state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint';
+  syncElementText(settingsLineEl, `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel} · ${selectedPlayStyle === 'practice' ? lesson.label : 'Rush'}`);
+  syncElementText(startButton, state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint');
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
   for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
@@ -246,32 +250,42 @@ function renderHud(nowMs) {
   const micReadiness = buildMicrophoneReadiness(microphoneState);
   micReadinessEl.dataset.status = micReadiness.status;
   micReadinessEl.dataset.ready = micReadiness.ready ? 'true' : 'false';
-  micReadinessTitleEl.textContent = micReadiness.title;
-  micReadinessBodyEl.textContent = micReadiness.body;
-  startMicrophoneMainButton.textContent = micReadiness.action;
+  syncElementText(micReadinessTitleEl, micReadiness.title);
+  syncElementText(micReadinessBodyEl, micReadiness.body);
+  syncElementText(startMicrophoneMainButton, micReadiness.action);
   const microphoneStarting = microphoneState.permission === 'requesting';
   startMicrophoneButton.disabled = microphoneStarting;
   startMicrophoneMainButton.disabled = microphoneStarting;
   stopMicrophoneButton.disabled = !microphoneStarting && getCurrentMicrophoneTrackState() === 'none';
-  microphoneStatusEl.textContent = microphoneStatusText();
-  syncLiveRegionText(heardNoteEl, buildHeardNoteMessage(microphoneState.note));
-  syncLiveRegionText(microphoneRecordingDiagnosticEl, microphoneRecordingDiagnostic);
-  microphoneDebugTextEl.textContent = microphoneDebugText;
-  syncLiveRegionText(micReportPreviewEl, lastMicReport ? `Last report: ${lastMicReport.capture.label} · ${lastMicReport.interpretation}` : 'No exported report yet.');
-  syncLiveRegionText(calibrationReadingEl, calibrationReadingText());
+  syncElementText(microphoneStatusEl, microphoneStatusText());
+  semanticPresenter.updatePitch(heardNoteEl, { message: buildHeardNoteMessage(microphoneState.note), hasPitch: Boolean(microphoneState.note), nowMs });
+  syncElementText(microphoneRecordingDiagnosticEl, microphoneRecordingDiagnostic);
+  syncElementText(microphoneDebugTextEl, microphoneDebugText);
+  syncElementText(micReportPreviewEl, lastMicReport ? `Last report: ${lastMicReport.capture.label} · ${lastMicReport.interpretation}` : 'No exported report yet.');
+  syncElementText(calibrationReadingEl, calibrationReadingText());
   calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 
+  let roundEndedAnnouncement = null;
   if (state.phase === 'ended') {
     const summary = getRoundSummary(state);
     summaryEl.hidden = false;
-    summaryTitleEl.textContent = summary.title;
-    summaryContextEl.textContent = `${summary.mode} · ${summary.speed} · ${summary.difficulty}`;
-    summaryHeadlineEl.textContent = summary.headline;
-    summaryDetailEl.textContent = `${summary.detail} · ${learningRecommendation.text}`;
-    summaryRestartButton.textContent = summary.primaryAction;
+    syncElementText(summaryTitleEl, summary.title);
+    syncElementText(summaryContextEl, `${summary.mode} · ${summary.speed} · ${summary.difficulty}`);
+    syncElementText(summaryHeadlineEl, summary.headline);
+    syncElementText(summaryDetailEl, `${summary.detail} · ${learningRecommendation.text}`);
+    syncElementText(summaryRestartButton, summary.primaryAction);
+    roundEndedAnnouncement = `Round ended. ${summary.headline}. ${summary.detail}.`;
   } else {
     summaryEl.hidden = true;
   }
+
+  const roundId = state.startedAtMs ?? 'idle';
+  if (state.correct > 0) semanticPresenter.announce({ kind: 'correct', id: `${roundId}:${state.correct}`, message: `Correct. ${state.lastOutcome?.expectedAnswer || 'Note'} scored.` });
+  if (state.wrong > 0) semanticPresenter.announce({ kind: 'wrong', id: `${roundId}:${state.wrong}`, message: `Wrong answer. ${state.lastOutcome?.givenAnswer || 'That note'} did not match; try again.` });
+  if (state.missed > 0) semanticPresenter.announce({ kind: 'missed', id: `${roundId}:${state.missed}`, message: `Missed note. ${state.lastOutcome?.expectedAnswer || 'The note'} fell off the staff.` });
+  if (microphoneState.permission === 'granted') semanticPresenter.announce({ kind: 'microphone-ready', id: microphoneSessionNumber });
+  if (microphoneState.permission === 'blocked') semanticPresenter.announce({ kind: 'microphone-error', id: microphoneSessionNumber, message: `Microphone error. ${microphoneState.error || 'Check browser permission and try again.'}` });
+  if (roundEndedAnnouncement) semanticPresenter.announce({ kind: 'round-ended', id: state.startedAtMs, message: roundEndedAnnouncement });
 }
 
 function render(nowMs = performance.now()) {
@@ -374,6 +388,7 @@ async function startMicrophone() {
     if (!navigator.mediaDevices?.getUserMedia) {
       throw new Error('getUserMedia unavailable');
     }
+    microphoneSessionNumber += 1;
     const context = getAudioContext();
     const sessionRequest = microphoneController.start({ navigatorObject: navigator, audioContext: context });
     microphoneState = { ...microphoneState, permission: 'requesting', listening: false, error: null, frequency: null, note: null, cents: null, inputLevel: 0, silentFrameCount: 0, trackState: 'none', vocalCandidate: null };

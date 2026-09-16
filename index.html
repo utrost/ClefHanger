@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice63-accessible-notation-2026-09-16">
+<html lang="en" data-app-version="clefhanger-slice64-semantic-announcements-2026-09-16">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -501,7 +501,7 @@
           <h1>ClefHanger</h1>
           <p class="tagline">Sing, hum, or play the staff note before it drops. <a class="site-link" href="https://simiono.com/">simiono</a></p>
         </div>
-        <div class="timer-card" aria-live="polite"><small>seconds</small><span id="timer">60</span></div>
+        <div class="timer-card"><small>seconds</small><span id="timer">60</span></div>
       </header>
 
       <section class="hud" aria-label="Round stats">
@@ -548,8 +548,9 @@
       <section class="stage" id="notation-stage" aria-label="Treble clef · Treble mode · Practice playfield">
         <p id="notation-prompt" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
         <div id="staff"></div>
-        <div id="feedback" aria-live="polite">Tap Start when ready.</div>
-        <p id="learning-coach" aria-label="Learning suggestion" aria-live="polite">Golden path: Practice · Beginner · Sing/Play. Use buttons only as a quiet fallback.</p>
+        <div id="feedback">Tap Start when ready.</div>
+        <p id="learning-coach" aria-label="Learning suggestion">Golden path: Practice · Beginner · Sing/Play. Use buttons only as a quiet fallback.</p>
+        <p id="game-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
         <aside id="summary" class="ending-splash" aria-label="Rush result" hidden>
           <div>
             <h2 id="summary-title">Time! Sprint complete</h2>
@@ -572,11 +573,11 @@
           </section>
           <p id="microphone-status">Mic off. Check mic, then sing one steady comfortable note.</p>
           <button id="start-microphone-main" type="button">Check mic</button>
-          <p id="heard-note" aria-live="polite">You played —</p>
+          <p id="heard-note">You played —</p>
           <details id="mic-help"><summary>How Sing/Play scoring works</summary><p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p></details>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 63: accessible notation</p>
+        <p class="microcopy">Slice 64: semantic announcements</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -629,18 +630,18 @@
             <button id="record-microphone-diagnostic" type="button">Record 1s test</button>
             <button id="export-mic-report" type="button">Export mic report</button>
           </div>
-          <p id="mic-report-preview" aria-live="polite">No exported report yet.</p>
-          <p id="microphone-recording-diagnostic" aria-live="polite">Recording test: not run yet.</p>
-          <p id="calibration-reading" aria-live="polite">Check mic, then sing any steady comfortable note; Play A is only a reference.</p>
+          <p id="mic-report-preview">No exported report yet.</p>
+          <p id="microphone-recording-diagnostic">Recording test: not run yet.</p>
+          <p id="calibration-reading">Check mic, then sing any steady comfortable note; Play A is only a reference.</p>
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice63-accessible-notation-2026-09-16"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice64-semantic-announcements-2026-09-16"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice63-accessible-notation-2026-09-16')
+            .register('./sw.js?v=clefhanger-slice64-semantic-announcements-2026-09-16')
             .then((registration) => registration.update())
             .catch(() => {});
         });
