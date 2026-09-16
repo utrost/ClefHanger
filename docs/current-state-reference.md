@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice68-input-compatibility-2026-09-16`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice69-tester-readiness-2026-09-16`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Microphone-first scope
 
@@ -12,9 +12,9 @@ The current product direction is microphone-first: the default answer path is Si
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice68-input-compatibility-2026-09-16`.
-- Current visible slice marker: `Slice 68: input compatibility`.
-- Current service-worker cache: `clefhanger-pwa-v62`.
+- Current app marker: `clefhanger-slice69-tester-readiness-2026-09-16`.
+- Current visible slice marker: `Slice 69: tester readiness`.
+- Current service-worker cache: `clefhanger-pwa-v63`.
 
 A valid `?mode=` launch query takes precedence over the stored LocalStorage mode for that launch without overwriting the saved preference. The relative manifest URLs use the same contract for browser, installed shortcut, and offline navigation; missing or invalid mode values safely retain the stored mode.
 
@@ -137,7 +137,7 @@ Modes are defined in `GAME_MODES`.
 
 ## Beginner lessons
 
-Beginner lessons apply to Treble + Beginner difficulty. Other modes/difficulties use their full answer options.
+Beginner lessons apply to Treble Practice and Treble Rush. Other modes use their full prompt pools, hide the Treble-specific lesson selector/intro, and avoid Treble lesson progression copy.
 
 ### Mic-first lesson cards
 
@@ -205,7 +205,8 @@ The reducer uses these phases:
 
 - Starts with `startPractice`.
 - No end time; timer display is `∞`.
-- Uses Speed 1 internally and Beginner difficulty.
+- Uses Speed 1 internally and Beginner difficulty; the runtime summary labels Practice as effective settings instead of showing stored Rush speed/difficulty.
+- Speed slider and difficulty buttons are disabled with explanatory copy while Practice is selected; switching back to Rush restores the stored selections.
 - Always keeps one active prompt.
 - Wrong answers keep the same prompt active.
 - If a correct answer empties the queue, the DOM handler spawns the next note immediately.
@@ -215,6 +216,7 @@ The reducer uses these phases:
 ### Rush
 
 - Starts with `startRound`.
+- Treble Rush uses the selected beginner lesson pool, so “try Rush on the same lesson” stays true for First steps, Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes.
 - Round length: 60,000 ms.
 - Notes move horizontally toward the cliff using each note's spawn/deadline timing.
 - Expired notes count as missed if they reach their deadline before answer.

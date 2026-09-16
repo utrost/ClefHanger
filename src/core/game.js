@@ -1,15 +1,15 @@
-import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+} from './content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+} from './content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
 
 
 export const STAFF_LAYOUT = {
@@ -173,7 +173,7 @@ export function spawnNextNote(state, nowMs) {
   next.speedId = speed.id;
   next.difficultyId = difficulty.id;
 
-  const pool = next.phase === 'practice' && mode.id === 'basics' ? getLessonPool(mode.pool, next.lessonId) : mode.pool;
+  const pool = ['practice', 'running'].includes(next.phase) && mode.id === 'basics' ? getLessonPool(mode.pool, next.lessonId) : mode.pool;
   const targetQueueSize = next.phase === 'practice' ? 1 : difficulty.noteQueueSize;
 
   while (next.noteQueue.length < targetQueueSize) {
@@ -202,10 +202,13 @@ export function startRound(state, nowMs, modeId = state.modeId, speedId = state.
 
 export function startPractice(state, nowMs, modeId = state.modeId, lessonId = state.lessonId || 'first-steps') {
   const lesson = getBeginnerLesson(lessonId);
+  const mode = getMode(modeId);
   const next = createInitialState({ roundLengthMs: null, nowMs, seed: state.seed, modeId, speedId: '1', difficultyId: 'beginner', lessonId: lesson.id });
   next.phase = 'practice';
   next.endsAtMs = null;
-  next.feedback = { kind: 'practice', text: `Practice: ${lesson.title}. No timer — learn the note shape.` };
+  next.feedback = mode.id === 'basics'
+    ? { kind: 'practice', text: `Practice: ${lesson.title}. No timer — learn the note shape.` }
+    : { kind: 'practice', text: `Practice: ${mode.label}. No timer — learn the note shape.` };
   return spawnNextNote(next, nowMs);
 }
 

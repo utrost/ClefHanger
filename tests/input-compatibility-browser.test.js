@@ -142,3 +142,90 @@ test('Chords prevents Sing/Play and Piano in the real app shell before practice 
   assert.match(result.live, /Chord mode needs Notes/);
   assert.ok(result.firstAnswer, 'chord answer buttons are available');
 });
+
+test('Practice hides lesson scope outside Treble and marks speed and difficulty as inactive', { timeout: 60000 }, async (t) => {
+  const server = createServer(async (request, response) => {
+    const pathname = new URL(request.url, 'http://localhost').pathname;
+    const filePath = join(ROOT, pathname === '/' ? 'index.html' : pathname);
+    try {
+      const file = await import('node:fs/promises').then(({ readFile }) => readFile(filePath));
+      response.writeHead(200, { 'content-type': MIME[extname(filePath)] || 'application/octet-stream' });
+      response.end(file);
+    } catch {
+      response.writeHead(404).end();
+    }
+  });
+  await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
+  t.after(() => server.close());
+
+  const debugPort = 44000 + Math.floor(Math.random() * 1000);
+  const profile = mkdtempSync(join(tmpdir(), 'clefhanger-chrome-'));
+  const origin = `http://127.0.0.1:${server.address().port}`;
+  const chrome = spawn(findChromeExecutable(), [
+    '--headless=new', '--disable-gpu', '--no-sandbox', `--remote-debugging-port=${debugPort}`,
+    `--user-data-dir=${profile}`, `${origin}/`,
+  ], { stdio: 'ignore' });
+  t.after(() => {
+    chrome.kill('SIGKILL');
+    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  });
+
+  const page = await waitFor(async () => {
+    const response = await fetch(`http://127.0.0.1:${debugPort}/json`);
+    const pages = await response.json();
+    return pages.find((candidate) => candidate.type === 'page' && candidate.url.startsWith(origin));
+  });
+  const cdp = connectCdp(page.webSocketDebuggerUrl);
+  t.after(() => cdp.close());
+  await waitFor(() => cdp.evaluate("Boolean(window.__clefHanger && document.querySelector('[data-mode=bass]'))"));
+
+  const result = await cdp.evaluate(`(async () => {
+    window.__clefHanger.selectLesson('interval-jumps');
+    window.__clefHanger.selectSpeed('10');
+    window.__clefHanger.selectDifficulty('hard');
+    window.__clefHanger.selectPlayStyle('practice');
+    window.__clefHanger.selectMode('bass');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const practiceSummary = document.querySelector('#settings-line').textContent;
+    const practiceControls = {
+      lessonSelectHidden: document.querySelector('#lesson-select').closest('label').hidden,
+      lessonIntroHidden: document.querySelector('#lesson-intro').hidden,
+      speedDisabled: document.querySelector('#speed-slider').disabled,
+      difficultyDisabled: [...document.querySelectorAll('#difficulty-buttons button')].every((button) => button.disabled),
+      speedLabel: document.querySelector('#speed-label').textContent,
+      difficultyHelp: document.querySelector('#difficulty-help').textContent,
+      coach: document.querySelector('#learning-coach').textContent,
+    };
+    document.querySelector('#start-round').click();
+    const practiceState = structuredClone(window.__clefHanger.getState());
+    const practiceFeedback = document.querySelector('#feedback').textContent;
+    window.__clefHanger.selectPlayStyle('rush');
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    return {
+      practiceSummary,
+      practiceState,
+      practiceFeedback,
+      ...practiceControls,
+      rushSummary: document.querySelector('#settings-line').textContent,
+      rushCoach: document.querySelector('#learning-coach').textContent,
+    };
+  })()`);
+
+  assert.match(result.practiceSummary, /Bass · Practice · Sing\/Play/);
+  assert.doesNotMatch(result.practiceSummary, /Hard|Speed 10|Line notes|First steps/);
+  assert.equal(result.practiceState.phase, 'practice');
+  assert.equal(result.practiceState.speedId, '1');
+  assert.equal(result.practiceState.difficultyId, 'beginner');
+  assert.match(result.practiceFeedback, /Practice: Bass/);
+  assert.doesNotMatch(result.practiceFeedback, /Treble|Interval jumps|same note|step|skip/i);
+  assert.match(result.rushSummary, /Bass · Hard · Speed 10 · Sing\/Play · Rush/);
+  assert.match(result.rushCoach, /Bass Rush/);
+  assert.doesNotMatch(result.rushCoach, /Practice Bass|Interval jumps|same note|step|skip|next lesson/i);
+  assert.equal(result.lessonSelectHidden, true);
+  assert.equal(result.lessonIntroHidden, true);
+  assert.equal(result.speedDisabled, true);
+  assert.equal(result.difficultyDisabled, true);
+  assert.match(result.speedLabel, /Practice only/);
+  assert.match(result.difficultyHelp, /Practice ignores speed and difficulty/);
+  assert.doesNotMatch(result.coach, /First steps|Line notes|same lesson|next lesson/i);
+});

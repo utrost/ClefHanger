@@ -105,6 +105,39 @@ test('practice mode creates an untimed single-note lesson instead of a sprint', 
   assert.equal(rush.phase, 'running');
 });
 
+test('beginner lesson scope applies to both Practice and Rush prompts', () => {
+  const expectedAnswers = {
+    'first-steps': new Set(['C', 'D', 'E']),
+    'line-notes': new Set(['E', 'G', 'B', 'D', 'F']),
+    'space-notes': new Set(['F', 'A', 'C', 'E']),
+    'ledger-notes': new Set(['C', 'A']),
+    'interval-jumps': new Set(['C', 'D', 'E', 'F', 'G']),
+    mixed: new Set(['C', 'D', 'E', 'F', 'G', 'A', 'B']),
+  };
+
+  for (const lesson of BEGINNER_LESSONS) {
+    const allowed = expectedAnswers[lesson.id];
+    const practiceSeen = new Set();
+    const rushSeen = new Set();
+    for (let seed = 1; seed <= 40; seed += 1) {
+      const idle = createInitialState({ nowMs: 1000, seed, lessonId: lesson.id });
+      const practice = startPractice(idle, 2000, 'basics', lesson.id);
+      const rush = startRound(idle, 2000, 'basics', '5', 'beginner');
+      practiceSeen.add(practice.activeNote.answer);
+      for (const prompt of rush.noteQueue) rushSeen.add(prompt.answer);
+    }
+    for (const answer of practiceSeen) assert.ok(allowed.has(answer), `${lesson.id} Practice emitted ${answer}`);
+    for (const answer of rushSeen) assert.ok(allowed.has(answer), `${lesson.id} Rush emitted ${answer}`);
+  }
+});
+
+test('non-Treble Practice feedback names the active mode, not the hidden Treble lesson', () => {
+  const state = startPractice(createInitialState({ nowMs: 1000, seed: 1 }), 2000, 'bass', 'line-notes');
+  assert.equal(state.phase, 'practice');
+  assert.match(state.feedback.text, /Practice: Bass/);
+  assert.doesNotMatch(state.feedback.text, /Treble|Line notes|line notes/i);
+});
+
 test('next practice note skips exactly one prompt without resetting session progress', () => {
   const started = startPractice(createInitialState({ nowMs: 1000, seed: 1975 }), 2000, 'basics', 'interval-jumps');
   const answered = answerActiveNote(started, started.activeNote.answer, 2100);
@@ -236,6 +269,18 @@ test('learning coach recommends repeat, rush, or next lesson from simple progres
   assert.match(tooManyMisses.text, /lower speed/i);
 });
 
+test('learning recommendations avoid Treble lesson progression in non-lesson modes', () => {
+  const bassPractice = buildLearningRecommendation({ modeId: 'bass', playStyle: 'practice', lessonId: 'line-notes', correct: 8, wrong: 0, missed: 0, bestStreak: 8 });
+  assert.equal(bassPractice.kind, 'mode-practice');
+  assert.match(bassPractice.text, /Practice Bass/i);
+  assert.doesNotMatch(bassPractice.text, /Line notes|same lesson|next lesson/i);
+
+  const sharpsRush = buildLearningRecommendation({ modeId: 'sharps', playStyle: 'rush', lessonId: 'first-steps', correct: 9, wrong: 1, missed: 0, accuracy: 90 });
+  assert.equal(sharpsRush.kind, 'mode-rush');
+  assert.match(sharpsRush.text, /Sharps/i);
+  assert.doesNotMatch(sharpsRush.text, /First steps|Space notes|next lesson/i);
+});
+
 test('accidental learning hint explains that sharps and flats reuse staff positions', () => {
   const sharpHint = buildAccidentalLearningHint({ modeId: 'sharps', prompt: { noteName: 'C', accidental: 'sharp', answer: 'C♯' } });
   assert.match(sharpHint.text, /same staff spot as C/i);
@@ -279,10 +324,11 @@ test('interval lesson appears in the documented beginner ramp', () => {
   assert.match(guide, /same note, step, or skip/i);
 });
 
-test('shell wires interval learning hints into the learning coach path', () => {
+test('shell wires interval learning hints into the learning coach path only for Treble lessons', () => {
   const app = read('src/app.js');
   assert.match(app, /buildIntervalLearningHint/);
   assert.match(app, /previousPrompt/);
+  assert.match(app, /selectedModeId === 'basics' && selectedLessonId === 'interval-jumps'/);
   assert.match(app, /state\.phase === 'practice'[\s\S]*skipPracticeNote/);
   assert.match(app, /function restartPracticeSession/);
 });

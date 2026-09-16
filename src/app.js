@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+} from './core/content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -23,9 +23,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+} from './core/game.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -38,19 +38,19 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
 
-const appVersion = 'clefhanger-slice68-input-compatibility-2026-09-16';
+const appVersion = 'clefhanger-slice69-tester-readiness-2026-09-16';
 const appBackground = document.querySelector('#app-background');
 const staff = document.querySelector('#staff');
 const notationStage = document.querySelector('#notation-stage');
@@ -214,9 +214,19 @@ function calibrationReadingText() {
   return 'Check mic, then sing any steady comfortable note; Play A is only a reference.';
 }
 
+function isLessonScopedMode(modeId = selectedModeId) {
+  return getMode(modeId).id === 'basics';
+}
+
+function isPracticeSelected() {
+  return selectedPlayStyle === 'practice';
+}
+
 function renderLessonIntro() {
+  const lessonApplies = isLessonScopedMode();
   const intro = getLessonIntroCard(selectedLessonId);
-  lessonIntro.hidden = lessonIntroHidden;
+  lessonIntro.hidden = !lessonApplies || lessonIntroHidden;
+  if (lessonSelect.closest('label')) lessonSelect.closest('label').hidden = !lessonApplies;
   syncElementText(lessonIntroTitle, intro.title);
   syncElementText(lessonIntroBody, intro.body);
   syncElementText(lessonIntroExamples, intro.examples.join(' · '));
@@ -225,7 +235,7 @@ function renderLessonIntro() {
 function currentLearningRecommendation() {
   const accidentalHint = buildAccidentalLearningHint({ modeId: selectedModeId, prompt: state.activeNote });
   if (accidentalHint) return accidentalHint;
-  const intervalHint = selectedLessonId === 'interval-jumps'
+  const intervalHint = selectedModeId === 'basics' && selectedLessonId === 'interval-jumps'
     ? buildIntervalLearningHint({ previousPrompt: state.previousPrompt, prompt: state.activeNote })
     : null;
   if (intervalHint) return intervalHint;
@@ -233,7 +243,8 @@ function currentLearningRecommendation() {
   const accuracy = attempts > 0 ? Math.round((state.correct / attempts) * 100) : 0;
   const microphoneStable = selectedInputMode !== 'microphone' || Boolean(microphoneState.note && microphoneState.frequency);
   return buildLearningRecommendation({
-    playStyle: state.phase === 'running' || state.phase === 'ended' ? 'rush' : 'practice',
+    modeId: selectedModeId,
+    playStyle: selectedPlayStyle === 'rush' || state.phase === 'running' || state.phase === 'ended' ? 'rush' : 'practice',
     lessonId: selectedLessonId,
     correct: state.correct,
     wrong: state.wrong,
@@ -262,17 +273,31 @@ function renderHud(nowMs) {
   syncElementText(bestEl, getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
   syncElementText(modeLabelEl, mode.label);
   syncElementText(modeHelpEl, mode.help);
-  syncElementText(speedLabelEl, speed.label);
-  speedSlider.value = speed.id;
-  syncElementText(difficultyLabelEl, difficulty.label);
-  syncElementText(difficultyHelpEl, difficulty.help);
   const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Sing/Play' : 'Notes';
   const lesson = getBeginnerLesson(selectedLessonId);
-  syncElementText(settingsLineEl, `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel} · ${selectedPlayStyle === 'practice' ? lesson.label : 'Rush'}`);
+  const lessonApplies = isLessonScopedMode();
+  const practiceSelected = isPracticeSelected();
+  const speedDisplay = practiceSelected ? 'Practice only' : speed.label;
+  const difficultyDisplay = practiceSelected ? 'Practice only' : difficulty.label;
+  syncElementText(speedLabelEl, speedDisplay);
+  speedSlider.value = speed.id;
+  speedSlider.disabled = practiceSelected;
+  speedSlider.setAttribute('aria-disabled', practiceSelected ? 'true' : 'false');
+  syncElementText(difficultyLabelEl, difficultyDisplay);
+  syncElementText(difficultyHelpEl, practiceSelected ? 'Practice ignores speed and difficulty: it is always untimed Beginner at the easiest speed.' : difficulty.help);
+  const settingsParts = practiceSelected
+    ? [mode.label, lessonApplies ? `Practice: ${lesson.label}` : 'Practice', inputLabel]
+    : [mode.label, difficulty.label, speed.label, inputLabel, lessonApplies ? lesson.label : 'Rush'];
+  syncElementText(settingsLineEl, settingsParts.join(' · '));
   syncElementText(startButton, state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint');
   restartPracticeButton.hidden = state.phase !== 'practice';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
-  for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
+  for (const button of difficultyButtons.querySelectorAll('button')) {
+    button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
+    button.disabled = practiceSelected;
+    button.setAttribute('aria-disabled', practiceSelected ? 'true' : 'false');
+    button.title = practiceSelected ? 'Practice ignores difficulty; Rush uses this selection.' : '';
+  }
   for (const button of inputModeButtons.querySelectorAll('button')) {
     button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
     button.disabled = selectedModeId === 'chords' && ['microphone', 'piano'].includes(button.dataset.inputMode);

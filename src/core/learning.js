@@ -1,5 +1,6 @@
-import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { getMode } from './content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
 function explainPrompt(prompt) {
   if (!prompt) return 'Keep going.';
   if (prompt.label) return prompt.label;
@@ -120,6 +121,7 @@ function noteNameBetween(previous, current, direction) {
 }
 
 export function buildLearningRecommendation({
+  modeId = 'basics',
   playStyle = 'practice',
   lessonId = 'first-steps',
   correct = 0,
@@ -131,6 +133,21 @@ export function buildLearningRecommendation({
   inputMode = 'microphone',
   microphoneStable = true,
 } = {}) {
+  const mode = getMode(modeId);
+  if (mode.id !== 'basics') {
+    if (playStyle === 'practice') {
+      return {
+        kind: 'mode-practice',
+        text: `Practice ${mode.label} with no timer. Speed and difficulty apply in Rush.`,
+        action: 'continue',
+      };
+    }
+    return {
+      kind: 'mode-rush',
+      text: `${mode.label} Rush uses the full ${mode.label} prompt set. Repeat it once before changing settings.`,
+      action: 'repeat-rush',
+    };
+  }
   const lesson = getBeginnerLesson(lessonId);
   const nextLesson = getNextBeginnerLesson(lesson.id);
   const attempts = correct + wrong + missed;

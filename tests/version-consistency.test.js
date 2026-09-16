@@ -7,15 +7,15 @@ test('version consistency check accepts the current cache-busted PWA markers', (
   const result = validateVersionConsistency({ rootDir: new URL('..', import.meta.url) });
 
   assert.deepEqual(result.errors, []);
-  assert.equal(result.appVersion, 'clefhanger-slice68-input-compatibility-2026-09-16');
-  assert.equal(result.sliceMarker, 'Slice 68: input compatibility');
-  assert.equal(result.cacheName, 'clefhanger-pwa-v62');
+  assert.equal(result.appVersion, 'clefhanger-slice69-tester-readiness-2026-09-16');
+  assert.equal(result.sliceMarker, 'Slice 69: tester readiness');
+  assert.equal(result.cacheName, 'clefhanger-pwa-v63');
   assert.ok(result.checkedFiles.includes('index.html'));
   assert.ok(result.checkedFiles.includes('src/app.js'));
   assert.ok(result.checkedFiles.includes('sw.js'));
 });
 
-test('slice 68 documentation markers match the runtime release', () => {
+test('slice 69 documentation markers match the runtime release', () => {
   for (const path of [
     'docs/current-state-reference.md',
     'docs/developer-handoff.md',
@@ -31,17 +31,17 @@ test('slice 68 documentation markers match the runtime release', () => {
 test('version consistency check catches stale ES-module query strings', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice68-input-compatibility-2026-09-16">
+<html data-app-version="clefhanger-slice69-tester-readiness-2026-09-16">
   <body>
     <p class="microcopy">Slice 62: microphone lifecycle</p>
     <script type="module" src="./src/app.js?v=old-version"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice68-input-compatibility-2026-09-16')</script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice69-tester-readiness-2026-09-16')</script>
   </body>
 </html>`,
-    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-const appVersion = 'clefhanger-slice68-input-compatibility-2026-09-16';`,
-    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v62';
+    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+const appVersion = 'clefhanger-slice69-tester-readiness-2026-09-16';`,
+    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v63';
 const APP_SHELL = ['./', './index.html', './src/app.js'];`,
   };
 
@@ -53,17 +53,17 @@ const APP_SHELL = ['./', './index.html', './src/app.js'];`,
 test('version consistency check catches service-worker asset drift', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice68-input-compatibility-2026-09-16">
+<html data-app-version="clefhanger-slice69-tester-readiness-2026-09-16">
   <body>
     <p class="microcopy">Slice 62: microphone lifecycle</p>
-    <script type="module" src="./src/app.js?v=clefhanger-slice68-input-compatibility-2026-09-16"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice68-input-compatibility-2026-09-16')</script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice69-tester-readiness-2026-09-16"></script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice69-tester-readiness-2026-09-16')</script>
   </body>
 </html>`,
-    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
-const appVersion = 'clefhanger-slice68-input-compatibility-2026-09-16';`,
-    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v62';
+    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+const appVersion = 'clefhanger-slice69-tester-readiness-2026-09-16';`,
+    'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v63';
 const APP_SHELL = ['./', './index.html'];`,
   };
 
