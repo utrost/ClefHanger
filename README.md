@@ -26,9 +26,10 @@ Buttons and piano remain fallback input modes; they are no longer the product ce
 
 ## Current playable slice
 
-Slices through 53 are implemented as a dependency-free static PWA:
+Slices through 66 are implemented as a dependency-free static PWA:
 
 - Microphone-first practice flow: the app starts in untimed Practice mode with Sing/Play as the default input and a visible main-screen **Check mic** action.
+- **Next practice note** skips a prompt without resetting progress or treating the skip as a learning outcome; restarting practice remains a separate deliberate action.
 - First-run tutorial card with three small tips and a dismiss action.
 - Six beginner lessons: First steps, Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes. Narrow lessons intentionally hide irrelevant buttons: Line notes shows E/G/B/D/F, Space notes shows F/A/C/E, and Mixed notes shows all seven natural notes.
 - Tiny lesson intro cards for line, space, ledger-line, and interval-jump lessons before practice starts.

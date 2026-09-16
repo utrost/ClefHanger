@@ -15,7 +15,7 @@ import {
   getLessonIntroCard,
   getScaffoldedAnswerOptions,
 } from '../src/core/learning.js';
-import { answerActiveNote, createInitialState, getAnswerOptions, startPractice, startRound } from '../src/core/game.js';
+import { answerActiveNote, createInitialState, getAnswerOptions, restartPractice, skipPracticeNote, startPractice, startRound } from '../src/core/game.js';
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
@@ -103,6 +103,75 @@ test('practice mode creates an untimed single-note lesson instead of a sprint', 
   assert.equal(practice.noteQueue.length, 1);
   assert.match(practice.feedback.text, /Practice/i);
   assert.equal(rush.phase, 'running');
+});
+
+test('next practice note skips exactly one prompt without resetting session progress', () => {
+  const started = startPractice(createInitialState({ nowMs: 1000, seed: 1975 }), 2000, 'basics', 'interval-jumps');
+  const answered = answerActiveNote(started, started.activeNote.answer, 2100);
+  const withNextPrompt = skipPracticeNote({
+    ...answered,
+    wrong: 2,
+    score: 375,
+    streak: 3,
+    bestStreak: 4,
+    activeNote: null,
+    noteQueue: [],
+  }, 2200);
+  const skippedPrompt = withNextPrompt.activeNote;
+  const beforeSkip = {
+    ...withNextPrompt,
+    lastOutcome: { ...withNextPrompt.lastOutcome, analyticsTag: 'prior-learning-evidence' },
+    correction: { answer: skippedPrompt.answer, label: skippedPrompt.answer },
+  };
+
+  const next = skipPracticeNote(beforeSkip, 2300);
+
+  assert.equal(next.correct, beforeSkip.correct);
+  assert.equal(next.wrong, 2);
+  assert.equal(next.score, 375);
+  assert.equal(next.streak, 3, 'a neutral skip neither breaks nor extends the streak');
+  assert.equal(next.bestStreak, 4);
+  assert.deepEqual(next.lastOutcome, beforeSkip.lastOutcome, 'skip is neutral to analytics and outcome evidence');
+  assert.deepEqual(next.previousPrompt, beforeSkip.previousPrompt, 'the last answered prompt remains interval history');
+  assert.equal(next.correction, null, 'prompt-local correction does not follow the skipped note');
+  assert.equal(next.noteCounter, beforeSkip.noteCounter + 1);
+  assert.equal(next.noteQueue.length, 1);
+  assert.notEqual(next.activeNote.id, skippedPrompt.id);
+  assert.equal(next.activeNote.id, `note-${next.noteCounter}`);
+  assert.equal(next.feedback.kind, 'skipped');
+});
+
+test('skips do not invent interval history, while an explicit practice restart clears it', () => {
+  const started = startPractice(createInitialState({ nowMs: 1000, seed: 11 }), 2000, 'basics', 'interval-jumps');
+  const skipped = skipPracticeNote(started, 2100);
+  assert.equal(skipped.previousPrompt, null);
+
+  const learned = answerActiveNote(skipped, skipped.activeNote.answer, 2200);
+  const advanced = skipPracticeNote({ ...learned, activeNote: null, noteQueue: [] }, 2300);
+  const restarted = restartPractice(advanced, 2400);
+
+  assert.deepEqual(advanced.previousPrompt, learned.previousPrompt);
+  assert.equal(restarted.phase, 'practice');
+  assert.equal(restarted.correct, 0);
+  assert.equal(restarted.wrong, 0);
+  assert.equal(restarted.score, 0);
+  assert.equal(restarted.streak, 0);
+  assert.equal(restarted.previousPrompt, null);
+});
+
+test('practice skip is documented as neutral learning navigation', () => {
+  const reference = read('docs/current-state-reference.md');
+  const guide = read('docs/player-tester-guide.md');
+
+  for (const doc of [reference, guide]) {
+    assert.match(doc, /Next practice note/i);
+    assert.match(doc, /does not count as correct, wrong, or missed/i);
+    assert.match(doc, /does not change.*score.*streak/i);
+    assert.match(doc, /restart practice.*reset/i);
+  }
+  assert.match(guide, /does not add.*outcome evidence/i);
+  assert.match(guide, /visible learning suggestion.*may change/i);
+  assert.doesNotMatch(guide, /does not change[^.]*learning recommendations/i);
 });
 
 test('ledger-line practice only drills notes that need short extra staff lines', () => {
@@ -214,6 +283,19 @@ test('shell wires interval learning hints into the learning coach path', () => {
   const app = read('src/app.js');
   assert.match(app, /buildIntervalLearningHint/);
   assert.match(app, /previousPrompt/);
+  assert.match(app, /state\.phase === 'practice'[\s\S]*skipPracticeNote/);
+  assert.match(app, /function restartPracticeSession/);
+});
+
+test('practice controls expose separately named skip and restart actions with distinct wiring', () => {
+  const html = read('index.html');
+  const app = read('src/app.js');
+
+  assert.match(html, /<button id="start-round"[^>]*>Start practice<\/button>/);
+  assert.match(html, /<button id="restart-practice"[^>]*>Restart practice<\/button>/);
+  assert.match(app, /syncElementText\(startButton,[\s\S]*'Next practice note'/);
+  assert.match(app, /restartPracticeButton\.addEventListener\('click', restartPracticeSession\)/);
+  assert.doesNotMatch(app, /restartPracticeButton\.addEventListener\('click', beginRound\)/);
 });
 
 test('user journey documents the learning contract before adding more notation', () => {

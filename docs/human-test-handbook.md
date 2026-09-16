@@ -91,7 +91,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 65: summary focus`.
+- Visible marker says `Slice 66: practice skip`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -222,8 +222,10 @@ Steps:
 9. Select **Interval jumps**.
 10. Confirm C/D/E/F/G buttons and an intro card.
 11. Answer at least two interval prompts correctly.
-12. Select **Mixed notes**.
-13. Confirm C/D/E/F/G/A/B buttons.
+12. Note the correct/wrong counts, score, streak, and interval hint, then press **Next practice note**.
+13. Confirm exactly one new note appears and those values do not reset or change; the interval hint still relates to the last answered note rather than treating the skipped note as an answer.
+14. Select **Mixed notes**.
+15. Confirm C/D/E/F/G/A/B buttons.
 
 Expected:
 
@@ -501,7 +503,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice65-summary-focus`.
+2. Confirm the HTML contains `clefhanger-slice66-practice-skip`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -520,7 +522,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v59`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v60`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:

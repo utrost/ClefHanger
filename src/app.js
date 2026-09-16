@@ -10,20 +10,22 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+} from './core/content.js?v=clefhanger-slice66-practice-skip-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
   startRound,
   startPractice,
+  restartPractice,
+  skipPracticeNote,
   spawnNextNote,
   answerActiveNote,
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+} from './core/game.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice66-practice-skip-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -36,18 +38,18 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice66-practice-skip-2026-09-16';
 
-const appVersion = 'clefhanger-slice65-summary-focus-2026-09-16';
+const appVersion = 'clefhanger-slice66-practice-skip-2026-09-16';
 const appBackground = document.querySelector('#app-background');
 const staff = document.querySelector('#staff');
 const notationStage = document.querySelector('#notation-stage');
@@ -80,6 +82,7 @@ const modeButtons = document.querySelector('#mode-buttons');
 const speedSlider = document.querySelector('#speed-slider');
 const difficultyButtons = document.querySelector('#difficulty-buttons');
 const startButton = document.querySelector('#start-round');
+const restartPracticeButton = document.querySelector('#restart-practice');
 const tutorialCard = document.querySelector('#tutorial-card');
 const tutorialText = document.querySelector('#tutorial-text');
 const tutorialNextButton = document.querySelector('#tutorial-next');
@@ -244,6 +247,7 @@ function renderHud(nowMs) {
   const lesson = getBeginnerLesson(selectedLessonId);
   syncElementText(settingsLineEl, `${mode.label} · ${difficulty.label} · ${speed.label} · ${inputLabel} · ${selectedPlayStyle === 'practice' ? lesson.label : 'Rush'}`);
   syncElementText(startButton, state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint');
+  restartPracticeButton.hidden = state.phase !== 'practice';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
   for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
@@ -325,6 +329,11 @@ function beginRound() {
   if (rafId !== null) cancelAnimationFrame(rafId);
   const now = performance.now();
   if (selectedPlayStyle === 'practice') {
+    if (state.phase === 'practice') {
+      state = skipPracticeNote(state, now);
+      render(now);
+      return;
+    }
     state = startPractice(state, now, selectedModeId, selectedLessonId);
     summaryEl.hidden = true;
     render(now);
@@ -334,6 +343,15 @@ function beginRound() {
   summaryEl.hidden = true;
   render(now);
   rafId = requestAnimationFrame(tick);
+}
+
+function restartPracticeSession() {
+  if (rafId !== null) cancelAnimationFrame(rafId);
+  rafId = null;
+  const now = performance.now();
+  state = restartPractice(state, now, selectedModeId, selectedLessonId);
+  summaryEl.hidden = true;
+  render(now);
 }
 
 function replayRound() {
@@ -715,6 +733,7 @@ function installDifficulties() {
 }
 
 startButton.addEventListener('click', beginRound);
+restartPracticeButton.addEventListener('click', restartPracticeSession);
 summaryRestartButton.addEventListener('click', replayRound);
 document.addEventListener('keydown', (event) => summaryFocusManager.handleKeydown(event));
 playCalibrationToneButton.addEventListener('click', playCalibrationTone);
@@ -748,6 +767,7 @@ window.__clefHanger = {
   getState: () => state,
   beginRound,
   startPractice: () => { selectedPlayStyle = 'practice'; beginRound(); },
+  restartPractice: restartPracticeSession,
   selectMode: (modeId) => {
     selectedModeId = getMode(modeId).id;
     resetIdleState();

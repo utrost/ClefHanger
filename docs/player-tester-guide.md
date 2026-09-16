@@ -60,6 +60,8 @@ Use Practice to learn.
 - Wrong answer keeps the same note visible.
 - Teaching feedback says what the note was and where it sits.
 - Correct answer plays the pitch and moves to another practice note.
+- **Next practice note** skips only the current prompt. It does not count as correct, wrong, or missed, does not change the score or streak, and does not add analytics or outcome evidence. The visible learning suggestion may change because it can describe the newly active prompt.
+- **Restart practice** is a separate deliberate action that resets the practice session and its progress.
 
 ### Rush
 
@@ -254,7 +256,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 65: summary focus`.
+2. Confirm the page shows `Slice 66: practice skip`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus a staff correction label, with no answer-button pre-highlight.
 5. Tap the correct answer and verify score increases and a pitch plays.

@@ -1,15 +1,15 @@
-import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice66-practice-skip-2026-09-16';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice65-summary-focus-2026-09-16';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+} from './content.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice66-practice-skip-2026-09-16';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice66-practice-skip-2026-09-16';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+} from './content.js?v=clefhanger-slice66-practice-skip-2026-09-16';
 
 
 export const STAFF_LAYOUT = {
@@ -207,6 +207,23 @@ export function startPractice(state, nowMs, modeId = state.modeId, lessonId = st
   next.endsAtMs = null;
   next.feedback = { kind: 'practice', text: `Practice: ${lesson.title}. No timer — learn the note shape.` };
   return spawnNextNote(next, nowMs);
+}
+
+export function restartPractice(state, nowMs, modeId = state.modeId, lessonId = state.lessonId || 'first-steps') {
+  return startPractice(state, nowMs, modeId, lessonId);
+}
+
+// Skipping is navigation, not a learning outcome: counters, score, streak, the
+// latest scored outcome, and the last answered prompt all remain unchanged.
+export function skipPracticeNote(state, nowMs) {
+  if (state.phase !== 'practice') return cloneState(state);
+  const next = cloneState(state);
+  next.noteQueue = (next.noteQueue || []).slice(next.activeNote ? 1 : 0);
+  next.activeNote = next.noteQueue[0] || null;
+  next.correction = null;
+  const advanced = spawnNextNote(next, nowMs);
+  advanced.feedback = { kind: 'skipped', text: 'Skipped. Here is another practice note.' };
+  return advanced;
 }
 
 export function answerActiveNote(state, answer, nowMs) {
