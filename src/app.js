@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+} from './core/content.js?v=clefhanger-slice65-summary-focus-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,9 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+} from './core/game.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice65-summary-focus-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -36,17 +36,19 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice64-semantic-announcements-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice65-summary-focus-2026-09-16';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice65-summary-focus-2026-09-16';
 
-const appVersion = 'clefhanger-slice64-semantic-announcements-2026-09-16';
+const appVersion = 'clefhanger-slice65-summary-focus-2026-09-16';
+const appBackground = document.querySelector('#app-background');
 const staff = document.querySelector('#staff');
 const notationStage = document.querySelector('#notation-stage');
 const notationPrompt = document.querySelector('#notation-prompt');
@@ -138,6 +140,12 @@ let lastMicRecordingEvidence = null;
 let lastMicReport = null;
 let microphoneSessionNumber = 0;
 const semanticPresenter = createSemanticPresenter({ announcementElement: gameAnnouncerEl });
+const summaryFocusManager = createSummaryFocusManager({
+  backgroundElement: appBackground,
+  summaryElement: summaryEl,
+  replayButton: summaryRestartButton,
+  playfieldElement: notationStage,
+});
 const microphoneController = createMicrophoneController({
   startSession: (options) => startMicrophoneSession(options),
   onStop: () => {
@@ -268,15 +276,12 @@ function renderHud(nowMs) {
   let roundEndedAnnouncement = null;
   if (state.phase === 'ended') {
     const summary = getRoundSummary(state);
-    summaryEl.hidden = false;
     syncElementText(summaryTitleEl, summary.title);
     syncElementText(summaryContextEl, `${summary.mode} · ${summary.speed} · ${summary.difficulty}`);
     syncElementText(summaryHeadlineEl, summary.headline);
     syncElementText(summaryDetailEl, `${summary.detail} · ${learningRecommendation.text}`);
     syncElementText(summaryRestartButton, summary.primaryAction);
     roundEndedAnnouncement = `Round ended. ${summary.headline}. ${summary.detail}.`;
-  } else {
-    summaryEl.hidden = true;
   }
 
   const roundId = state.startedAtMs ?? 'idle';
@@ -286,6 +291,7 @@ function renderHud(nowMs) {
   if (microphoneState.permission === 'granted') semanticPresenter.announce({ kind: 'microphone-ready', id: microphoneSessionNumber });
   if (microphoneState.permission === 'blocked') semanticPresenter.announce({ kind: 'microphone-error', id: microphoneSessionNumber, message: `Microphone error. ${microphoneState.error || 'Check browser permission and try again.'}` });
   if (roundEndedAnnouncement) semanticPresenter.announce({ kind: 'round-ended', id: state.startedAtMs, message: roundEndedAnnouncement });
+  summaryFocusManager.sync(state.phase === 'ended');
 }
 
 function render(nowMs = performance.now()) {
@@ -328,6 +334,11 @@ function beginRound() {
   summaryEl.hidden = true;
   render(now);
   rafId = requestAnimationFrame(tick);
+}
+
+function replayRound() {
+  beginRound();
+  summaryFocusManager.closeForReplay();
 }
 
 function getAudioContext() {
@@ -704,7 +715,8 @@ function installDifficulties() {
 }
 
 startButton.addEventListener('click', beginRound);
-summaryRestartButton.addEventListener('click', beginRound);
+summaryRestartButton.addEventListener('click', replayRound);
+document.addEventListener('keydown', (event) => summaryFocusManager.handleKeydown(event));
 playCalibrationToneButton.addEventListener('click', playCalibrationTone);
 startMicrophoneButton.addEventListener('click', startMicrophone);
 startMicrophoneMainButton.addEventListener('click', startMicrophone);

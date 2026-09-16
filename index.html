@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice64-semantic-announcements-2026-09-16">
+<html lang="en" data-app-version="clefhanger-slice65-summary-focus-2026-09-16">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -239,8 +239,10 @@
       #feedback[data-kind="ended"] { color: var(--accent); }
 
       #summary.ending-splash {
-        position: absolute;
-        inset: 12px;
+        position: fixed;
+        inset: 50% auto auto 50%;
+        width: min(calc(100% - 24px), 436px);
+        transform: translate(-50%, -50%);
         z-index: 3;
         display: grid;
         place-items: center;
@@ -495,7 +497,7 @@
     </style>
   </head>
   <body>
-    <main aria-label="ClefHanger sight-reading game">
+    <main id="app-background" aria-label="ClefHanger sight-reading game">
       <header>
         <div>
           <h1>ClefHanger</h1>
@@ -545,21 +547,11 @@
         <label class="hint-row"><input id="hint-toggle" type="checkbox" checked /> Show hints after mistakes</label>
       </section>
 
-      <section class="stage" id="notation-stage" aria-label="Treble clef · Treble mode · Practice playfield">
+      <section class="stage" id="notation-stage" tabindex="-1" aria-label="Treble clef · Treble mode · Practice playfield">
         <p id="notation-prompt" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
         <div id="staff"></div>
         <div id="feedback">Tap Start when ready.</div>
         <p id="learning-coach" aria-label="Learning suggestion">Golden path: Practice · Beginner · Sing/Play. Use buttons only as a quiet fallback.</p>
-        <p id="game-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
-        <aside id="summary" class="ending-splash" aria-label="Rush result" hidden>
-          <div>
-            <h2 id="summary-title">Time! Sprint complete</h2>
-            <p id="summary-context">Treble · Speed 5 · Beginner</p>
-            <p><strong id="summary-headline">0 points · 0% accuracy</strong></p>
-            <p id="summary-detail">0 correct · 0 wrong · 0 missed · best streak 0</p>
-            <button id="summary-restart" type="button">Play another 60s rush</button>
-          </div>
-        </aside>
       </section>
 
       <section class="controls" aria-label="Game controls">
@@ -577,7 +569,7 @@
           <details id="mic-help"><summary>How Sing/Play scoring works</summary><p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p></details>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
         </div>
-        <p class="microcopy">Slice 64: semantic announcements</p>
+        <p class="microcopy">Slice 65: summary focus</p>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -636,12 +628,22 @@
         </section>
       </dialog>
     </main>
-    <script type="module" src="./src/app.js?v=clefhanger-slice64-semantic-announcements-2026-09-16"></script>
+    <p id="game-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
+    <aside id="summary" class="ending-splash" role="dialog" aria-modal="true" aria-label="Rush result" hidden>
+      <div>
+        <h2 id="summary-title">Time! Sprint complete</h2>
+        <p id="summary-context">Treble · Speed 5 · Beginner</p>
+        <p><strong id="summary-headline">0 points · 0% accuracy</strong></p>
+        <p id="summary-detail">0 correct · 0 wrong · 0 missed · best streak 0</p>
+        <button id="summary-restart" type="button">Play another 60s rush</button>
+      </div>
+    </aside>
+    <script type="module" src="./src/app.js?v=clefhanger-slice65-summary-focus-2026-09-16"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice64-semantic-announcements-2026-09-16')
+            .register('./sw.js?v=clefhanger-slice65-summary-focus-2026-09-16')
             .then((registration) => registration.update())
             .catch(() => {});
         });

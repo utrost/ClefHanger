@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice64-semantic-announcements-2026-09-16`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice65-summary-focus-2026-09-16`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Microphone-first scope
 
@@ -12,9 +12,9 @@ The current product direction is microphone-first: the default answer path is Si
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice64-semantic-announcements-2026-09-16`.
-- Current visible slice marker: `Slice 64: semantic announcements`.
-- Current service-worker cache: `clefhanger-pwa-v58`.
+- Current app marker: `clefhanger-slice65-summary-focus-2026-09-16`.
+- Current visible slice marker: `Slice 65: summary focus`.
+- Current service-worker cache: `clefhanger-pwa-v59`.
 
 Accessibility announcements use separate responsibilities: notation changes remain in the notation status region, while game and microphone events use a dedicated semantic announcer. Timer and raw pitch readouts are visual, cached updates; pitch acquisition/loss, scoring outcomes, microphone readiness/errors, and round completion are announced once per event.
 - Core/UI modules:
@@ -56,7 +56,7 @@ The main page contains:
 - staff playfield with cliff edge;
 - selected input panel: note buttons, piano strip, or microphone status panel;
 - non-blocking learning suggestion line below the feedback;
-- centered time-up summary for ended Rush rounds.
+- centered modal time-up summary for ended Rush rounds, with one-time Replay focus, contained Tab navigation, and background isolation.
 
 ## Modes and prompt pools
 
@@ -214,7 +214,9 @@ The reducer uses these phases:
 - Round length: 60,000 ms.
 - Notes move horizontally toward the cliff using each note's spawn/deadline timing.
 - Expired notes count as missed if they reach their deadline before answer.
-- On timeout, phase becomes `ended`, active notes/queue are cleared, and the time-up summary appears.
+- On timeout, phase becomes `ended`, active notes/queue are cleared, and the time-up summary appears. Replay receives focus once, Tab and Shift+Tab remain on that sole modal control, and the game background becomes `inert` and `aria-hidden`.
+- The issue #3 round-ended live announcement remains the single result-speech path. The modal uses a generic `Rush result` dialog label, while focusing Replay supplies the next action without also focusing or naming the dialog from the result heading.
+- Escape intentionally keeps the terminal summary open and focuses its Replay action. Replay closes the summary, restores the game surface, starts the next rush, and focuses the programmatically focusable playfield (`tabindex="-1"`).
 - Late answers after `ended` do not mutate the result.
 
 ## Learning recommendations

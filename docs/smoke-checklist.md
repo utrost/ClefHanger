@@ -40,12 +40,13 @@ For exact current rules and constants, see [Current State Reference](./current-s
 - Tapping a wrong note leaves the note active and shows wrong-answer feedback.
 - Letting a note reach the cliff records a miss.
 - Let the Rush timer reach `0`; the playfield should show a centered **Time! Sprint complete** splash with points, accuracy, correct/wrong/missed counts, best streak, and a **Play another 60s rush** button.
+- Confirm focus enters on Replay once; Tab and Shift+Tab remain on Replay; background controls cannot be reached; Escape keeps the summary open; the result heading is not repeated as the dialog name; the result is spoken only by the round-ended live announcement; and Replay returns focus to the new rush playfield.
 - Browser console has no errors.
 
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice64-semantic-announcements`.
+- Verify the HTML contains `clefhanger-slice65-summary-focus`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/content.js`, `src/core/scoring.js`, `src/core/learning.js`, `src/core/lessons.js`, `src/core/audio.js`, `src/core/pitch.js`, `src/platform/storage.js`, `src/platform/microphone-session.js`, `src/platform/mic-recording-diagnostic.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.

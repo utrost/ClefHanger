@@ -15,12 +15,12 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice64-semantic-announcements-2026-09-16"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice64-semantic-announcements-2026-09-16'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice65-summary-focus-2026-09-16"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice65-summary-focus-2026-09-16'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
-  assert.match(html, /<section class="stage" id="notation-stage" aria-label="Treble clef · Treble mode · Practice playfield">/);
+  assert.match(html, /<section class="stage" id="notation-stage" tabindex="-1" aria-label="Treble clef · Treble mode · Practice playfield">/);
   assert.match(html, /id="notation-prompt"[^>]+role="status"[^>]+aria-live="polite"[^>]+aria-atomic="true"/);
   assert.match(html, /id="game-announcer"[^>]+role="status"[^>]+aria-live="polite"[^>]+aria-atomic="true"/);
   assert.match(html, /id="feedback"/);
@@ -58,8 +58,34 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice64-semantic-announcements/);
-  assert.match(html, /Slice 64: semantic announcements/);
+  assert.match(html, /data-app-version="clefhanger-slice65-summary-focus/);
+  assert.match(html, /Slice 65: summary focus/);
+});
+
+test('rush summary is a focus-managed modal isolated from the background game', () => {
+  const html = read('index.html');
+  const app = read('src/app.js');
+
+  assert.match(html, /<main id="app-background"[^>]*aria-label="ClefHanger sight-reading game">/);
+  assert.match(html, /<aside id="summary"[^>]+role="dialog"[^>]+aria-modal="true"[^>]+aria-label="Rush result"[^>]+hidden>/);
+  assert.doesNotMatch(html, /<aside id="summary"[^>]+aria-labelledby="summary-title"/);
+  assert.match(html, /<h2 id="summary-title">/);
+  assert.ok(html.indexOf('id="summary"') > html.indexOf('</main>'), 'summary is outside the inert background');
+  assert.match(app, /createSummaryFocusManager/);
+  assert.match(app, /summaryFocusManager\.sync\(state\.phase === 'ended'\)/);
+  assert.match(app, /summaryFocusManager\.closeForReplay\(\)/);
+  assert.match(app, /summaryFocusManager\.handleKeydown\(event\)/);
+});
+
+test('the terminal result has one speech path: live announcement plus action focus', () => {
+  const html = read('index.html');
+  const app = read('src/app.js');
+
+  assert.match(html, /<h2 id="summary-title">/);
+  assert.doesNotMatch(html, /<h2 id="summary-title"[^>]+tabindex/);
+  assert.doesNotMatch(html, /<aside id="summary"[^>]+aria-labelledby="summary-title"/);
+  assert.match(app, /kind: 'round-ended'/, 'issue #3 terminal live announcement remains');
+  assert.match(app, /replayButton: summaryRestartButton/);
 });
 
 test('live regions have explicit responsibilities and volatile visual readouts are not live', () => {
@@ -157,7 +183,7 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v58/);
+  assert.match(sw, /clefhanger-pwa-v59/);
   for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }
