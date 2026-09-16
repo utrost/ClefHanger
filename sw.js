@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clefhanger-pwa-v56';
+const CACHE_NAME = 'clefhanger-pwa-v57';
 const APP_SHELL = [
   './',
   './index.html',

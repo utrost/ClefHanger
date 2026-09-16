@@ -1,7 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createInitialState, createNote } from '../src/core/game.js';
-import { renderStaffSvg } from '../src/ui/staff-renderer.js';
+import {
+  buildNotationPromptDescription,
+  buildStageAccessibleLabel,
+  renderStaffSvg,
+  syncLiveRegionText,
+  syncNotationAccessibility,
+} from '../src/ui/staff-renderer.js';
 
 function makeStateWithQueue(noteQueue, correction = null) {
   return {
@@ -27,7 +33,7 @@ test('staff renderer draws staff, clef, lead note, and true ledger lines', () =>
   const svg = renderStaffSvg({ state: makeStateWithQueue([note]), nowMs: 2500 });
 
   assert.match(svg, /<svg viewBox="0 0 330 180"/);
-  assert.match(svg, /aria-label="treble staff with cliff edge"/);
+  assert.match(svg, /aria-hidden="true"/);
   assert.match(svg, /class="clef clef-treble"/);
   assert.match(svg, />𝄞<\/text>/);
   assert.match(svg, /class="queue-note lead-note"/);
@@ -59,7 +65,7 @@ test('staff renderer draws correction labels with escaped text', () => {
   assert.match(svg, /class="correction-label"/);
   assert.match(svg, /data-correction-active="true"/);
   assert.match(svg, /E &lt;line&gt; &amp; &quot;space&quot;/);
-  assert.match(svg, /aria-label="Correct: E &lt;line&gt; &amp; &quot;space&quot;"/);
+  assert.doesNotMatch(svg, /aria-label=/);
 });
 
 test('staff renderer draws chord stacks and preview notes behind the lead note', () => {
@@ -112,4 +118,154 @@ test('staff renderer draws microphone ghost note from detected pitch only in mic
   assert.doesNotMatch(buttonsSvg, /ghost-note/);
   assert.match(micSvg, /class="ghost-note"/);
   assert.match(micSvg, /you played A4/);
+});
+
+test('notation prompt describes line, space, ledger, accidental, and clef without revealing answers', () => {
+  const cases = [
+    {
+      note: createNote({ id: 'line', noteName: 'E', octave: 4, staffStep: 0, clef: 'treble', spawnedAtMs: 0 }),
+      expected: 'Lead single note: treble clef, bottom line of staff, natural.',
+    },
+    {
+      note: createNote({ id: 'space', noteName: 'F', octave: 4, staffStep: 1, clef: 'treble', spawnedAtMs: 0 }),
+      expected: 'Lead single note: treble clef, bottom space of staff, natural.',
+    },
+    {
+      note: createNote({ id: 'ledger', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 0 }),
+      expected: 'Lead single note: treble clef, first ledger line below staff, natural.',
+    },
+    {
+      note: createNote({ id: 'sharp', noteName: 'F', accidental: 'sharp', octave: 3, staffStep: 6, clef: 'bass', spawnedAtMs: 0 }),
+      expected: 'Lead single note: bass clef, fourth line from bottom, sharp accidental.',
+    },
+    {
+      note: createNote({ id: 'flat', noteName: 'B', accidental: 'flat', octave: 3, staffStep: 4, clef: 'bass', spawnedAtMs: 0 }),
+      expected: 'Lead single note: bass clef, middle line of staff, flat accidental.',
+    },
+  ];
+
+  for (const { note, expected } of cases) {
+    const description = buildNotationPromptDescription(makeStateWithQueue([note]));
+    assert.equal(description, expected);
+    assert.doesNotMatch(description, new RegExp(`\\b${note.noteName}\\b|${note.answer}|${note.displayName}`));
+  }
+});
+
+test('notation prompt describes chord and preview positions and accidentals without exposing answers', () => {
+  const lead = createNote({
+    id: 'chord-lead',
+    kind: 'chord',
+    chordName: 'C',
+    quality: 'major',
+    notes: ['C', 'E', 'G'],
+    staffSteps: [-2, 0, 2],
+    clef: 'treble',
+    spawnedAtMs: 0,
+  });
+  const preview = createNote({ id: 'secret-preview', noteName: 'A', accidental: 'sharp', octave: 5, staffStep: 10, clef: 'treble', spawnedAtMs: 0 });
+
+  const description = buildNotationPromptDescription(makeStateWithQueue([lead, preview]));
+
+  assert.equal(description, 'Lead chord with 3 notes: treble clef; first ledger line below staff, bottom line of staff, second line from bottom; natural. Preview 1: treble clef, first ledger line above staff, sharp accidental.');
+  assert.doesNotMatch(description, /C major|C-E-G|A5|secret-preview/);
+});
+
+test('stage accessible label stays synchronized with clef, mode, and play style', () => {
+  assert.equal(buildStageAccessibleLabel({ clef: 'treble', modeLabel: 'Sharps', playStyle: 'rush' }), 'Treble clef · Sharps mode · Rush playfield');
+  assert.equal(buildStageAccessibleLabel({ clef: 'bass', modeLabel: 'Bass', playStyle: 'practice' }), 'Bass clef · Bass mode · Practice playfield');
+  assert.equal(buildStageAccessibleLabel({ clef: 'treble', modeLabel: 'Chords', playStyle: 'practice' }), 'Treble clef · Chords mode · Practice playfield');
+});
+
+test('notation accessibility writes once per prompt rather than once per animation frame', () => {
+  const note = createNote({ id: 'prompt-1', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 0 });
+  const next = createNote({ id: 'prompt-2', noteName: 'D', octave: 4, staffStep: -1, clef: 'treble', spawnedAtMs: 1000 });
+  const writes = [];
+  const promptElement = {
+    dataset: {},
+    get textContent() { return writes.at(-1) || ''; },
+    set textContent(value) { writes.push(value); },
+  };
+  const stageElement = {
+    ariaLabel: '',
+    setAttribute(name, value) {
+      assert.equal(name, 'aria-label');
+      this.ariaLabel = value;
+    },
+  };
+  const options = { promptElement, stageElement, modeLabel: 'Treble', playStyle: 'rush' };
+
+  syncNotationAccessibility({ ...options, state: makeStateWithQueue([note]), nowMs: 100 });
+  syncNotationAccessibility({ ...options, state: makeStateWithQueue([note]), nowMs: 200 });
+  syncNotationAccessibility({ ...options, state: makeStateWithQueue([next]), nowMs: 1100 });
+
+  assert.equal(writes.length, 2);
+  assert.match(writes[0], /first ledger line below staff/);
+  assert.match(writes[1], /space immediately below staff/);
+  assert.equal(stageElement.ariaLabel, 'Treble clef · Treble mode · Rush playfield');
+});
+
+test('Rush announces bounded movement and urgency transitions instead of every frame', () => {
+  const note = createNote({ id: 'rush-prompt', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 1000, travelMs: 4000 });
+  const writes = [];
+  const promptElement = {
+    dataset: {},
+    get textContent() { return writes.at(-1) || ''; },
+    set textContent(value) { writes.push(value); },
+  };
+  const stageElement = { setAttribute() {} };
+  const options = { promptElement, stageElement, state: makeStateWithQueue([note]), modeLabel: 'Treble', playStyle: 'rush' };
+
+  for (const nowMs of [1000, 1200, 2500, 3100, 3300, 4200, 4300]) {
+    syncNotationAccessibility({ ...options, nowMs });
+  }
+
+  assert.equal(writes.length, 3);
+  assert.match(writes[0], /moving toward the cliff/i);
+  assert.match(writes[1], /halfway to the cliff/i);
+  assert.match(writes[2], /urgent.*near the cliff/i);
+});
+
+test('practice prompts do not emit Rush movement updates', () => {
+  const note = createNote({ id: 'practice-prompt', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 1000, travelMs: 4000 });
+  const writes = [];
+  const promptElement = {
+    dataset: {},
+    get textContent() { return writes.at(-1) || ''; },
+    set textContent(value) { writes.push(value); },
+  };
+  const options = { promptElement, stageElement: { setAttribute() {} }, state: makeStateWithQueue([note]), modeLabel: 'Treble', playStyle: 'practice' };
+
+  syncNotationAccessibility({ ...options, nowMs: 1000 });
+  syncNotationAccessibility({ ...options, nowMs: 4500 });
+
+  assert.equal(writes.length, 1);
+  assert.doesNotMatch(writes[0], /cliff|urgent/i);
+});
+
+test('live region text is only replaced when its value changes', () => {
+  const writes = [];
+  const element = {
+    value: '',
+    get textContent() { return this.value; },
+    set textContent(value) { this.value = value; writes.push(value); },
+  };
+
+  syncLiveRegionText(element, 'Keep going.');
+  syncLiveRegionText(element, 'Keep going.');
+  syncLiveRegionText(element, 'Nice work.');
+
+  assert.deepEqual(writes, ['Keep going.', 'Nice work.']);
+});
+
+test('animated notation and microphone ghost are hidden behind one deliberate prompt description', () => {
+  const note = createNote({ id: 'front', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 0 });
+  const svg = renderStaffSvg({
+    state: makeStateWithQueue([note]),
+    selectedInputMode: 'microphone',
+    microphoneState: { note: { noteName: 'A', octave: 4, answer: 'A', frequency: 440, cents: 0 } },
+    nowMs: 1000,
+  });
+
+  assert.match(svg, /<svg[^>]+aria-hidden="true"/);
+  assert.doesNotMatch(svg, /role="img"|aria-label=/);
 });

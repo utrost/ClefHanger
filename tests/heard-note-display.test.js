@@ -22,5 +22,5 @@ test('microphone panel has a dedicated visible heard-note readout', () => {
   assert.match(html, /You played/);
   assert.match(app, /heardNoteEl/);
   assert.match(app, /buildHeardNoteMessage/);
-  assert.match(app, /heardNoteEl\.textContent/);
+  assert.match(app, /syncLiveRegionText\(heardNoteEl, buildHeardNoteMessage\(microphoneState\.note\)\)/);
 });

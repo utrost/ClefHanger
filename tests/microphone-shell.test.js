@@ -23,9 +23,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Actual calibration/);
   assert.match(html, /Check mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice62-microphone-lifecycle/);
-  assert.match(app, /const appVersion = 'clefhanger-slice62-microphone-lifecycle-2026-09-16'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice62-microphone-lifecycle-2026-09-16/);
+  assert.match(html, /data-app-version="clefhanger-slice63-accessible-notation/);
+  assert.match(app, /const appVersion = 'clefhanger-slice63-accessible-notation-2026-09-16'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice63-accessible-notation-2026-09-16/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -87,6 +87,7 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(app, /buildMicrophoneScoringFeedback/);
   assert.match(staffRenderer, /createGhostNoteFromPitch/);
   assert.match(staffRenderer, /class=\"ghost-note\"/);
-  assert.match(staffRenderer, /Ghost note you played/);
+  assert.doesNotMatch(staffRenderer, /Ghost note you played/);
+  assert.match(staffRenderer, /aria-hidden=\"true\"/);
   assert.match(app, /\['running', 'practice'\]\.includes\(state\.phase\)/);
 });

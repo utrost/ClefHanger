@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+} from './core/content.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -21,9 +21,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+} from './core/game.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -36,17 +36,19 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { renderStaffSvg } from './ui/staff-renderer.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
-import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice62-microphone-lifecycle-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { renderStaffSvg, syncLiveRegionText, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
+import { createStorageAdapter } from './platform/storage.js?v=clefhanger-slice63-accessible-notation-2026-09-16';
 
-const appVersion = 'clefhanger-slice62-microphone-lifecycle-2026-09-16';
+const appVersion = 'clefhanger-slice63-accessible-notation-2026-09-16';
 const staff = document.querySelector('#staff');
+const notationStage = document.querySelector('#notation-stage');
+const notationPrompt = document.querySelector('#notation-prompt');
 const buttons = document.querySelector('#note-buttons');
 const pianoStrip = document.querySelector('#piano-strip');
 const calibrationPanel = document.querySelector('#calibration-panel');
@@ -157,6 +159,14 @@ function normalizeInputMode(inputMode) {
 
 function renderStaff(nowMs) {
   staff.innerHTML = renderStaffSvg({ state, selectedInputMode, microphoneState, nowMs });
+  syncNotationAccessibility({
+    promptElement: notationPrompt,
+    stageElement: notationStage,
+    state,
+    modeLabel: getMode(selectedModeId).label,
+    playStyle: selectedPlayStyle,
+    nowMs,
+  });
 }
 
 function calibrationReadingText() {
@@ -205,11 +215,11 @@ function renderHud(nowMs) {
   const difficulty = getDifficulty(selectedDifficultyId);
   scoreEl.textContent = String(state.score);
   streakEl.textContent = String(state.streak);
-  timerEl.textContent = String(getRemainingSeconds(state, nowMs));
-  feedbackEl.textContent = state.feedback.text;
+  syncLiveRegionText(timerEl, String(getRemainingSeconds(state, nowMs)));
+  syncLiveRegionText(feedbackEl, state.feedback.text);
   feedbackEl.dataset.kind = state.feedback.kind;
   const learningRecommendation = currentLearningRecommendation();
-  learningCoachEl.textContent = learningRecommendation.text;
+  syncLiveRegionText(learningCoachEl, learningRecommendation.text);
   learningCoachEl.dataset.kind = learningRecommendation.kind;
   bestEl.textContent = String(getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
   modeLabelEl.textContent = mode.label;
@@ -244,11 +254,11 @@ function renderHud(nowMs) {
   startMicrophoneMainButton.disabled = microphoneStarting;
   stopMicrophoneButton.disabled = !microphoneStarting && getCurrentMicrophoneTrackState() === 'none';
   microphoneStatusEl.textContent = microphoneStatusText();
-  heardNoteEl.textContent = buildHeardNoteMessage(microphoneState.note);
-  microphoneRecordingDiagnosticEl.textContent = microphoneRecordingDiagnostic;
+  syncLiveRegionText(heardNoteEl, buildHeardNoteMessage(microphoneState.note));
+  syncLiveRegionText(microphoneRecordingDiagnosticEl, microphoneRecordingDiagnostic);
   microphoneDebugTextEl.textContent = microphoneDebugText;
-  micReportPreviewEl.textContent = lastMicReport ? `Last report: ${lastMicReport.capture.label} · ${lastMicReport.interpretation}` : 'No exported report yet.';
-  calibrationReadingEl.textContent = calibrationReadingText();
+  syncLiveRegionText(micReportPreviewEl, lastMicReport ? `Last report: ${lastMicReport.capture.label} · ${lastMicReport.interpretation}` : 'No exported report yet.');
+  syncLiveRegionText(calibrationReadingEl, calibrationReadingText());
   calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
 
   if (state.phase === 'ended') {
