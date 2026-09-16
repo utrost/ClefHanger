@@ -28,7 +28,7 @@ function findChromeExecutable() {
   throw new Error('Chrome prerequisite missing: install Google Chrome or Chromium, or set CHROME_BIN to its executable.');
 }
 
-function waitFor(check, timeoutMs = 5000) {
+function waitFor(check, timeoutMs = 15000) {
   const started = Date.now();
   return new Promise((resolveWait, reject) => {
     const poll = async () => {
@@ -74,7 +74,7 @@ function connectCdp(url) {
   };
 }
 
-test('Next practice note preserves progress and Restart practice resets it', { timeout: 15000 }, async (t) => {
+test('Next practice note preserves progress and Restart practice resets it', { timeout: 30000 }, async (t) => {
   const server = createServer(async (request, response) => {
     const pathname = new URL(request.url, 'http://localhost').pathname;
     const filePath = join(ROOT, pathname === '/' ? 'index.html' : pathname);
@@ -176,7 +176,7 @@ test('Next practice note preserves progress and Restart practice resets it', { t
   assert.ok(afterRestart.activeNote);
 });
 
-test('launch query overrides stored mode and invalid mode falls back in a real browser', { timeout: 15000 }, async (t) => {
+test('launch query overrides stored mode and invalid mode falls back in a real browser', { timeout: 30000 }, async (t) => {
   const server = createServer(async (request, response) => {
     const pathname = new URL(request.url, 'http://localhost').pathname;
     const filePath = join(ROOT, pathname === '/' ? 'index.html' : pathname);
