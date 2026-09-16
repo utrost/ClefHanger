@@ -15,8 +15,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice67-shortcut-launch-2026-09-16"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice67-shortcut-launch-2026-09-16'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice68-input-compatibility-2026-09-16"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice68-input-compatibility-2026-09-16'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
@@ -58,8 +58,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice67-shortcut-launch/);
-  assert.match(html, /Slice 67: shortcut launch/);
+  assert.match(html, /data-app-version="clefhanger-slice68-input-compatibility/);
+  assert.match(html, /Slice 68: input compatibility/);
 });
 
 test('rush summary is a focus-managed modal isolated from the background game', () => {
@@ -187,8 +187,8 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v61/);
-  for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
+  assert.match(sw, /clefhanger-pwa-v62/);
+  for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/input-compatibility.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }
   assert.match(sw, /request\.mode === 'navigate'/);
@@ -203,4 +203,18 @@ test('startup applies the direct launch query after LocalStorage preferences', (
   assert.match(app, /resolveStartupPreferences\(storageAdapter\.readPreferences\(\), window\.location\.search\)/);
   assert.match(docs, /A valid `\?mode=` launch query takes precedence over the stored LocalStorage mode/);
   assert.match(docs, /browser, installed shortcut, and offline navigation/);
+});
+
+test('Chord mode resolves Sing/Play to a playable answer mode before starting', () => {
+  const app = read('src/app.js');
+  const serviceWorker = read('sw.js');
+
+  assert.match(app, /resolvePlayableInputMode/);
+  assert.match(app, /buildInputCompatibilityMessage/);
+  assert.match(app, /ensurePlayableInputMode/);
+  assert.match(app, /selectedInputMode = ensurePlayableInputMode\(selectedModeId, selectedInputMode/);
+  assert.match(app, /kind: 'input-compatibility'/);
+  assert.match(app, /Chord mode needs Notes/);
+  assert.doesNotMatch(app, /Sing the front note[\s\S]*selectedModeId === 'chords'/);
+  assert.match(serviceWorker, /\.\/src\/core\/input-compatibility\.js/);
 });

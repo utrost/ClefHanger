@@ -4,6 +4,7 @@ export const ANNOUNCEMENT_KINDS = Object.freeze([
   'missed',
   'microphone-ready',
   'microphone-error',
+  'input-compatibility',
   'round-ended',
 ]);
 

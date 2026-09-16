@@ -10,7 +10,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+} from './core/content.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -23,9 +23,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+} from './core/game.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -38,18 +38,19 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
-import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice67-shortcut-launch-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
+import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice68-input-compatibility-2026-09-16';
 
-const appVersion = 'clefhanger-slice67-shortcut-launch-2026-09-16';
+const appVersion = 'clefhanger-slice68-input-compatibility-2026-09-16';
 const appBackground = document.querySelector('#app-background');
 const staff = document.querySelector('#staff');
 const notationStage = document.querySelector('#notation-stage');
@@ -139,6 +140,7 @@ let microphoneBuffer = null;
 let microphoneRafId = null;
 let microphoneRecordingDiagnostic = 'Recording test: not run yet.';
 let microphoneDebugText = 'No recording details yet.';
+let inputCompatibilityMessage = null;
 let lastMicRecordingEvidence = null;
 let lastMicReport = null;
 let microphoneSessionNumber = 0;
@@ -171,6 +173,26 @@ function setBestScore(score, modeId = selectedModeId, speedId = selectedSpeedId,
 function normalizeInputMode(inputMode) {
   return normalizeMicrophoneInputMode(inputMode);
 }
+
+function ensurePlayableInputMode(modeId, inputMode, { persist = false, announce = false } = {}) {
+  const normalizedInputMode = normalizeInputMode(inputMode);
+  const resolvedInputMode = resolvePlayableInputMode({ modeId, inputMode: normalizedInputMode });
+  const compatibilityMessage = buildInputCompatibilityMessage({ modeId, requestedInputMode: normalizedInputMode, resolvedInputMode });
+  if (compatibilityMessage) inputCompatibilityMessage = compatibilityMessage;
+  else if (modeId !== 'chords') inputCompatibilityMessage = null;
+  if (resolvedInputMode !== selectedInputMode) {
+    selectedInputMode = resolvedInputMode;
+    microphoneController.selectInputMode(selectedInputMode);
+    if (persist) storageAdapter.writePreference('selectedInputMode', selectedInputMode);
+    if (selectedInputMode !== 'microphone') stopMicrophone();
+  }
+  if (announce && compatibilityMessage) {
+    semanticPresenter.announce({ kind: 'input-compatibility', id: `${modeId}:${normalizedInputMode}:${resolvedInputMode}`, message: compatibilityMessage.text });
+  }
+  return resolvedInputMode;
+}
+
+selectedInputMode = ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: false });
 
 function renderStaff(nowMs) {
   staff.innerHTML = renderStaffSvg({ state, selectedInputMode, microphoneState, nowMs });
@@ -234,8 +256,9 @@ function renderHud(nowMs) {
   syncElementText(feedbackEl, state.feedback.text);
   feedbackEl.dataset.kind = state.feedback.kind;
   const learningRecommendation = currentLearningRecommendation();
-  syncElementText(learningCoachEl, learningRecommendation.text);
-  learningCoachEl.dataset.kind = learningRecommendation.kind;
+  const coachMessage = inputCompatibilityMessage || learningRecommendation;
+  syncElementText(learningCoachEl, coachMessage.text);
+  learningCoachEl.dataset.kind = coachMessage.kind;
   syncElementText(bestEl, getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
   syncElementText(modeLabelEl, mode.label);
   syncElementText(modeHelpEl, mode.help);
@@ -250,7 +273,12 @@ function renderHud(nowMs) {
   restartPracticeButton.hidden = state.phase !== 'practice';
   for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
   for (const button of difficultyButtons.querySelectorAll('button')) button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
-  for (const button of inputModeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
+  for (const button of inputModeButtons.querySelectorAll('button')) {
+    button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
+    button.disabled = selectedModeId === 'chords' && ['microphone', 'piano'].includes(button.dataset.inputMode);
+    button.setAttribute('aria-disabled', button.disabled ? 'true' : 'false');
+    button.title = button.disabled ? 'Chord mode needs Notes answers.' : '';
+  }
   for (const button of playStyleButtons) button.dataset.active = button.dataset.playStyle === selectedPlayStyle ? 'true' : 'false';
   lessonSelect.value = selectedLessonId;
   hintToggle.checked = showHints;
@@ -326,6 +354,7 @@ function resetIdleState() {
 }
 
 function beginRound() {
+  ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: true, announce: true });
   if (rafId !== null) cancelAnimationFrame(rafId);
   const now = performance.now();
   if (selectedPlayStyle === 'practice') {
@@ -620,8 +649,9 @@ function installPiano() {
 function installInputModes() {
   for (const button of inputModeButtons.querySelectorAll('button')) {
     button.addEventListener('click', () => {
-      selectedInputMode = normalizeInputMode(button.dataset.inputMode);
-      microphoneController.selectInputMode(selectedInputMode);
+      const requestedInputMode = normalizeInputMode(button.dataset.inputMode);
+      selectedInputMode = requestedInputMode;
+      ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: true, announce: true });
       storageAdapter.writePreference('selectedInputMode', selectedInputMode);
       render();
     });
@@ -649,6 +679,7 @@ function installModes() {
     button.addEventListener('click', () => {
       selectedModeId = mode.id;
       storageAdapter.writePreference('selectedMode', selectedModeId);
+      ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: true, announce: true });
       resetIdleState();
     });
     modeButtons.append(button);
@@ -770,6 +801,7 @@ window.__clefHanger = {
   restartPractice: restartPracticeSession,
   selectMode: (modeId) => {
     selectedModeId = getMode(modeId).id;
+    ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: false, announce: true });
     resetIdleState();
   },
   selectSpeed: (speedId) => {
@@ -792,7 +824,7 @@ window.__clefHanger = {
   },
   selectInputMode: (inputMode) => {
     selectedInputMode = normalizeInputMode(inputMode);
-    microphoneController.selectInputMode(selectedInputMode);
+    ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: false, announce: true });
     render();
   },
   setMatchAnyOctave: (enabled) => {

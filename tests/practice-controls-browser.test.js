@@ -97,7 +97,7 @@ test('Next practice note preserves progress and Restart practice resets it', { t
   ], { stdio: 'ignore' });
   t.after(() => {
     chrome.kill('SIGKILL');
-    rmSync(profile, { recursive: true, force: true });
+    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   });
 
   const page = await waitFor(async () => {
@@ -200,7 +200,7 @@ test('launch query overrides stored mode and invalid mode falls back in a real b
   ], { stdio: 'ignore' });
   t.after(() => {
     chrome.kill('SIGKILL');
-    rmSync(profile, { recursive: true, force: true });
+    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   });
 
   const page = await waitFor(async () => {

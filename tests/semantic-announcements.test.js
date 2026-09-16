@@ -143,6 +143,7 @@ test('game, microphone, and terminal events each produce one understandable anno
     { kind: 'missed', id: 'missed-1', message: 'Missed C. Here comes the next note.' },
     { kind: 'microphone-ready', id: 'mic-1' },
     { kind: 'microphone-error', id: 'mic-error-1', message: 'Microphone unavailable. Check browser permission.' },
+    { kind: 'input-compatibility', id: 'chords:microphone:buttons', message: 'Chord mode needs Notes. Switched from Sing/Play to Notes so every chord has answer buttons.' },
     { kind: 'round-ended', id: 'round-1', message: 'Round ended. 80 points, 75 percent accuracy.' },
   ];
 
@@ -156,7 +157,8 @@ test('game, microphone, and terminal events each produce one understandable anno
   assert.match(announcements[2], /missed/i);
   assert.match(announcements[3], /microphone.+ready/i);
   assert.match(announcements[4], /microphone.+(unavailable|error)/i);
-  assert.match(announcements[5], /round ended/i);
+  assert.match(announcements[5], /chord mode needs notes/i);
+  assert.match(announcements[6], /round ended/i);
   assert.deepEqual(new Set(ANNOUNCEMENT_KINDS), new Set(events.map(({ kind }) => kind)));
 });
 
