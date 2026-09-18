@@ -312,7 +312,7 @@ test('critical DOM flows cover settings, ended Rush focus, microphone cleanup, a
       active: button.dataset.active,
       pressed: button.getAttribute('aria-pressed'),
     }));
-    const minTargetSizes = [...document.querySelectorAll('.play-style-button, .mode-button, .difficulty-button, .input-mode-button, #open-settings, #close-settings, #start-round, #restart-practice, #start-microphone-main, summary')]
+    const minTargetSizes = [...document.querySelectorAll('.play-style-button, .mode-button, .difficulty-button, .input-mode-button, .hint-row, #lesson-select, #mic-lab-label, #open-settings, #close-settings, #start-round, #restart-practice, #start-microphone-main, summary')]
       .filter((element) => !element.hidden && element.offsetParent !== null)
       .map((element) => ({ label: element.id || element.textContent.trim(), width: element.getBoundingClientRect().width, height: element.getBoundingClientRect().height }));
     const settingsState = {

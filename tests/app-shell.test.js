@@ -214,7 +214,9 @@ test('selector controls expose pressed state, accessible target sizes, and stron
   assert.match(html, /@media \(forced-colors: active\)[\s\S]*outline-color:\s*Highlight/);
   assert.match(html, /\.mode-button, \.speed-button, \.difficulty-button, #open-settings, #close-settings \{[\s\S]*min-height:\s*44px/);
   assert.match(html, /\.input-mode-button \{[\s\S]*min-height:\s*44px/);
-  assert.match(html, /\.tutorial-actions button, \.play-style-button, #lesson-select, \.hint-row, summary \{ min-height:\s*44px/);
+  assert.match(html, /\.tutorial-actions button, \.play-style-button, #lesson-select, #mic-lab-label, \.hint-row, summary \{ min-height:\s*44px/);
+  assert.match(html, /\.hint-row select \{[\s\S]*min-height:\s*44px/);
+  assert.match(html, /\.hint-row input\[type="checkbox"\] \{[\s\S]*inline-size:\s*24px/);
   assert.match(html, /summary \{ display:\s*flex; align-items:\s*center; cursor:\s*pointer; \}/);
   assert.match(html, /#play-calibration-tone, #start-microphone, #start-microphone-main, #stop-microphone, #record-microphone-diagnostic, #export-mic-report \{[\s\S]*min-height:\s*44px/);
 });

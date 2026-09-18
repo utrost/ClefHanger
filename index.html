@@ -306,10 +306,13 @@
       .lesson-intro-actions { display: flex; justify-content: end; }
       #lesson-intro-dismiss { min-height: 44px; border-radius: 11px; }
       .tutorial-actions, .play-style-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-      .tutorial-actions button, .play-style-button, #lesson-select, .hint-row, summary { min-height: 44px; border-radius: 12px; }
+      .tutorial-actions button, .play-style-button, #lesson-select, #mic-lab-label, .hint-row, summary { min-height: 44px; border-radius: 12px; }
       summary { display: flex; align-items: center; cursor: pointer; }
       .play-style-button[data-active="true"] { background: var(--accent); color: #1d1300; }
       .hint-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.8rem; }
+      .hint-row select { flex: 1; min-width: 0; min-height: 44px; border-radius: 12px; }
+      .hint-row input[type="checkbox"] { inline-size: 24px; block-size: 24px; flex: 0 0 24px; accent-color: var(--accent); }
+      .hint-row:has(input[type="checkbox"]) { cursor: pointer; padding-inline: 4px; }
       .queue-note[data-correction-active="true"] .active-note { filter: drop-shadow(0 0 8px rgba(10,111,60,0.48)); }
       .correction-label rect { fill: #17112b; stroke: var(--feedback-good); stroke-width: 3; }
       .correction-label text { fill: #f8f4df; stroke: none; text-anchor: middle; font-size: 20px; font-weight: 950; dominant-baseline: central; }
