@@ -144,6 +144,10 @@ let inputCompatibilityMessage = null;
 let lastMicRecordingEvidence = null;
 let lastMicReport = null;
 let microphoneSessionNumber = 0;
+const reducedMotionQuery = typeof window.matchMedia === 'function'
+  ? window.matchMedia('(prefers-reduced-motion: reduce)')
+  : { matches: false, addEventListener: null, addListener: null };
+let prefersReducedMotion = Boolean(reducedMotionQuery.matches);
 const semanticPresenter = createSemanticPresenter({ announcementElement: gameAnnouncerEl });
 const summaryFocusManager = createSummaryFocusManager({
   backgroundElement: appBackground,
@@ -195,7 +199,7 @@ function ensurePlayableInputMode(modeId, inputMode, { persist = false, announce 
 selectedInputMode = ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: false });
 
 function renderStaff(nowMs) {
-  staff.innerHTML = renderStaffSvg({ state, selectedInputMode, microphoneState, nowMs });
+  staff.innerHTML = renderStaffSvg({ state, selectedInputMode, microphoneState, nowMs, reducedMotion: prefersReducedMotion });
   syncNotationAccessibility({
     promptElement: notationPrompt,
     stageElement: notationStage,
@@ -204,6 +208,17 @@ function renderStaff(nowMs) {
     playStyle: selectedPlayStyle,
     nowMs,
   });
+}
+
+function handleReducedMotionChange(event) {
+  prefersReducedMotion = event.matches;
+  render(performance.now());
+}
+
+if (typeof reducedMotionQuery.addEventListener === 'function') {
+  reducedMotionQuery.addEventListener('change', handleReducedMotionChange);
+} else if (typeof reducedMotionQuery.addListener === 'function') {
+  reducedMotionQuery.addListener(handleReducedMotionChange);
 }
 
 function calibrationReadingText() {

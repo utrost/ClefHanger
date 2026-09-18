@@ -97,10 +97,30 @@ export function syncLiveRegionText(element, value) {
 
 function rushMovementState(note, nowMs) {
   const duration = note.deadlineMs - note.spawnedAtMs;
-  const progress = duration > 0 ? (nowMs - note.spawnedAtMs) / duration : 1;
-  if (progress >= 0.8) return { key: 'urgent', description: 'Urgent: near the cliff.' };
-  if (progress >= 0.5) return { key: 'halfway', description: 'Halfway to the cliff.' };
-  return { key: 'moving', description: 'Moving toward the cliff.' };
+  const progress = duration > 0 ? Math.min(1, Math.max(0, (nowMs - note.spawnedAtMs) / duration)) : 1;
+  if (progress >= 0.8) return { key: 'urgent', description: 'Urgent: near the cliff.', label: 'urgent', progress };
+  if (progress >= 0.5) return { key: 'halfway', description: 'Halfway to the cliff.', label: 'halfway', progress };
+  return { key: 'moving', description: 'Moving toward the cliff.', label: 'moving', progress };
+}
+
+function xForRushProgress(progress, { reducedMotion = false } = {}) {
+  if (reducedMotion) {
+    if (progress >= 0.8) return 256;
+    if (progress >= 0.5) return 174;
+    return 92;
+  }
+  return 72 + progress * 202;
+}
+
+function renderReducedMotionRushCue(movement) {
+  if (!movement) return '';
+  const width = movement.key === 'urgent' ? 188 : movement.key === 'halfway' ? 118 : 48;
+  return `
+    <g class="rush-reduced-cue" data-urgency="${movement.key}">
+      <rect x="72" y="160" width="188" height="8" rx="4" class="rush-progress-track" />
+      <rect x="72" y="160" width="${width}" height="8" rx="4" class="rush-progress" />
+      <text x="166" y="154" class="rush-urgency-label">Rush urgency: ${movement.label}</text>
+    </g>`;
 }
 
 export function syncNotationAccessibility({ promptElement, stageElement, state, modeLabel, playStyle, nowMs = 0 }) {
@@ -167,10 +187,12 @@ function renderGhostNote({ clef, x = 98, selectedInputMode = 'buttons', micropho
   `;
 }
 
-export function renderStaffSvg({ state, selectedInputMode = 'buttons', microphoneState = {}, nowMs = 0 }) {
+export function renderStaffSvg({ state, selectedInputMode = 'buttons', microphoneState = {}, nowMs = 0, reducedMotion = false }) {
   const note = state.activeNote;
   const mode = getMode(state.modeId);
   const clef = getClefPresentation(note?.clef || mode.clef || 'treble');
+  const reducedRush = reducedMotion && state.phase === 'running';
+  const reducedRushMovement = reducedRush && note ? rushMovementState(note, nowMs) : null;
   const lines = [52, 72, 92, 112, 132]
     .map((y) => `<line x1="18" y1="${y}" x2="318" y2="${y}" class="staff-line" />`)
     .join('');
@@ -192,7 +214,7 @@ export function renderStaffSvg({ state, selectedInputMode = 'buttons', microphon
       const correction = storedCorrection;
       const progressNowMs = correction?.shouldFreezeNote && correction.frozenAtMs ? Math.min(nowMs, correction.frozenAtMs) : nowMs;
       const progress = Math.min(1, Math.max(0, (progressNowMs - queuedNote.spawnedAtMs) / (queuedNote.deadlineMs - queuedNote.spawnedAtMs)));
-      const x = 72 + progress * 202;
+      const x = xForRushProgress(progress, { reducedMotion: reducedRush });
       const noteMarkup = queuedNote.kind === 'chord'
         ? renderChord(queuedNote, x)
         : renderSingleNote(queuedNote, x, yForStaffStep(queuedNote.staffStep ?? 0), correction);
@@ -202,13 +224,14 @@ export function renderStaffSvg({ state, selectedInputMode = 'buttons', microphon
     .join('');
 
   const ghostX = note
-    ? Math.max(98, 72 + Math.min(1, Math.max(0, (nowMs - note.spawnedAtMs) / (note.deadlineMs - note.spawnedAtMs))) * 202)
+    ? Math.max(98, xForRushProgress(Math.min(1, Math.max(0, (nowMs - note.spawnedAtMs) / (note.deadlineMs - note.spawnedAtMs))), { reducedMotion: reducedRush }))
     : 98;
 
   return `
-    <svg viewBox="0 0 330 180" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 330 180" aria-hidden="true" focusable="false"${reducedRush ? ' data-motion="reduced"' : ''}${reducedRushMovement ? ` data-urgency="${reducedRushMovement.key}"` : ''}>
       ${lines}
       ${cliff}
+      ${renderReducedMotionRushCue(reducedRushMovement)}
       ${renderGhostNote({ clef: clef.clef, x: ghostX, selectedInputMode, microphoneState })}
       ${active}
     </svg>

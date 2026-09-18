@@ -211,6 +211,9 @@
       .clef-bass { font-size: 70px; }
       .cliff-line { stroke: var(--danger); stroke-width: 4; stroke-dasharray: 8 7; }
       .cliff-rock { fill: #4b342d; }
+      .rush-progress-track { fill: rgba(23, 17, 43, 0.16); }
+      .rush-progress { fill: var(--feedback-ended); }
+      .rush-urgency-label { fill: #221500; font-size: 10px; font-weight: 950; text-anchor: middle; }
       .active-note { fill: #17112b; stroke: #17112b; stroke-width: 4; }
       .ghost-note { opacity: 0.78; pointer-events: none; }
       .ghost-note .active-note { fill: rgba(10, 111, 60, 0.26); stroke: var(--feedback-good); stroke-width: 3; filter: drop-shadow(0 0 4px rgba(10,111,60,0.42)); }
@@ -492,6 +495,16 @@
       #summary h2 { margin: 0 0 6px; }
       #summary p { margin: 5px 0; color: var(--muted); }
       .microcopy { margin: 0; text-align: center; color: var(--muted); font-size: 0.74rem; }
+
+      @media (prefers-reduced-motion: reduce) {
+        .note-button:active, .piano-key:active, #start-round:active, #play-calibration-tone:active, .mode-button:active, .speed-button:active, .difficulty-button:active, .input-mode-button:active {
+          transform: none;
+        }
+        .ghost-note .active-note,
+        .queue-note[data-correction-active="true"] .active-note {
+          filter: none;
+        }
+      }
 
       @media (max-width: 720px) {
         body { padding-inline: 8px; }

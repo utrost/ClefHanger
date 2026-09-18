@@ -167,6 +167,19 @@ test('mobile microphone panel keeps only the primary mic controls expanded', () 
   assert.match(html, /@media \(max-width: 720px\)[\s\S]*#mic-readiness \{[\s\S]*padding: 7px/);
 });
 
+test('app honors OS reduced-motion preference for Rush presentation', () => {
+  const app = read('src/app.js');
+  const html = read('index.html');
+
+  assert.match(app, /matchMedia\('\(prefers-reduced-motion: reduce\)'\)/);
+  assert.match(app, /typeof window\.matchMedia === 'function'/);
+  assert.match(app, /reducedMotionQuery\.addEventListener\('change', handleReducedMotionChange\)/);
+  assert.match(app, /reducedMotionQuery\.addListener\(handleReducedMotionChange\)/);
+  assert.match(app, /renderStaffSvg\(\{ state, selectedInputMode, microphoneState, nowMs, reducedMotion: prefersReducedMotion/);
+  assert.match(html, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(html, /\.rush-progress/);
+});
+
 test('manifest and service worker describe an installable subpath-safe app shell', () => {
   const manifest = JSON.parse(read('manifest.webmanifest'));
   assert.equal(manifest.name, 'ClefHanger');

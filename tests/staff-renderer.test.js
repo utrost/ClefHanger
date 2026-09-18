@@ -225,6 +225,37 @@ test('Rush announces bounded movement and urgency transitions instead of every f
   assert.match(writes[2], /urgent.*near the cliff/i);
 });
 
+test('reduced-motion Rush uses stepped note positions and non-motion urgency cues', () => {
+  const note = createNote({ id: 'reduced-motion-rush', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 1000, travelMs: 4000 });
+  const state = { ...makeStateWithQueue([note]), phase: 'running' };
+
+  const early = renderStaffSvg({ state, nowMs: 1200, reducedMotion: true });
+  const sameStep = renderStaffSvg({ state, nowMs: 2400, reducedMotion: true });
+  const later = renderStaffSvg({ state, nowMs: 3300, reducedMotion: true });
+  const urgent = renderStaffSvg({ state, nowMs: 4300, reducedMotion: true });
+
+  const firstX = early.match(/<ellipse cx="([0-9.]+)"/)?.[1];
+  const firstProgressWidth = early.match(/width="([0-9.]+)" height="8" rx="4" class="rush-progress"/)?.[1];
+  assert.equal(sameStep.match(/<ellipse cx="([0-9.]+)"/)?.[1], firstX, 'reduced-motion Rush does not continuously translate within a step');
+  assert.equal(sameStep.match(/width="([0-9.]+)" height="8" rx="4" class="rush-progress"/)?.[1], firstProgressWidth, 'reduced-motion Rush progress cue is stepped, not continuously resizing');
+  assert.notEqual(later.match(/<ellipse cx="([0-9.]+)"/)?.[1], firstX, 'reduced-motion Rush can still step progress forward');
+  assert.match(urgent, /data-motion="reduced"/);
+  assert.match(urgent, /data-urgency="urgent"/);
+  assert.match(urgent, /Rush urgency: urgent/);
+  assert.match(urgent, /<rect[^>]+class="rush-progress"/);
+});
+
+test('practice rendering stays continuous when reduced motion is requested', () => {
+  const note = createNote({ id: 'reduced-motion-practice', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 1000, travelMs: 4000 });
+  const state = makeStateWithQueue([note]);
+
+  const normal = renderStaffSvg({ state, nowMs: 2400 });
+  const reduced = renderStaffSvg({ state, nowMs: 2400, reducedMotion: true });
+
+  assert.equal(reduced.match(/<ellipse cx="([0-9.]+)"/)?.[1], normal.match(/<ellipse cx="([0-9.]+)"/)?.[1]);
+  assert.doesNotMatch(reduced, /data-motion="reduced"|rush-progress/);
+});
+
 test('practice prompts do not emit Rush movement updates', () => {
   const note = createNote({ id: 'practice-prompt', noteName: 'C', octave: 4, staffStep: -2, clef: 'treble', spawnedAtMs: 1000, travelMs: 4000 });
   const writes = [];
