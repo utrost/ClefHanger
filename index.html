@@ -23,6 +23,9 @@
         --accent: #f5c542;
         --danger: #ff6b6b;
         --good: #62e6a7;
+        --feedback-good: #0a6f3c;
+        --feedback-danger: #9f1d1d;
+        --feedback-ended: #614900;
       }
 
       * { box-sizing: border-box; }
@@ -210,9 +213,9 @@
       .cliff-rock { fill: #4b342d; }
       .active-note { fill: #17112b; stroke: #17112b; stroke-width: 4; }
       .ghost-note { opacity: 0.78; pointer-events: none; }
-      .ghost-note .active-note { fill: rgba(98, 230, 167, 0.34); stroke: #118f62; stroke-width: 3; filter: drop-shadow(0 0 5px rgba(98,230,167,0.55)); }
-      .ghost-note .accidental { fill: #118f62; }
-      .ghost-label { fill: #118f62; stroke: none; text-anchor: middle; font-size: 10px; font-weight: 950; }
+      .ghost-note .active-note { fill: rgba(10, 111, 60, 0.26); stroke: var(--feedback-good); stroke-width: 3; filter: drop-shadow(0 0 4px rgba(10,111,60,0.42)); }
+      .ghost-note .accidental { fill: var(--feedback-good); }
+      .ghost-label { fill: var(--feedback-good); stroke: none; text-anchor: middle; font-size: 10px; font-weight: 950; }
       .preview-note { opacity: 0.42; transform-box: fill-box; transform-origin: center; transform: scale(0.82); }
       .accidental { fill: #17112b; stroke: none; font-size: 27px; font-weight: 900; }
       .chord-note { stroke-width: 4; }
@@ -222,6 +225,8 @@
         font-weight: 850;
         text-align: center;
         padding: 9px;
+        border-left-width: 7px;
+        border-left-color: transparent;
       }
 
       #learning-coach {
@@ -234,9 +239,9 @@
         text-align: center;
       }
 
-      #feedback[data-kind="correct"] { color: var(--good); }
-      #feedback[data-kind="wrong"], #feedback[data-kind="missed"] { color: var(--danger); }
-      #feedback[data-kind="ended"] { color: var(--accent); }
+      #feedback[data-kind="correct"] { color: var(--feedback-good); border-left-color: var(--feedback-good); border-left-style: solid; }
+      #feedback[data-kind="wrong"], #feedback[data-kind="missed"] { color: var(--feedback-danger); border-left-color: var(--feedback-danger); border-left-style: double; }
+      #feedback[data-kind="ended"] { color: var(--feedback-ended); border-left-color: var(--feedback-ended); border-left-style: dashed; }
 
       #summary.ending-splash {
         position: fixed;
@@ -290,9 +295,9 @@
       .tutorial-actions button, .play-style-button, #lesson-select, .hint-row { min-height: 36px; border-radius: 12px; }
       .play-style-button[data-active="true"] { background: var(--accent); color: #1d1300; }
       .hint-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.8rem; }
-      .queue-note[data-correction-active="true"] .active-note { filter: drop-shadow(0 0 8px rgba(98,230,167,0.55)); }
-      .correction-label rect { fill: #17112b; stroke: var(--good); stroke-width: 3; }
-      .correction-label text { fill: var(--good); stroke: none; text-anchor: middle; font-size: 20px; font-weight: 950; dominant-baseline: central; }
+      .queue-note[data-correction-active="true"] .active-note { filter: drop-shadow(0 0 8px rgba(10,111,60,0.48)); }
+      .correction-label rect { fill: #17112b; stroke: var(--feedback-good); stroke-width: 3; }
+      .correction-label text { fill: #f8f4df; stroke: none; text-anchor: middle; font-size: 20px; font-weight: 950; dominant-baseline: central; }
 
       .settings-summary {
         grid-template-columns: 1fr auto;
@@ -502,6 +507,17 @@
       @media (min-width: 721px) {
         body { padding-block: 24px; }
         main { min-height: min(860px, 100svh); }
+      }
+
+      @media (forced-colors: active) {
+        #feedback[data-kind] {
+          color: CanvasText;
+          border-left-color: CanvasText;
+        }
+        .ghost-note .active-note,
+        .correction-label rect {
+          stroke: CanvasText;
+        }
       }
     </style>
   </head>
