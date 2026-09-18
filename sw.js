@@ -45,6 +45,22 @@ function matchVersionedPrecacheRequest(request) {
   return asset ? caches.match(asset) : Promise.resolve(undefined);
 }
 
+function isRuntimeCacheableRequest(request) {
+  const url = new URL(request.url);
+  const scopePath = new URL('./', self.location.href).pathname;
+  return request.method === 'GET' && url.origin === self.location.origin && url.pathname.startsWith(scopePath);
+}
+
+function isRuntimeCacheableResponse(response) {
+  return response?.ok && ['basic', 'default'].includes(response.type);
+}
+
+function putRuntimeCache(request, response) {
+  if (!isRuntimeCacheableRequest(request) || !isRuntimeCacheableResponse(response)) return null;
+  const copy = response.clone();
+  return caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
   self.skipWaiting();
@@ -54,9 +70,8 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
-    ),
+    ).then(() => self.clients.claim()),
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
@@ -71,8 +86,8 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(request)
       .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        const cacheWrite = putRuntimeCache(request, response);
+        if (cacheWrite) event.waitUntil(cacheWrite.catch(() => undefined));
         return response;
       })
       .catch(() => caches.match(request).then((cached) => cached || matchVersionedPrecacheRequest(request))),

@@ -195,6 +195,9 @@ test('manifest and service worker describe an installable subpath-safe app shell
   assert.match(sw, /fetch\(request\)\.catch\(\(\) => caches\.match\('\.\/index\.html'\)\)/, 'offline navigation keeps the direct shortcut URL and its query in the address bar');
   assert.match(sw, /matchVersionedPrecacheRequest\(request\)/, 'versioned module requests fall back to approved precached app-shell assets offline');
   assert.match(sw, /searchParams\.get\('v'\) !== APP_VERSION/, 'only the current app-version query may be canonicalized');
+  assert.match(sw, /\.then\(\(\) => self\.clients\.claim\(\)\)/, 'clients.claim is included in the activation lifetime');
+  assert.match(sw, /event\.waitUntil\(cacheWrite\.catch\(\(\) => undefined\)\)/, 'runtime cache writes are bound to the fetch lifetime');
+  assert.match(sw, /response\?\.ok/, 'failed HTTP responses are not runtime cached');
   assert.doesNotMatch(sw, /ignoreSearch:\s*true/, 'offline fallback must not collapse unrelated query variants onto cached app-shell assets');
 });
 
