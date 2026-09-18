@@ -180,6 +180,17 @@ test('app honors OS reduced-motion preference for Rush presentation', () => {
   assert.match(html, /\.rush-progress/);
 });
 
+test('CI exposes browser integration tests as a separate gate', () => {
+  const pkg = JSON.parse(read('package.json'));
+  const workflow = read('.github/workflows/check.yml');
+
+  assert.match(pkg.scripts['test:unit'], /node --test/);
+  assert.match(pkg.scripts['test:browser'], /\*browser\*\.test\.js/);
+  assert.match(pkg.scripts.check, /npm run test:unit && npm run test:browser/);
+  assert.match(workflow, /Run unit tests[\s\S]*npm run test:unit/);
+  assert.match(workflow, /Run browser integration tests[\s\S]*npm run test:browser/);
+});
+
 test('manifest and service worker describe an installable subpath-safe app shell', () => {
   const manifest = JSON.parse(read('manifest.webmanifest'));
   assert.equal(manifest.name, 'ClefHanger');

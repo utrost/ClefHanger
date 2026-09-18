@@ -26,7 +26,10 @@ jobs:
           python3 --version
 
       - name: Run unit tests
-        run: npm test
+        run: npm run test:unit
+
+      - name: Run browser integration tests
+        run: npm run test:browser
 
       - name: Run full project gate
         run: npm run check

@@ -43,6 +43,14 @@ function waitFor(check, timeoutMs = 30000) {
   });
 }
 
+async function getFreePort() {
+  const probe = createServer();
+  await new Promise((resolveListen) => probe.listen(0, '127.0.0.1', resolveListen));
+  const { port } = probe.address();
+  await new Promise((resolveClose) => probe.close(resolveClose));
+  return port;
+}
+
 function connectCdp(url) {
   const socket = new WebSocket(url);
   let nextId = 0;
@@ -60,6 +68,14 @@ function connectCdp(url) {
     socket.addEventListener('error', rejectReady, { once: true });
   });
   return {
+    async command(method, params = {}) {
+      await ready;
+      const id = ++nextId;
+      return new Promise((resolveCommand, rejectCommand) => {
+        pending.set(id, { resolveCommand, rejectCommand });
+        socket.send(JSON.stringify({ id, method, params }));
+      });
+    },
     async evaluate(expression) {
       await ready;
       const id = ++nextId;
@@ -232,4 +248,140 @@ test('launch query overrides stored mode and invalid mode falls back in a real b
   assert.deepEqual(await launch('bass', '?mode=not-a-mode'), {
     modeId: 'bass', modeLabel: 'Bass', activeMode: 'bass', storedMode: 'bass',
   });
+});
+
+test('critical DOM flows cover settings, ended Rush focus, microphone cleanup, and basic accessibility states', { timeout: 60000 }, async (t) => {
+  const server = createServer(async (request, response) => {
+    const pathname = new URL(request.url, 'http://localhost').pathname;
+    const filePath = join(ROOT, pathname === '/' ? 'index.html' : pathname);
+    try {
+      const file = await import('node:fs/promises').then(({ readFile }) => readFile(filePath));
+      response.writeHead(200, { 'content-type': MIME[extname(filePath)] || 'application/octet-stream' });
+      response.end(file);
+    } catch {
+      response.writeHead(404).end();
+    }
+  });
+  await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
+  t.after(() => server.close());
+
+  const debugPort = await getFreePort();
+  const profile = mkdtempSync(join(tmpdir(), 'clefhanger-chrome-'));
+  const origin = `http://127.0.0.1:${server.address().port}`;
+  const chrome = spawn(findChromeExecutable(), [
+    '--headless=new', '--disable-gpu', '--no-sandbox', `--remote-debugging-port=${debugPort}`,
+    `--user-data-dir=${profile}`, `${origin}/`,
+  ], { stdio: 'ignore' });
+  t.after(() => {
+    chrome.kill('SIGKILL');
+    rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  });
+
+  const page = await waitFor(async () => {
+    const response = await fetch(`http://127.0.0.1:${debugPort}/json`);
+    const pages = await response.json();
+    return pages.find((candidate) => candidate.type === 'page' && candidate.url.startsWith(origin));
+  });
+  const cdp = connectCdp(page.webSocketDebuggerUrl);
+  t.after(() => cdp.close());
+  await cdp.command('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+  await waitFor(() => cdp.evaluate("Boolean(window.__clefHanger && document.querySelector('#open-settings'))"));
+
+  const result = await cdp.evaluate(`(async () => {
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    const scanA11y = (label) => {
+      const ids = [...document.querySelectorAll('[id]')].map((node) => node.id);
+      const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
+      const unnamedButtons = [...document.querySelectorAll('button')]
+        .filter((button) => !button.textContent.trim() && !button.getAttribute('aria-label'))
+        .map((button) => button.id || button.className || button.outerHTML.slice(0, 40));
+      const visibleDialogsWithoutLabel = [...document.querySelectorAll('dialog,[role="dialog"]')]
+        .filter((dialog) => !dialog.hidden && !dialog.getAttribute('aria-label') && !dialog.getAttribute('aria-labelledby'))
+        .map((dialog) => dialog.id || dialog.outerHTML.slice(0, 40));
+      return { label, duplicateIds, unnamedButtons, visibleDialogsWithoutLabel };
+    };
+    const states = [scanA11y('idle')];
+
+    document.querySelector('#open-settings').click();
+    const settingsOpen = document.querySelector('#settings-dialog').open;
+    document.querySelector('[data-mode="bass"]').click();
+    document.querySelector('[data-difficulty="normal"]').click();
+    document.querySelector('[data-input-mode="buttons"]').click();
+    const settingsState = {
+      mode: window.__clefHanger.getState().modeId,
+      activeMode: document.querySelector('#mode-buttons [data-active="true"]').dataset.mode,
+      activeDifficulty: document.querySelector('#difficulty-buttons [data-active="true"]').dataset.difficulty,
+      activeInputMode: document.querySelector('#input-mode-buttons [data-active="true"]').dataset.inputMode,
+    };
+    states.push(scanA11y('settings'));
+    document.querySelector('#close-settings').click();
+
+    document.querySelector('[data-mode="basics"]').click();
+    document.querySelector('[data-play-style="practice"]').click();
+    document.querySelector('[data-input-mode="buttons"]').click();
+    document.querySelector('#start-round').click();
+    states.push(scanA11y('active-practice'));
+
+    window.__fakeMic = { getUserMediaCalls: 0, stopCalls: 0 };
+    const makeTrack = () => ({ kind: 'audio', readyState: 'live', enabled: true, muted: false, stop() { this.readyState = 'ended'; window.__fakeMic.stopCalls += 1; } });
+    Object.defineProperty(navigator, 'permissions', { configurable: true, value: { query: async () => ({ state: 'prompt' }) } });
+    Object.defineProperty(navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: async () => {
+      window.__fakeMic.getUserMediaCalls += 1;
+      const track = makeTrack();
+      return { getTracks: () => [track], getAudioTracks: () => [track] };
+    } } });
+    class FakeAudioContext {
+      constructor() { this.state = 'running'; this.destination = {}; }
+      resume() { this.state = 'running'; return Promise.resolve(); }
+      createMediaStreamSource() { return { connect() {}, disconnect() {} }; }
+      createAnalyser() { return { fftSize: 0, connect() {}, disconnect() {}, getFloatTimeDomainData(buffer) { buffer.fill(0); } }; }
+      createGain() { return { gain: { value: 1 }, connect() {}, disconnect() {} }; }
+      createOscillator() { return { frequency: { setValueAtTime() {} }, type: 'sine', connect() {}, start() {}, stop() {} }; }
+    }
+    Object.defineProperty(window, 'AudioContext', { configurable: true, value: FakeAudioContext });
+    document.querySelector('[data-input-mode="microphone"]').click();
+    document.querySelector('#start-microphone-main').click();
+    await sleep(100);
+    document.querySelector('#start-microphone-main').click();
+    await sleep(100);
+    document.querySelector('#open-settings').click();
+    document.querySelector('#stop-microphone').click();
+    await sleep(50);
+    const microphone = { ...window.__fakeMic, listening: window.__clefHanger.getMicrophoneState().listening };
+    document.querySelector('#close-settings').click();
+
+    window.__clefHanger.selectPlayStyle('rush');
+    window.__clefHanger.beginRound();
+    const rushState = window.__clefHanger.getState();
+    rushState.endsAtMs = performance.now() - 1;
+    await sleep(80);
+    const ended = {
+      phase: window.__clefHanger.getState().phase,
+      summaryVisible: !document.querySelector('#summary').hidden,
+      activeElementId: document.activeElement.id,
+      backgroundInert: document.querySelector('#app-background').inert,
+      replayCopy: document.querySelector('#summary-restart').textContent,
+    };
+    states.push(scanA11y('ended'));
+
+    return { settingsOpen, settingsState, microphone, ended, states };
+  })()`);
+
+  assert.equal(result.settingsOpen, true);
+  assert.deepEqual(result.settingsState, {
+    mode: 'bass', activeMode: 'bass', activeDifficulty: 'beginner', activeInputMode: 'buttons',
+  });
+  assert.equal(result.microphone.getUserMediaCalls, 2, 'real DOM retry path starts microphone twice');
+  assert.ok(result.microphone.stopCalls >= 1, 'retry or switching away stops an existing microphone track');
+  assert.equal(result.microphone.listening, false);
+  assert.equal(result.ended.phase, 'ended');
+  assert.equal(result.ended.summaryVisible, true);
+  assert.equal(result.ended.activeElementId, 'summary-restart');
+  assert.equal(result.ended.backgroundInert, true);
+  assert.match(result.ended.replayCopy, /another 60s rush/i);
+  for (const state of result.states) {
+    assert.deepEqual(state.duplicateIds, [], `${state.label} has no duplicate IDs`);
+    assert.deepEqual(state.unnamedButtons, [], `${state.label} has no unnamed buttons`);
+    assert.deepEqual(state.visibleDialogsWithoutLabel, [], `${state.label} has no visible unlabeled dialogs`);
+  }
 });
