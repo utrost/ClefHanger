@@ -161,13 +161,15 @@
 
       #speed-slider {
         width: 100%;
+        min-height: 44px;
         accent-color: var(--accent);
       }
 
       .mode-button, .speed-button, .difficulty-button, #open-settings, #close-settings {
         border: 1px solid rgba(255,255,255,0.16);
         border-radius: 13px;
-        min-height: 34px;
+        min-height: 44px;
+        padding: 8px 9px;
         background: rgba(255,255,255,0.10);
         color: var(--ink);
         font-weight: 850;
@@ -177,6 +179,15 @@
       .mode-button[data-active="true"], .speed-button[data-active="true"], .difficulty-button[data-active="true"] {
         background: var(--accent);
         color: #1d1300;
+      }
+
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        box-shadow: 0 0 0 5px rgba(245, 197, 66, 0.24);
       }
 
       .stage {
@@ -293,9 +304,10 @@
       #lesson-intro h3 { font-size: 0.92rem; }
       #lesson-intro-examples { color: var(--accent); font-weight: 950; }
       .lesson-intro-actions { display: flex; justify-content: end; }
-      #lesson-intro-dismiss { min-height: 32px; border-radius: 11px; }
+      #lesson-intro-dismiss { min-height: 44px; border-radius: 11px; }
       .tutorial-actions, .play-style-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-      .tutorial-actions button, .play-style-button, #lesson-select, .hint-row { min-height: 36px; border-radius: 12px; }
+      .tutorial-actions button, .play-style-button, #lesson-select, .hint-row, summary { min-height: 44px; border-radius: 12px; }
+      summary { display: flex; align-items: center; cursor: pointer; }
       .play-style-button[data-active="true"] { background: var(--accent); color: #1d1300; }
       .hint-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 0.8rem; }
       .queue-note[data-correction-active="true"] .active-note { filter: drop-shadow(0 0 8px rgba(10,111,60,0.48)); }
@@ -340,7 +352,7 @@
       }
 
       #restart-practice {
-        min-height: 40px;
+        min-height: 44px;
         border: 1px solid rgba(255,255,255,0.22);
         border-radius: 14px;
         background: rgba(255,255,255,0.10);
@@ -356,7 +368,7 @@
       }
 
       .input-mode-button {
-        min-height: 34px;
+        min-height: 44px;
         border: 0;
         border-radius: 12px;
         background: transparent;
@@ -417,7 +429,7 @@
       }
 
       #play-calibration-tone, #start-microphone, #start-microphone-main, #stop-microphone, #record-microphone-diagnostic, #export-mic-report {
-        min-height: 34px;
+        min-height: 44px;
         border: 0;
         border-radius: 14px;
         background: var(--accent);
@@ -442,7 +454,7 @@
       }
 
       .accidental-button {
-        min-height: 38px;
+        min-height: 44px;
         font-size: clamp(0.82rem, 4.2vw, 1.05rem);
         background: rgba(255,255,255,0.08);
       }
@@ -527,6 +539,13 @@
           color: CanvasText;
           border-left-color: CanvasText;
         }
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        summary:focus-visible {
+          outline-color: Highlight;
+          box-shadow: none;
+        }
         .ghost-note .active-note,
         .correction-label rect {
           stroke: CanvasText;
@@ -568,9 +587,9 @@
       </section>
 
       <section id="lesson-panel" aria-label="Beginner lesson controls">
-        <div class="play-style-row" aria-label="Practice or sprint">
-          <button class="play-style-button" type="button" data-play-style="practice" data-active="true">Practice</button>
-          <button class="play-style-button" type="button" data-play-style="rush">Rush</button>
+        <div class="play-style-row" role="group" aria-label="Practice or Rush selection">
+          <button class="play-style-button" type="button" data-play-style="practice" data-active="true" aria-pressed="true">Practice</button>
+          <button class="play-style-button" type="button" data-play-style="rush" aria-pressed="false">Rush</button>
         </div>
         <details id="rush-help"><summary>Rush is later</summary><p>Start in Practice. Use Rush when a tiny lesson feels easy.</p></details>
         <label class="hint-row" for="lesson-select">Tiny lesson
@@ -618,12 +637,12 @@
         </div>
         <section class="settings-section" aria-label="Difficulty setting">
           <div class="mode-copy"><small>difficulty</small><span id="difficulty-label">Beginner</span></div>
-          <div id="difficulty-buttons" aria-label="Difficulty buttons"></div>
+          <div id="difficulty-buttons" role="group" aria-label="Difficulty selection"></div>
           <p id="difficulty-help">Slow single notes in a forgiving starter lane.</p>
         </section>
         <section class="settings-section" aria-label="Mode setting">
           <div class="mode-copy"><small>mode</small><span id="mode-label">Treble</span></div>
-          <div id="mode-buttons" aria-label="Mode buttons">Bass</div>
+          <div id="mode-buttons" role="group" aria-label="Mode selection">Bass</div>
           <p id="mode-help">Natural treble notes.</p>
         </section>
         <section class="settings-section" aria-label="Speed setting">
@@ -636,10 +655,10 @@
         </section>
         <section class="settings-section" aria-label="Input setting">
           <h3>Input</h3>
-          <div id="input-mode-buttons" class="input-mode-row" aria-label="Input mode buttons">
-            <button class="input-mode-button" type="button" data-input-mode="microphone" data-active="true">Sing/Play</button>
-            <button class="input-mode-button" type="button" data-input-mode="buttons">Notes</button>
-            <button class="input-mode-button" type="button" data-input-mode="piano">Piano</button>
+          <div id="input-mode-buttons" class="input-mode-row" role="group" aria-label="Input mode selection">
+            <button class="input-mode-button" type="button" data-input-mode="microphone" data-active="true" aria-pressed="true">Sing/Play</button>
+            <button class="input-mode-button" type="button" data-input-mode="buttons" aria-pressed="false">Notes</button>
+            <button class="input-mode-button" type="button" data-input-mode="piano" aria-pressed="false">Piano</button>
           </div>
         </section>
         <section id="calibration-panel" class="settings-section" aria-label="Vocal calibration">

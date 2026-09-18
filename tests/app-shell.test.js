@@ -123,7 +123,7 @@ test('first-run shell presents Sing/Play as the default primary answer path', ()
 
   assert.match(html, /<p class="tagline">Sing, hum, or play the staff note before it drops\./);
   assert.match(html, /<div id="settings-line">Treble · Beginner · Speed 5 · Sing\/Play/);
-  assert.match(html, /data-input-mode="microphone" data-active="true">Sing\/Play/);
+  assert.match(html, /data-input-mode="microphone"[^>]*data-active="true"[^>]*>Sing\/Play/);
   assert.match(html, /<div id="microphone-panel" aria-label="Microphone answer status">/);
   assert.match(html, /id="start-microphone-main"/);
   assert.match(html, /id="mic-readiness"/);
@@ -155,7 +155,7 @@ test('first screen gives a microphone-first beginner path before extra modes', (
   const html = read('index.html');
   assert.match(html, /<p id="tutorial-text">Sing or hum the note you see\./);
   assert.doesNotMatch(html, /Guess if you are unsure/);
-  assert.match(html, /<button class="play-style-button" type="button" data-play-style="practice" data-active="true">Practice<\/button>/);
+  assert.match(html, /<button class="play-style-button" type="button" data-play-style="practice" data-active="true"[^>]*>Practice<\/button>/);
   assert.match(html, /<details id="rush-help"><summary>Rush is later<\/summary>/);
 });
 
@@ -189,6 +189,34 @@ test('CI exposes browser integration tests as a separate gate', () => {
   assert.match(pkg.scripts.check, /npm run test:unit && npm run test:browser/);
   assert.match(workflow, /Run unit tests[\s\S]*npm run test:unit/);
   assert.match(workflow, /Run browser integration tests[\s\S]*npm run test:browser/);
+});
+
+test('selector controls expose pressed state, accessible target sizes, and strong focus', () => {
+  const html = read('index.html');
+  const app = read('src/app.js');
+
+  assert.match(html, /data-play-style="practice"[^>]*aria-pressed="true"/);
+  assert.match(html, /data-play-style="rush"[^>]*aria-pressed="false"/);
+  assert.match(html, /data-input-mode="microphone"[^>]*aria-pressed="true"/);
+  assert.match(html, /data-input-mode="buttons"[^>]*aria-pressed="false"/);
+  assert.match(html, /class="play-style-row" role="group" aria-label="Practice or Rush selection"/);
+  assert.match(html, /id="input-mode-buttons" class="input-mode-row" role="group" aria-label="Input mode selection"/);
+  assert.match(html, /id="mode-buttons" role="group" aria-label="Mode selection"/);
+  assert.match(html, /id="difficulty-buttons" role="group" aria-label="Difficulty selection"/);
+  assert.match(app, /function syncPressedState\(button, pressed\)/);
+  assert.match(app, /setAttribute\('aria-pressed', value\)/);
+  assert.match(app, /syncPressedState\(button, button\.dataset\.mode === selectedModeId\)/);
+  assert.match(app, /syncPressedState\(button, button\.dataset\.difficulty === selectedDifficultyId\)/);
+  assert.match(app, /syncPressedState\(button, button\.dataset\.inputMode === selectedInputMode\)/);
+  assert.match(app, /syncPressedState\(button, button\.dataset\.playStyle === selectedPlayStyle\)/);
+  assert.match(app, /speedSlider\.setAttribute\('aria-valuetext'/);
+  assert.match(html, /button:focus-visible,[\s\S]*outline:\s*3px solid var\(--accent\)/);
+  assert.match(html, /@media \(forced-colors: active\)[\s\S]*outline-color:\s*Highlight/);
+  assert.match(html, /\.mode-button, \.speed-button, \.difficulty-button, #open-settings, #close-settings \{[\s\S]*min-height:\s*44px/);
+  assert.match(html, /\.input-mode-button \{[\s\S]*min-height:\s*44px/);
+  assert.match(html, /\.tutorial-actions button, \.play-style-button, #lesson-select, \.hint-row, summary \{ min-height:\s*44px/);
+  assert.match(html, /summary \{ display:\s*flex; align-items:\s*center; cursor:\s*pointer; \}/);
+  assert.match(html, /#play-calibration-tone, #start-microphone, #start-microphone-main, #stop-microphone, #record-microphone-diagnostic, #export-mic-report \{[\s\S]*min-height:\s*44px/);
 });
 
 test('manifest and service worker describe an installable subpath-safe app shell', () => {

@@ -307,11 +307,25 @@ test('critical DOM flows cover settings, ended Rush focus, microphone cleanup, a
     document.querySelector('[data-mode="bass"]').click();
     document.querySelector('[data-difficulty="normal"]').click();
     document.querySelector('[data-input-mode="buttons"]').click();
+    const pressedSnapshot = (selector, attr) => [...document.querySelectorAll(selector)].map((button) => ({
+      value: button.dataset[attr],
+      active: button.dataset.active,
+      pressed: button.getAttribute('aria-pressed'),
+    }));
+    const minTargetSizes = [...document.querySelectorAll('.play-style-button, .mode-button, .difficulty-button, .input-mode-button, #open-settings, #close-settings, #start-round, #restart-practice, #start-microphone-main, summary')]
+      .filter((element) => !element.hidden && element.offsetParent !== null)
+      .map((element) => ({ label: element.id || element.textContent.trim(), width: element.getBoundingClientRect().width, height: element.getBoundingClientRect().height }));
     const settingsState = {
       mode: window.__clefHanger.getState().modeId,
       activeMode: document.querySelector('#mode-buttons [data-active="true"]').dataset.mode,
       activeDifficulty: document.querySelector('#difficulty-buttons [data-active="true"]').dataset.difficulty,
       activeInputMode: document.querySelector('#input-mode-buttons [data-active="true"]').dataset.inputMode,
+      modes: pressedSnapshot('#mode-buttons button', 'mode'),
+      difficulties: pressedSnapshot('#difficulty-buttons button', 'difficulty'),
+      inputModes: pressedSnapshot('#input-mode-buttons button', 'inputMode'),
+      playStyles: pressedSnapshot('.play-style-button', 'playStyle'),
+      speedValueText: document.querySelector('#speed-slider').getAttribute('aria-valuetext'),
+      minTargetSizes,
     };
     states.push(scanA11y('settings'));
     document.querySelector('#close-settings').click();
@@ -368,9 +382,21 @@ test('critical DOM flows cover settings, ended Rush focus, microphone cleanup, a
   })()`);
 
   assert.equal(result.settingsOpen, true);
-  assert.deepEqual(result.settingsState, {
-    mode: 'bass', activeMode: 'bass', activeDifficulty: 'beginner', activeInputMode: 'buttons',
-  });
+  assert.equal(result.settingsState.mode, 'bass');
+  assert.equal(result.settingsState.activeMode, 'bass');
+  assert.equal(result.settingsState.activeDifficulty, 'beginner');
+  assert.equal(result.settingsState.activeInputMode, 'buttons');
+  for (const group of ['modes', 'difficulties', 'inputModes', 'playStyles']) {
+    const pressed = result.settingsState[group].filter((button) => button.pressed === 'true');
+    const active = result.settingsState[group].filter((button) => button.active === 'true');
+    assert.equal(pressed.length, 1, `${group} exposes exactly one aria-pressed option`);
+    assert.equal(active.length, 1, `${group} exposes exactly one visual active option`);
+    assert.equal(pressed[0].value, active[0].value, `${group} visual and ARIA state match`);
+  }
+  assert.equal(result.settingsState.speedValueText, 'Practice ignores speed');
+  for (const target of result.settingsState.minTargetSizes) {
+    assert.ok(target.height >= 44, `${target.label} target height ${target.height}px is at least 44px`);
+  }
   assert.equal(result.microphone.getUserMediaCalls, 2, 'real DOM retry path starts microphone twice');
   assert.ok(result.microphone.stopCalls >= 1, 'retry or switching away stops an existing microphone track');
   assert.equal(result.microphone.listening, false);

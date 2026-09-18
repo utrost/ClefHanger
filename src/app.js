@@ -166,6 +166,12 @@ const microphoneController = createMicrophoneController({
   },
 });
 
+function syncPressedState(button, pressed) {
+  const value = pressed ? 'true' : 'false';
+  button.dataset.active = value;
+  button.setAttribute('aria-pressed', value);
+}
+
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return storageAdapter.readHighScore(modeId, speedId, difficultyId);
 }
@@ -306,20 +312,21 @@ function renderHud(nowMs) {
   syncElementText(settingsLineEl, settingsParts.join(' · '));
   syncElementText(startButton, state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint');
   restartPracticeButton.hidden = state.phase !== 'practice';
-  for (const button of modeButtons.querySelectorAll('button')) button.dataset.active = button.dataset.mode === selectedModeId ? 'true' : 'false';
+  for (const button of modeButtons.querySelectorAll('button')) syncPressedState(button, button.dataset.mode === selectedModeId);
   for (const button of difficultyButtons.querySelectorAll('button')) {
-    button.dataset.active = button.dataset.difficulty === selectedDifficultyId ? 'true' : 'false';
+    syncPressedState(button, button.dataset.difficulty === selectedDifficultyId);
     button.disabled = practiceSelected;
     button.setAttribute('aria-disabled', practiceSelected ? 'true' : 'false');
     button.title = practiceSelected ? 'Practice ignores difficulty; Rush uses this selection.' : '';
   }
   for (const button of inputModeButtons.querySelectorAll('button')) {
-    button.dataset.active = button.dataset.inputMode === selectedInputMode ? 'true' : 'false';
+    syncPressedState(button, button.dataset.inputMode === selectedInputMode);
     button.disabled = selectedModeId === 'chords' && ['microphone', 'piano'].includes(button.dataset.inputMode);
     button.setAttribute('aria-disabled', button.disabled ? 'true' : 'false');
     button.title = button.disabled ? 'Chord mode needs Notes answers.' : '';
   }
-  for (const button of playStyleButtons) button.dataset.active = button.dataset.playStyle === selectedPlayStyle ? 'true' : 'false';
+  for (const button of playStyleButtons) syncPressedState(button, button.dataset.playStyle === selectedPlayStyle);
+  speedSlider.setAttribute('aria-valuetext', practiceSelected ? 'Practice ignores speed' : speed.label);
   lessonSelect.value = selectedLessonId;
   hintToggle.checked = showHints;
   matchAnyOctaveToggle.checked = matchAnyOctave;
@@ -716,6 +723,7 @@ function installModes() {
     button.className = 'mode-button';
     button.dataset.mode = mode.id;
     button.textContent = mode.label;
+    button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => {
       selectedModeId = mode.id;
       storageAdapter.writePreference('selectedMode', selectedModeId);
@@ -794,6 +802,7 @@ function installDifficulties() {
     button.className = 'difficulty-button';
     button.dataset.difficulty = difficulty.id;
     button.textContent = difficulty.label;
+    button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => {
       selectedDifficultyId = difficulty.id;
       storageAdapter.writePreference('selectedDifficulty', selectedDifficultyId);
