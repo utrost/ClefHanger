@@ -98,7 +98,7 @@ When changing JS behavior or import/export contracts, update all of these togeth
 Current marker set:
 
 - App version: `clefhanger-slice69-tester-readiness-2026-09-16`.
-- Service-worker cache: `clefhanger-pwa-v63`.
+- Service-worker cache: `clefhanger-pwa-v64`.
 - Visible marker: `Slice 69: tester readiness`.
 
 ## CI
@@ -306,7 +306,7 @@ curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-sli
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v63'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v64'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

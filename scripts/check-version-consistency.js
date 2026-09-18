@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { dirname, posix, resolve } from 'node:path';
 
 const DEFAULT_FILES = ['index.html', 'src/app.js', 'sw.js'];
 
@@ -22,6 +22,7 @@ function collectVersionQueries(text) {
     /(?:src|href)=["']([^"']+\?v=([^"']+))["']/g,
     /register\(\s*['"]([^'"]+\?v=([^'"]+))['"]\s*\)/g,
     /from\s+['"]([^'"]+\?v=([^'"]+))['"]/g,
+    /import\s+['"]([^'"]+\?v=([^'"]+))['"]/g,
     /export\s+[^;]*\sfrom\s+['"]([^'"]+\?v=([^'"]+))['"]/g,
     /import\s*\(\s*['"]([^'"]+\?v=([^'"]+))['"]\s*\)/g,
   ];
@@ -34,8 +35,29 @@ function collectVersionQueries(text) {
   return queries;
 }
 
-function appImportToSwAsset(specifier) {
+function listJavaScriptFiles(rootDir, read) {
+  if (read) return ['src/app.js'];
+  const rootPath = rootDir instanceof URL ? fileURLToPath(rootDir) : rootDir;
+  const files = [];
+  const walk = (relativeDir) => {
+    const absoluteDir = resolve(rootPath, relativeDir);
+    for (const entry of readdirSync(absoluteDir)) {
+      const relativePath = posix.join(relativeDir, entry);
+      const absolutePath = resolve(rootPath, relativePath);
+      if (statSync(absolutePath).isDirectory()) walk(relativePath);
+      else if (relativePath.endsWith('.js')) files.push(relativePath);
+    }
+  };
+  walk('src');
+  return files.sort();
+}
+
+function appImportToSwAsset(specifier, importerPath = 'src/app.js') {
   const bare = specifier.split('?')[0];
+  if (bare.startsWith('./') || bare.startsWith('../')) {
+    const resolved = posix.normalize(posix.join(posix.dirname(importerPath), bare));
+    return resolved.startsWith('src/') ? `./${resolved}` : null;
+  }
   if (bare.startsWith('./core/') || bare.startsWith('./ui/') || bare.startsWith('./platform/')) {
     return `./src/${bare.slice(2)}`;
   }
@@ -54,8 +76,10 @@ export function validateVersionConsistency({ rootDir = new URL('..', import.meta
 
   const html = read('index.html');
   checkedFiles.push('index.html');
-  const app = read('src/app.js');
-  checkedFiles.push('src/app.js');
+  const jsFiles = listJavaScriptFiles(rootDir, readText);
+  const jsTexts = new Map(jsFiles.map((file) => [file, read(file)]));
+  const app = jsTexts.get('src/app.js');
+  checkedFiles.push(...jsFiles);
   const sw = read('sw.js');
   checkedFiles.push('sw.js');
 
@@ -71,7 +95,7 @@ export function validateVersionConsistency({ rootDir = new URL('..', import.meta
   const expectedVersion = appVersion ?? htmlVersion;
   if (expectedVersion) {
     const htmlQueries = collectVersionQueries(html);
-    const appQueries = collectVersionQueries(app);
+    const appQueries = [...jsTexts.values()].flatMap((text) => collectVersionQueries(text));
 
     const appScriptQuery = htmlQueries.find(({ specifier }) => specifier.startsWith('./src/app.js?v='));
     if (!appScriptQuery) {
@@ -98,10 +122,12 @@ export function validateVersionConsistency({ rootDir = new URL('..', import.meta
     if (!swContainsAsset(sw, asset)) errors.push(`service worker precaches ${asset}`);
   }
 
-  for (const { specifier } of collectVersionQueries(app)) {
-    const asset = appImportToSwAsset(specifier);
+  for (const [file, text] of jsTexts) {
+    for (const { specifier } of collectVersionQueries(text)) {
+      const asset = appImportToSwAsset(specifier, file);
     if (asset && !swContainsAsset(sw, asset)) {
       errors.push(`service worker precaches ${asset}`);
+    }
     }
   }
 

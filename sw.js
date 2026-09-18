@@ -1,4 +1,5 @@
-const CACHE_NAME = 'clefhanger-pwa-v63';
+const APP_VERSION = 'clefhanger-slice69-tester-readiness-2026-09-16';
+const CACHE_NAME = 'clefhanger-pwa-v64';
 const APP_SHELL = [
   './',
   './index.html',
@@ -26,6 +27,23 @@ const APP_SHELL = [
   './icons/icon-192.svg',
   './icons/icon-512.svg',
 ];
+
+function appShellAssetForVersionedRequest(request) {
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return null;
+  if (url.searchParams.size !== 1 || url.searchParams.get('v') !== APP_VERSION) return null;
+
+  const scopePath = new URL('./', self.location.href).pathname;
+  if (!url.pathname.startsWith(scopePath)) return null;
+
+  const asset = `./${url.pathname.slice(scopePath.length)}`;
+  return APP_SHELL.includes(asset) ? asset : null;
+}
+
+function matchVersionedPrecacheRequest(request) {
+  const asset = appShellAssetForVersionedRequest(request);
+  return asset ? caches.match(asset) : Promise.resolve(undefined);
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
@@ -57,6 +75,6 @@ self.addEventListener('fetch', (event) => {
         caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
         return response;
       })
-      .catch(() => caches.match(request, { ignoreSearch: true })),
+      .catch(() => caches.match(request).then((cached) => cached || matchVersionedPrecacheRequest(request))),
   );
 });

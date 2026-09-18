@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import test from 'node:test';
 import { validateVersionConsistency } from '../scripts/check-version-consistency.js';
 
@@ -9,7 +11,7 @@ test('version consistency check accepts the current cache-busted PWA markers', (
   assert.deepEqual(result.errors, []);
   assert.equal(result.appVersion, 'clefhanger-slice69-tester-readiness-2026-09-16');
   assert.equal(result.sliceMarker, 'Slice 69: tester readiness');
-  assert.equal(result.cacheName, 'clefhanger-pwa-v63');
+  assert.equal(result.cacheName, 'clefhanger-pwa-v64');
   assert.ok(result.checkedFiles.includes('index.html'));
   assert.ok(result.checkedFiles.includes('src/app.js'));
   assert.ok(result.checkedFiles.includes('sw.js'));
@@ -71,4 +73,31 @@ const APP_SHELL = ['./', './index.html'];`,
 
   assert.ok(result.errors.some((error) => error.includes('service worker precaches ./src/app.js')));
   assert.ok(result.errors.some((error) => error.includes('service worker precaches ./src/platform/microphone-controller.js')));
+});
+
+test('version consistency check scans transitive ES-module imports', () => {
+  const root = mkdtempSync(join(tmpdir(), 'clefhanger-version-check-'));
+  try {
+    mkdirSync(join(root, 'src', 'core'), { recursive: true });
+    writeFileSync(join(root, 'index.html'), `<!doctype html>
+<html data-app-version="clefhanger-slice69-tester-readiness-2026-09-16">
+  <body>
+    <p class="microcopy">Slice 69: tester readiness</p>
+    <script type="module" src="./src/app.js?v=clefhanger-slice69-tester-readiness-2026-09-16"></script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice69-tester-readiness-2026-09-16')</script>
+  </body>
+</html>`);
+    writeFileSync(join(root, 'src', 'app.js'), `import './core/scoring.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+const appVersion = 'clefhanger-slice69-tester-readiness-2026-09-16';`);
+    writeFileSync(join(root, 'src', 'core', 'scoring.js'), `import './content.js?v=old-version';`);
+    writeFileSync(join(root, 'src', 'core', 'content.js'), 'export const ok = true;');
+    writeFileSync(join(root, 'sw.js'), `const CACHE_NAME = 'clefhanger-pwa-v64';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/scoring.js', './src/core/content.js'];`);
+
+    const result = validateVersionConsistency({ rootDir: root });
+
+    assert.ok(result.errors.some((error) => error.includes('./content.js?v=old-version uses query old-version')));
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

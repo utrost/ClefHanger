@@ -14,7 +14,7 @@ The current product direction is microphone-first: the default answer path is Si
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
 - Current app marker: `clefhanger-slice69-tester-readiness-2026-09-16`.
 - Current visible slice marker: `Slice 69: tester readiness`.
-- Current service-worker cache: `clefhanger-pwa-v63`.
+- Current service-worker cache: `clefhanger-pwa-v64`.
 
 A valid `?mode=` launch query takes precedence over the stored LocalStorage mode for that launch without overwriting the saved preference. The relative manifest URLs use the same contract for browser, installed shortcut, and offline navigation; missing or invalid mode values safely retain the stored mode.
 

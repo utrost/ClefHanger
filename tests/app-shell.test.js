@@ -187,13 +187,15 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v63/);
+  assert.match(sw, /clefhanger-pwa-v64/);
   for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/input-compatibility.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }
   assert.match(sw, /request\.mode === 'navigate'/);
   assert.match(sw, /fetch\(request\)\.catch\(\(\) => caches\.match\('\.\/index\.html'\)\)/, 'offline navigation keeps the direct shortcut URL and its query in the address bar');
-  assert.match(sw, /caches\.match\(request, \{ ignoreSearch: true \}\)/, 'versioned module requests fall back to the precached unversioned app shell offline');
+  assert.match(sw, /matchVersionedPrecacheRequest\(request\)/, 'versioned module requests fall back to approved precached app-shell assets offline');
+  assert.match(sw, /searchParams\.get\('v'\) !== APP_VERSION/, 'only the current app-version query may be canonicalized');
+  assert.doesNotMatch(sw, /ignoreSearch:\s*true/, 'offline fallback must not collapse unrelated query variants onto cached app-shell assets');
 });
 
 test('startup applies the direct launch query after LocalStorage preferences', () => {
