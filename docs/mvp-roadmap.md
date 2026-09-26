@@ -292,3 +292,13 @@ ClefHanger's product center is now microphone-first sight-singing / acoustic-not
 - Rewrite Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes lesson cards so they tell the player what to notice and what to sing/hum.
 - Keep fallback answer trays available without making Notes the primary learning path.
 - Document the mic-first lesson-card contract in the current-state reference and protect it with tests.
+
+
+## Slice 71 — Lesson clarity and safe updates — implemented
+
+- Constrain First steps, Line notes, and Space notes to their intended staff positions, not merely letter names.
+- Share position descriptions between notation accessibility, corrections, and the optional illustrated Practice guide.
+- Count guide/revealed-correction assistance separately from independent answers; respect the hint toggle for both text and overlays.
+- Fill short answer rows and preserve beginner scaffolding after returning from harder Rush play.
+- Delete only obsolete ClefHanger caches. Verify upgrades, saved progress, sibling caches, and offline startup through a real browser.
+- Keep browser resource use bounded and report meaningful timeout state instead of hanging commands.

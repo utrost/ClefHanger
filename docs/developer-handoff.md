@@ -97,13 +97,13 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice70-guided-practice-2026-09-26`.
-- Service-worker cache: `clefhanger-pwa-v65`.
-- Visible marker: `Slice 70: guided practice`.
+- App version: `clefhanger-slice71-lesson-clarity-2026-09-26`.
+- Service-worker cache: `clefhanger-pwa-v66`.
+- Visible marker: `Slice 71: lesson clarity`.
 
 ## CI
 
-GitHub Actions runs `.github/workflows/check.yml` on pushes and pull requests with Node.js 24. CI executes `npm run check` once. `scripts/run-tests.js` discovers current unit and browser test filenames; do not reintroduce a manually maintained file list. Browser tests require Chrome/Chromium (or `CHROME_BIN`).
+GitHub Actions runs `.github/workflows/check.yml` on pushes and pull requests with Node.js 24. CI executes `npm run check` once. `scripts/run-tests.js` discovers current unit and browser test filenames; do not reintroduce a manually maintained file list. Browser tests require Chrome/Chromium (or `CHROME_BIN`). The runner limits browser file concurrency to two Chrome instances; CDP commands have bounded timeouts with diagnostics.
 
 Use `gh run list --branch main --limit 5` after pushing to verify the current head has a green `check` run.
 
@@ -297,11 +297,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice70-guided-practice'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice71-lesson-clarity'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v65'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v66'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 
@@ -323,3 +323,9 @@ Keep these docs aligned:
 - `docs/developer-handoff.md`: how to safely continue coding.
 
 Do not let planned features read as implemented. For example, Pitchy, VexFlow, MIDI, cloud sync, and chord singing are future possibilities, not current behavior.
+
+## Lesson clarity maintenance
+
+Lesson subsets must constrain staff position as well as note name. Keep `describeStaffPosition` in the theory layer so correction copy, the optional illustrated guide, and screen-reader descriptions agree. The active prompt remains unlabelled until help is requested/revealed. Assistance belongs to a prompt ID and must not follow a neutral skip or reset into a fresh prompt.
+
+The PWA upgrade browser test serves a simulated prior release and then the current release on the same origin/profile. It checks activation, progress persistence, sibling-cache preservation, and an offline reload; it is separate from physical-phone testing.

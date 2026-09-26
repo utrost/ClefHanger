@@ -13,3 +13,11 @@ test('playback plus its acoustic tail cannot score and assistance belongs to the
   assert.equal(session.wasAssisted('note-1'), false);
   assert.equal(session.canScore(1200), false, 'resetting a round does not remove acoustic protection');
 });
+
+test('a revealed visual correction counts as help without blocking input or following a new prompt', () => {
+  const session = createListenSession();
+  session.assist('note-1');
+  assert.equal(session.wasAssisted('note-1'), true);
+  assert.equal(session.canScore(0), true);
+  assert.equal(session.wasAssisted('note-2'), false);
+});

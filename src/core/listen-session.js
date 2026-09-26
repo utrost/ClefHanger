@@ -3,6 +3,7 @@ export function createListenSession() {
   let blockedUntil = 0;
   let assistedPrompt = null;
   return {
+    assist(promptId) { assistedPrompt = promptId; },
     hear(promptId, nowMs, durationMs) {
       assistedPrompt = promptId;
       blockedUntil = Math.max(blockedUntil, nowMs + durationMs + 300);

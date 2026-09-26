@@ -45,6 +45,8 @@ Current boundaries:
   - Frequency-to-note conversion, cents math, A4 calibration readouts, microphone input-mode normalization, sung-note match/debounce rules including optional any-octave matching, microphone input-level diagnostics, and a small autocorrelation detector for analyser buffers.
 - `src/core/mic-diagnostics.js`
   - Renderer-free Mic Lab report contracts: live analyser summaries, decoded recording level/peak, pitch-window candidates, environment/track metadata, interpretation strings, and Telegram-friendly `.txt` JSON export metadata.
+- `src/ui/lesson-guide.js`
+  - Pure SVG lesson-reference rows, labels, ledger geometry, and accessible position keys.
 - `src/ui/staff-renderer.js`
   - Renderer-only SVG staff/chord/note/ledger-line/correction-label/ghost-note markup. It consumes core state and microphone state and returns SVG markup without touching the DOM.
 - `src/app.js`
@@ -96,7 +98,7 @@ Planned later implementation:
 Before a slice is considered done:
 
 - Unit tests pass.
-- Build passes.
+- Full project gate passes (there is no build step).
 - Markdown links are checked where practical.
 - `git diff --check` passes.
 - Local browser smoke passes in a portrait mobile viewport.

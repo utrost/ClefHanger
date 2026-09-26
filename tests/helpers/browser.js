@@ -55,33 +55,43 @@ function connectCdp(url) {
   const pending = new Map();
   socket.addEventListener('message', ({ data }) => {
     const message = JSON.parse(data);
-    if (!message.id || !pending.has(message.id)) return;
-    const { resolveCommand, rejectCommand } = pending.get(message.id);
+    const request = pending.get(message.id);
+    if (!request) return;
     pending.delete(message.id);
-    if (message.error) rejectCommand(new Error(message.error.message));
-    else resolveCommand(message.result);
+    clearTimeout(request.timer);
+    if (message.error) request.reject(new Error(message.error.message));
+    else request.resolve(message.result);
   });
-  const ready = new Promise((resolveReady, rejectReady) => {
-    socket.addEventListener('open', resolveReady, { once: true });
-    socket.addEventListener('error', rejectReady, { once: true });
+  socket.addEventListener('close', () => {
+    for (const request of pending.values()) {
+      clearTimeout(request.timer);
+      request.reject(new Error('Browser connection closed'));
+    }
+    pending.clear();
   });
+  const ready = new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Browser connection timed out')), 15000);
+    socket.addEventListener('open', () => { clearTimeout(timer); resolve(); }, { once: true });
+    socket.addEventListener('error', () => { clearTimeout(timer); reject(new Error('Browser connection failed')); }, { once: true });
+  });
+  async function command(method, params = {}) {
+    await ready;
+    if (socket.readyState !== WebSocket.OPEN) throw new Error('Browser connection is not open');
+    const id = ++nextId;
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        pending.delete(id);
+        reject(new Error(`Browser command timed out: ${method}`));
+      }, 15000);
+      pending.set(id, { resolve, reject, timer });
+      socket.send(JSON.stringify({ id, method, params }));
+    });
+  }
   return {
-    async command(method, params = {}) {
-      await ready;
-      const id = ++nextId;
-      return new Promise((resolveCommand, rejectCommand) => {
-        pending.set(id, { resolveCommand, rejectCommand });
-        socket.send(JSON.stringify({ id, method, params }));
-      });
-    },
+    command,
     async evaluate(expression) {
-      await ready;
-      const id = ++nextId;
-      const result = await new Promise((resolveCommand, rejectCommand) => {
-        pending.set(id, { resolveCommand, rejectCommand });
-        socket.send(JSON.stringify({ id, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, returnByValue: true } }));
-      });
-      if (result.exceptionDetails) throw new Error(result.exceptionDetails.text);
+      const result = await command('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
+      if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description || result.exceptionDetails.text);
       return result.result.value;
     },
     close() { socket.close(); },
@@ -89,13 +99,13 @@ function connectCdp(url) {
 }
 
 
-export async function launchBrowser(t, { width = 390, height = 844 } = {}) {
+export async function launchBrowser(t, { width = 390, height = 844, transformResponse = (_path, data) => data } = {}) {
   const server = createServer(async (request, response) => {
     const pathname = new URL(request.url, 'http://localhost').pathname;
     const filePath = join(ROOT, pathname === '/' ? 'index.html' : pathname);
     try {
       const data = await import('node:fs/promises').then(({ readFile }) => readFile(filePath));
-      response.writeHead(200, { 'content-type': MIME[extname(filePath)] || 'application/octet-stream' }).end(data);
+      response.writeHead(200, { 'content-type': MIME[extname(filePath)] || 'application/octet-stream', 'cache-control': 'no-store' }).end(transformResponse(filePath, data));
     } catch { response.writeHead(404).end(); }
   });
   await new Promise((resolveListen) => server.listen(0, '127.0.0.1', resolveListen));
@@ -104,7 +114,7 @@ export async function launchBrowser(t, { width = 390, height = 844 } = {}) {
   const profile = mkdtempSync(join(tmpdir(), 'clefhanger-browser-'));
   const chrome = spawn(findChromeExecutable(), ['--headless=new', '--no-sandbox', '--disable-gpu', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'], { stdio: 'ignore' });
   t.after(async () => {
-    await new Promise((done) => { if (chrome.exitCode !== null) return done(); chrome.once('exit', done); chrome.kill('SIGKILL'); });
+    await new Promise((done) => { if (chrome.exitCode !== null || chrome.signalCode !== null) return done(); chrome.once('exit', done); chrome.kill('SIGKILL'); });
     rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
   });
   const page = await waitFor(async () => (await fetch(`http://127.0.0.1:${port}/json`).then((r) => r.json())).find((p) => p.type === 'page'));
@@ -128,5 +138,5 @@ export async function launchBrowser(t, { width = 390, height = 844 } = {}) {
     await cdp.command('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
     await cdp.command('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   }
-  return { ...cdp, tap, waitFor, origin };
+  return { ...cdp, tap, waitFor, origin, goOffline: () => new Promise((done) => { server.closeAllConnections(); server.close(done); }) };
 }

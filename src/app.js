@@ -1,5 +1,6 @@
-import { createListenSession } from './core/listen-session.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { recordAttempt, summarizeProgress } from './core/progress.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { renderLessonGuide } from './ui/lesson-guide.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { createListenSession } from './core/listen-session.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { recordAttempt, summarizeProgress } from './core/progress.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
 import {
   ACCIDENTAL_BUTTONS,
   DIFFICULTY_LEVELS,
@@ -12,7 +13,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+} from './core/content.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -27,9 +28,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+} from './core/game.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -42,19 +43,19 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+} from './core/pitch.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
 
-const appVersion = 'clefhanger-slice70-guided-practice-2026-09-26';
+const appVersion = 'clefhanger-slice71-lesson-clarity-2026-09-26';
 const listenSession = createListenSession();
 let playbackRefreshTimer = null;
 const progressCache = new Map();
@@ -89,6 +90,9 @@ const inputModeButtons = document.querySelector('#input-mode-buttons');
 const modeButtons = document.querySelector('#mode-buttons');
 const speedSlider = document.querySelector('#speed-slider');
 const difficultyButtons = document.querySelector('#difficulty-buttons');
+const noteGuide = document.querySelector('#note-guide');
+const noteGuideContent = document.querySelector('#note-guide-content');
+let guideLessonId = null;
 const hearNoteButton = document.querySelector('#hear-note');
 const micGuidanceEl = document.querySelector('#mic-guidance');
 const lessonProgressEl = document.querySelector('#lesson-progress');
@@ -259,6 +263,11 @@ function isPracticeSelected() {
 }
 
 function renderLessonIntro() {
+  noteGuide.hidden = selectedModeId !== 'basics' || selectedPlayStyle !== 'practice';
+  if (guideLessonId !== selectedLessonId) {
+    noteGuideContent.innerHTML = renderLessonGuide(getLessonPool(getMode('basics').pool, selectedLessonId));
+    guideLessonId = selectedLessonId;
+  }
   const lessonApplies = isLessonScopedMode();
   const intro = getLessonIntroCard(selectedLessonId);
   lessonIntro.hidden = !lessonApplies || lessonIntroHidden;
@@ -768,10 +777,13 @@ function handleAnswer(answer) {
   if (!['practice', 'running'].includes(state.phase) || settingsDialog.open) return;
   const now = performance.now();
   const answeredPrompt = state.activeNote;
+  if (state.phase === 'practice' && !noteGuide.hidden && noteGuide.open) listenSession.assist(answeredPrompt.id);
   state = answerActiveNote(state, answer, now);
   savePracticeAttempt(state.lastOutcome);
-  if (state.phase === 'practice') state = applyLearningFeedback(state, now);
-  if (!showHints && state.feedback.kind === 'wrong') state.feedback.text = `${answer} is not it. Try again.`;
+  if (state.phase === 'practice') {
+    state = applyLearningFeedback(state, now, { showHints });
+    if (state.correction) listenSession.assist(answeredPrompt.id);
+  }
   if (state.feedback.kind === 'correct') playPromptAudio(answeredPrompt);
   if (state.phase === 'running') state = updateRound(state, now);
   if (state.phase === 'practice' && !state.activeNote) state = spawnNextNote(state, now + 1);
@@ -780,7 +792,8 @@ function handleAnswer(answer) {
 
 function installButtons() {
   buttons.innerHTML = '';
-  const answers = getScaffoldedAnswerOptions({ modeId: selectedModeId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId, allOptions: getAnswerOptions(selectedModeId) });
+  const answers = getScaffoldedAnswerOptions({ modeId: selectedModeId, difficultyId: selectedPlayStyle === 'practice' ? 'beginner' : selectedDifficultyId, lessonId: selectedLessonId, allOptions: getAnswerOptions(selectedModeId) });
+  buttons.style.setProperty('--answer-columns', String(Math.min(answers.length, 7)));
   for (const option of answers) {
     const button = document.createElement('button');
     button.type = 'button';
@@ -915,6 +928,10 @@ function installBeginnerControls() {
   hintToggle.addEventListener('change', () => {
     showHints = hintToggle.checked;
     storageAdapter.writePreference('showHints', showHints);
+    if (state.phase === 'practice' && state.lastOutcome?.result === 'wrong' && state.activeNote?.id === state.lastOutcome.prompt?.id) {
+      state = applyLearningFeedback(state, performance.now(), { showHints });
+      if (state.correction) listenSession.assist(state.activeNote.id);
+    }
     render();
   });
   matchAnyOctaveToggle.addEventListener('change', () => {
@@ -943,6 +960,9 @@ function installDifficulties() {
   }
 }
 
+noteGuide.addEventListener('toggle', () => {
+  if (noteGuide.open && state.phase === 'practice' && !noteGuide.hidden) listenSession.assist(state.activeNote?.id);
+});
 hearNoteButton.addEventListener('click', hearCurrentNote);
 pauseRushButton.addEventListener('click', toggleRushPause);
 summaryPracticeButton.addEventListener('click', returnToPractice);

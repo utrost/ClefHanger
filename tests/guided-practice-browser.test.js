@@ -68,7 +68,7 @@ test('recent success recovers after mistakes and a real tap advances to the next
   const browser = await launchBrowser(t);
   await browser.tap('#use-note-buttons');
   await browser.tap('#start-round');
-  for (let i = 0; i < 11; i++) {
+  for (let i = 0; i < 12; i++) {
     const selector = await browser.evaluate(`(() => {
       const answer = window.__clefHanger.getState().activeNote.answer;
       const buttons = [...document.querySelectorAll('#note-buttons button')];

@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice70-guided-practice-2026-09-26`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice71-lesson-clarity-2026-09-26`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Microphone-first scope
 
@@ -12,9 +12,9 @@ The current product direction is microphone-first: the default answer path is Si
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice70-guided-practice-2026-09-26`.
-- Current visible slice marker: `Slice 70: guided practice`.
-- Current service-worker cache: `clefhanger-pwa-v65`.
+- Current app marker: `clefhanger-slice71-lesson-clarity-2026-09-26`.
+- Current visible slice marker: `Slice 71: lesson clarity`.
+- Current service-worker cache: `clefhanger-pwa-v66`.
 
 A valid `?mode=` launch query takes precedence over the stored LocalStorage mode for that launch without overwriting the saved preference. The relative manifest URLs use the same contract for browser, installed shortcut, and offline navigation; missing or invalid mode values safely retain the stored mode.
 
@@ -149,7 +149,7 @@ Slice 61 keeps the beginner lesson cards aligned with the canonical Sing/Play wo
 - Label: First steps.
 - Copy: `Start with C, D, E`.
 - Answer buttons: C, D, E.
-- Prompt filter: note names C, D, E.
+- Prompt filter: C4/D4/E4, staff steps -2/-1/0 only.
 
 ### Line notes
 
@@ -157,7 +157,7 @@ Slice 61 keeps the beginner lesson cards aligned with the canonical Sing/Play wo
 - Label: Line notes.
 - Intro: see the staff line first, then sing it steadily: E G B D F from bottom to top.
 - Answer buttons: E, G, B, D, F.
-- Prompt filter: note names E, G, B, D, F.
+- Prompt filter: E4/G4/B4/D5/F5, staff steps 0/2/4/6/8 only.
 
 ### Space notes
 
@@ -165,7 +165,7 @@ Slice 61 keeps the beginner lesson cards aligned with the canonical Sing/Play wo
 - Label: Space notes.
 - Intro: see the space between the lines first, then sing the pitch: F A C E from bottom to top.
 - Answer buttons: F, A, C, E.
-- Prompt filter: note names F, A, C, E.
+- Prompt filter: F4/A4/C5/E5, staff steps 1/3/5/7 only.
 
 ### Ledger lines
 
@@ -191,6 +191,12 @@ Slice 61 keeps the beginner lesson cards aligned with the canonical Sing/Play wo
 - Copy: all seven natural notes in gentle Sing/Play practice before Rush.
 - Answer buttons: C, D, E, F, G, A, B.
 - Prompt pool: full Treble pool.
+
+## Illustrated lesson help
+
+`src/ui/lesson-guide.js` renders the current Treble lesson in rows of at most five labelled notes, with ledger lines and a text key. Each SVG has an accessible position description from `src/core/music-theory.js` `describeStaffPosition`, shared with correction feedback and the unlabelled active-prompt accessibility description. The guide is in a collapsed **Learn these notes** disclosure beneath Practice controls; Rush and non-Treble modes hide it. It is regenerated only when the selected lesson changes.
+
+Opening the guide on a prompt marks that prompt as assisted, even after closing it. Keeping it open marks subsequent answered prompts as assisted. Revealing a correction similarly marks later attempts on that prompt as assisted; the initial wrong independent answer remains in recent history. Turning hints off removes both correction text and the staff label. Existing saved counters are preserved; prior records cannot be retrospectively reclassified.
 
 ## Play styles and phases
 
@@ -317,7 +323,7 @@ Wrong answers:
 - reset `streak` to 0;
 - keep the active note;
 - set beginner teaching feedback;
-- create a correction overlay frozen for 1,400 ms;
+- with hints enabled, create a correction overlay frozen for 1,400 ms and mark later answers on that prompt as assisted; with hints disabled, reveal neither the answer name nor overlay;
 - never mark the answer button with the current correct answer before the player acts.
 
 Missed notes:
@@ -584,11 +590,11 @@ It runs:
 
 Current automated suite covers:
 
-- PWA shell/manifest/service-worker contract.
+- PWA shell/manifest/service-worker contract, including simulated prior-release upgrade, unrelated-cache preservation, saved progress, and offline startup.
 - Staff/clef/ledger geometry.
 - Beginner lessons, tutorial, correction overlay, scaffolded answers.
 - Difficulty/queue/speed/high-score separation.
-- Core scoring, pause/resume, playback protection, progress normalization and persistence.
+- Core scoring, pause/resume, playback protection, visual assistance, progress normalization and persistence.
 - Real touch input at phone viewports, listen/imitate scoring exclusion, reload persistence, next-lesson navigation, microphone cleanup, and keyboard/touch result exits.
 - Mode-specific note pools, accidentals, chords, piano input mapping.
 - Audio voice plan and A4 calibration tone.

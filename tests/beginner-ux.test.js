@@ -58,7 +58,7 @@ test('line, space, and ledger lessons have tiny intro cards before practice star
 
 test('beginner lesson copy teaches singing first while keeping buttons as fallback', () => {
   const lessons = read('src/core/lessons.js');
-  assert.match(lessons, /Sing or hum C, D, or E/);
+  assert.match(lessons, /Start with middle C/);
   assert.match(lessons, /sing it steadily: E G B D F/);
   assert.match(lessons, /sing the pitch: F A C E/);
   assert.match(lessons, /aim your voice/i);
@@ -220,7 +220,7 @@ test('wrong answers teach the correct note and why it was correct', () => {
   const note = { answer: 'G', noteName: 'G', octave: 4, label: 'G line', staffStep: 2 };
   const feedback = buildBeginnerFeedback({ prompt: note, givenAnswer: 'E', kind: 'wrong' });
   assert.match(feedback.text, /That was G/i);
-  assert.match(feedback.text, /G line/i);
+  assert.match(feedback.text, /second line from bottom/i);
   assert.equal(feedback.correctAnswer, 'G');
 
   const state = { ...createInitialState(), phase: 'practice', activeNote: note, noteQueue: [note] };
@@ -238,7 +238,7 @@ test('wrong answers expose a visual correction overlay contract', () => {
   assert.equal(overlay.label, 'E');
   assert.match(overlay.location, /bottom line/i);
   assert.equal(overlay.shouldFreezeNote, true);
-  assert.equal(overlay.ariaLabel, 'Correction: E, bottom line E');
+  assert.equal(overlay.ariaLabel, 'Correction: E, bottom line of staff');
 });
 
 test('beginner microphone message hides debug details unless expanded', () => {

@@ -20,9 +20,18 @@ The MVP is now microphone-first:
 
 - The mobile Practice screen keeps the staff, **Hear this note**, **Check mic**, and pitch guidance together. Tutorial and lesson detail are in Settings → Lesson help; timing and score panels are reserved for Rush.
 - **Hear this note** starts Practice if needed. Listen, then imitate in a comfortable octave. Microphone scoring waits through app playback and a 300 ms acoustic tail.
-- Practice progress is saved locally per lesson (or mode outside Treble). Listening-assisted attempts are separate from the last ten independent attempts; 8/10 unlocks an optional **Next lesson** suggestion. All lessons remain selectable.
+- Practice progress is saved locally per lesson (or mode outside Treble). Attempts made with listening, the note guide, or a revealed correction are separate from the last ten independent attempts; 8/10 unlocks an optional **Next lesson** suggestion. All lessons remain selectable.
 - **Next practice note** skips without recording an attempt. **Restart practice** resets the current session, preserving saved learning progress.
 - Rush pauses when Settings opens or the page becomes hidden. Resume explicitly; results offer replay or **Back to Practice**, and Escape returns to Practice.
+
+## Lesson clarity (Slice 71)
+
+- First steps is precisely C4/D4/E4. Line notes uses only the five treble lines; Space notes uses only the four spaces.
+- **Learn these notes** opens a labelled staff guide with accessible position descriptions. It stays optional so the main practice controls remain together.
+- Corrections describe staff positions consistently. Turning off hints conceals both the answer copy and the visual label.
+- Correcting an answer after seeing its solution counts as practice with help, not an independent success. Skipping remains neutral.
+- Short answer rows fill the available width; Practice always uses beginner answer choices, regardless of the previous Rush difficulty.
+- PWA updates remove only obsolete ClefHanger caches. Upgrade tests preserve saved progress and another app’s cache before exercising an offline reload.
 
 ## Input modes
 
@@ -34,7 +43,7 @@ Buttons and piano remain fallback input modes; they are no longer the product ce
 
 ## Current playable slice
 
-Slices through 70 are implemented as a dependency-free static PWA:
+Slices through 71 are implemented as a dependency-free static PWA:
 
 - Microphone-first practice flow: the app starts in untimed Practice mode with Sing/Play as the default input and a visible main-screen **Check mic** action.
 - **Next practice note** skips a prompt without resetting progress or treating the skip as a learning outcome; restarting practice remains a separate deliberate action.

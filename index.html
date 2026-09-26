@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-app-version="clefhanger-slice70-guided-practice-2026-09-26">
+<html lang="en" data-app-version="clefhanger-slice71-lesson-clarity-2026-09-26">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -386,7 +386,7 @@
 
       #note-buttons {
         display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
+        grid-template-columns: repeat(var(--answer-columns, 7), minmax(0, 1fr));
         gap: 5px;
       }
 
@@ -585,6 +585,12 @@
         main { gap: 5px; }
         .tagline { display: none; }
       }
+      #note-guide { border: 1px solid rgba(255,255,255,0.14); border-radius: 16px; padding: 0 10px; }
+      #note-guide > summary { justify-content: space-between; }
+      #note-guide[open] .disclosure-icon { transform: rotate(180deg); }
+      #note-guide p, .guide-key { color: var(--muted); font-size: 0.85rem; }
+      #note-guide-content svg { display: block; width: 100%; height: auto; background: var(--paper); border-radius: 12px; margin-top: 8px; }
+      .guide-key { padding-left: 22px; line-height: 1.6; }
     </style>
   </head>
   <body>
@@ -659,6 +665,11 @@
         </div>
 
         <p id="learning-coach" aria-label="Learning suggestion">Golden path: Practice · Beginner · Sing/Play. Use buttons only as a quiet fallback.</p>
+        <details id="note-guide">
+          <summary><span>Learn these notes</span><span class="disclosure-icon" aria-hidden="true">⌄</span></summary>
+          <p>Read the labelled examples, then close the guide and try the staff note. Answers made with this guide count as practice with help.</p>
+          <div id="note-guide-content"></div>
+        </details>
       </section>
 
       <dialog id="settings-dialog" aria-label="ClefHanger settings">
@@ -736,7 +747,7 @@
         <button id="restart-practice" type="button" hidden>Restart practice</button>
           <details id="mic-help"><summary>How Sing/Play scoring works</summary><p>Sing the front note. With Match any octave on, a low or high C counts as C; ClefHanger accepts a steady matching pitch class within 50 cents. Buttons stay available as a quiet fallback in Settings.</p></details>
           <details id="microphone-debug"><summary>Advanced mic details</summary><p id="microphone-debug-text">No recording details yet.</p></details>
-        <details id="about"><summary>About ClefHanger</summary><p class="microcopy">Slice 70: guided practice</p></details>
+        <details id="about"><summary>About ClefHanger</summary><p class="microcopy">Slice 71: lesson clarity</p></details>
       </dialog>
     </main>
     <p id="game-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
@@ -750,12 +761,12 @@
         <button id="summary-practice" class="secondary-action" type="button">Back to Practice</button>
       </div>
     </aside>
-    <script type="module" src="./src/app.js?v=clefhanger-slice70-guided-practice-2026-09-26"></script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice71-lesson-clarity-2026-09-26"></script>
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker
-            .register('./sw.js?v=clefhanger-slice70-guided-practice-2026-09-26')
+            .register('./sw.js?v=clefhanger-slice71-lesson-clarity-2026-09-26')
             .then((registration) => registration.update())
             .catch(() => {});
         });

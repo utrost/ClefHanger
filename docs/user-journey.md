@@ -137,7 +137,7 @@ The user should:
 4. Tap **Hear this note** when needed, listen, then sing or hum slowly.
 5. Treat wrong notes as hints.
 6. Repeat until the note positions become familiar.
-7. Use the optional **Next lesson** action after eight of the last ten independent attempts are correct, or select any lesson at any time. Listening-assisted attempts are counted separately. Progress survives reloads and restarting a session on this device.
+7. Use the optional **Next lesson** action after eight of the last ten independent attempts are correct, or select any lesson at any time. Listening- or visually-assisted attempts are counted separately. Progress survives reloads and restarting a session on this device.
 
 Recommended order:
 
@@ -298,3 +298,9 @@ If the canonical Sing/Play path fails because of noise, permission, or browser b
 3. Prove the visual note-reading loop still works.
 4. Export a Mic Lab report if the microphone path needs debugging.
 5. Return to Sing/Play when the environment is quiet or the browser issue is fixed.
+
+## Learning with the note guide
+
+In Treble Practice, open **Learn these notes** to see each lesson note on a labelled staff, followed by its line/space description. First steps uses only middle C, D immediately below the staff, and bottom-line E. Close the guide when you want to answer independently. Answers after viewing the guide, hearing a reference, or seeing a correction count as practice with help. This changes neither access to lessons nor the score; it keeps the progress suggestion honest.
+
+Turning off **Show hints after mistakes** in Settings → Lesson help hides both the answer explanation and its staff label. It does not remove help already seen for the current prompt.

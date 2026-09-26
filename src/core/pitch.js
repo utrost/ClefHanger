@@ -1,4 +1,4 @@
-import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { SEMITONES_FROM_C, answerLabel } from './music-theory.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
 
 const NOTE_NAMES = ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'];
 const DEFAULT_TOLERANCE_CENTS = 50;

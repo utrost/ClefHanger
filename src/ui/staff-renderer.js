@@ -3,8 +3,8 @@ import {
   getClefPresentation,
   getLedgerLinesForStaffStep,
   getMode,
-} from '../core/game.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { createGhostNoteFromPitch } from '../core/music-theory.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+} from '../core/game.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { createGhostNoteFromPitch, describeStaffPosition } from '../core/music-theory.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
 
 export function yForStaffStep(step) {
   return STAFF_LAYOUT.bottomLineY - step * STAFF_LAYOUT.halfStep;
@@ -20,45 +20,6 @@ function escapeSvgText(value) {
   return String(value ?? '').replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char]);
 }
 
-function ordinal(value) {
-  const words = ['zeroth', 'first', 'second', 'third', 'fourth', 'fifth'];
-  if (words[value]) return words[value];
-  const remainder100 = value % 100;
-  if (remainder100 >= 11 && remainder100 <= 13) return `${value}th`;
-  if (value % 10 === 1) return `${value}st`;
-  if (value % 10 === 2) return `${value}nd`;
-  if (value % 10 === 3) return `${value}rd`;
-  return `${value}th`;
-}
-
-function staffPositionDescription(staffStep = 0) {
-  if (staffStep === -1) return 'space immediately below staff';
-  if (staffStep === 9) return 'space immediately above staff';
-  if (staffStep < -1) {
-    const ledgerNumber = Math.floor(Math.abs(staffStep) / 2);
-    return staffStep % 2 === 0
-      ? `${ordinal(ledgerNumber)} ledger line below staff`
-      : `space below ${ordinal(ledgerNumber)} ledger line below staff`;
-  }
-  if (staffStep > 9) {
-    const ledgerNumber = Math.floor((staffStep - 8) / 2);
-    return staffStep % 2 === 0
-      ? `${ordinal(ledgerNumber)} ledger line above staff`
-      : `space above ${ordinal(ledgerNumber)} ledger line above staff`;
-  }
-  if (staffStep % 2 === 0) {
-    const line = (staffStep / 2) + 1;
-    if (line === 1) return 'bottom line of staff';
-    if (line === 3) return 'middle line of staff';
-    if (line === 5) return 'top line of staff';
-    return `${ordinal(line)} line from bottom`;
-  }
-  const space = ((staffStep - 1) / 2) + 1;
-  if (space === 1) return 'bottom space of staff';
-  if (space === 4) return 'top space of staff';
-  return `${ordinal(space)} space from bottom`;
-}
-
 function accidentalDescription(note) {
   return note.accidental ? `${note.accidental} accidental` : 'natural';
 }
@@ -66,10 +27,10 @@ function accidentalDescription(note) {
 function notationDescription(note) {
   const clef = getClefPresentation(note.clef || 'treble').clef;
   if (note.kind === 'chord') {
-    const positions = (note.staffSteps || []).map(staffPositionDescription).join(', ');
+    const positions = (note.staffSteps || []).map(describeStaffPosition).join(', ');
     return `chord with ${(note.staffSteps || []).length} notes: ${clef} clef; ${positions}; ${accidentalDescription(note)}`;
   }
-  return `${clef} clef, ${staffPositionDescription(note.staffStep)}, ${accidentalDescription(note)}`;
+  return `${clef} clef, ${describeStaffPosition(note.staffStep)}, ${accidentalDescription(note)}`;
 }
 
 export function buildNotationPromptDescription(state) {

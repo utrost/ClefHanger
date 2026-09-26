@@ -46,7 +46,7 @@ For exact current rules and constants, see [Current State Reference](./current-s
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice70-guided-practice`.
+- Verify the HTML contains `clefhanger-slice71-lesson-clarity`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/content.js`, `src/core/scoring.js`, `src/core/learning.js`, `src/core/lessons.js`, `src/core/audio.js`, `src/core/pitch.js`, `src/platform/storage.js`, `src/platform/microphone-session.js`, `src/platform/mic-recording-diagnostic.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.
@@ -62,3 +62,12 @@ For exact current rules and constants, see [Current State Reference](./current-s
 - Start the microphone, switch to Notes, and confirm the microphone track stops.
 - Open Settings during Rush. Confirm timer/notes freeze, closing leaves it paused, and Resume continues without losing time. Repeat after hiding and returning to the page.
 - At results, test Back to Practice, Escape, forward/backward Tab wrapping, and replay.
+
+## Lesson clarity regression checks
+
+- First steps produces only C4/D4/E4; line and space lessons stay on their respective lines/spaces in both Practice and Rush.
+- On a phone, open **Learn these notes**. Confirm labelled notes/ledger lines agree with the text key and no horizontal page scrolling appears. Mixed notes uses multiple readable rows.
+- View then close the guide, answer a note, and confirm the assisted counter increases. Repeat after a wrong answer reveals its correction; the corrected answer must not inflate the independent count.
+- Disable hints, answer incorrectly, and confirm neither the correct name nor a correction label appears.
+- Switch from Hard Rush to First steps Practice; confirm the three answer buttons fill the row.
+- Upgrade an installed copy and reload offline. Saved progress and unrelated same-origin app caches must survive.

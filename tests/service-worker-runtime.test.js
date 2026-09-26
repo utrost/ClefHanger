@@ -30,7 +30,7 @@ function loadServiceWorker({ fetchImpl, keysImpl } = {}) {
   };
   const caches = {
     openCalls: [],
-    keys: keysImpl || (async () => ['old-cache', 'clefhanger-pwa-v65']),
+    keys: keysImpl || (async () => ['clefhanger-pwa-v1', 'clefhanger-pwa-v66']),
     delete: async (key) => {
       deleteCalls.push(key);
       return true;
@@ -76,7 +76,7 @@ test('activation keeps clients.claim inside the activation lifetime', async () =
   let resolveKeys;
   const worker = loadServiceWorker({
     keysImpl: () => new Promise((resolve) => {
-      resolveKeys = () => resolve(['old-cache', 'clefhanger-pwa-v65']);
+      resolveKeys = () => resolve(['clefhanger-pwa-v1', 'clefhanger-pwa-v66']);
     }),
   });
 
@@ -88,7 +88,7 @@ test('activation keeps clients.claim inside the activation lifetime', async () =
   await waitUntilPromises[0];
 
   assert.equal(worker.self.clients.claimCalls, 1);
-  assert.deepEqual(worker.deleteCalls, ['old-cache']);
+  assert.deepEqual(worker.deleteCalls, ['clefhanger-pwa-v1']);
 });
 
 test('successful runtime cache writes are attached to the fetch event lifetime', async () => {
@@ -104,7 +104,7 @@ test('successful runtime cache writes are attached to the fetch event lifetime',
   };
 
   const { responsePromise, waitUntilPromises } = await worker.dispatch('fetch', {
-    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice70-guided-practice-2026-09-26'),
+    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice71-lesson-clarity-2026-09-26'),
   });
 
   const response = await responsePromise;
@@ -125,11 +125,20 @@ test('failed HTTP responses are returned but not written into the runtime cache'
   });
 
   const { responsePromise, waitUntilPromises } = await worker.dispatch('fetch', {
-    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice70-guided-practice-2026-09-26'),
+    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice71-lesson-clarity-2026-09-26'),
   });
 
   const response = await responsePromise;
   assert.equal(response.status, 404);
   assert.equal(worker.putCalls.length, 0, 'failed HTTP responses must not poison the runtime cache');
   assert.equal(waitUntilPromises.length, 0, 'uncacheable failed responses should not create cache-write lifetime work');
+});
+
+test('activation deletes only obsolete ClefHanger caches and preserves other apps on the origin', async () => {
+  const worker = loadServiceWorker({ keysImpl: async () => [
+    'clefhanger-pwa-v1', 'clefhanger-pwa-v66', 'another-app-v1', 'shared-assets',
+  ] });
+  const { waitUntilPromises } = await worker.dispatch('activate');
+  await Promise.all(waitUntilPromises);
+  assert.deepEqual(worker.deleteCalls, ['clefhanger-pwa-v1']);
 });

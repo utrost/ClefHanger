@@ -1,12 +1,13 @@
-import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-import { getMode } from './content.js?v=clefhanger-slice70-guided-practice-2026-09-26';
-export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { describeStaffPosition, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { getMode } from './content.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
 function explainPrompt(prompt) {
   if (!prompt) return 'Keep going.';
-  if (prompt.label) return prompt.label;
-  if (prompt.staffStep === 2 && prompt.noteName === 'G') return 'the G line';
-  if (prompt.staffStep % 2 === 0) return 'a staff line note';
-  return 'a staff space note';
+  if (prompt.kind === 'chord') return prompt.label || prompt.displayName || 'a chord';
+  const step = Number.isFinite(prompt.staffStep) ? prompt.staffStep : getStaffStepForPitch(prompt, prompt.clef || 'treble');
+  if (step !== null) return describeStaffPosition(step);
+  return prompt.label || 'the shown staff position';
 }
 
 export function buildBeginnerFeedback({ prompt, givenAnswer, kind = 'wrong', points = 0 } = {}) {
@@ -47,8 +48,11 @@ export function buildTeachingFeedback(outcome = {}) {
   };
 }
 
-export function applyLearningFeedback(state = {}, nowMs = 0) {
+export function applyLearningFeedback(state = {}, nowMs = 0, { showHints = true } = {}) {
   if (!state.lastOutcome) return state;
+  if (!showHints && state.lastOutcome.result === 'wrong') {
+    return { ...state, feedback: { kind: 'wrong', text: `${state.lastOutcome.givenAnswer || 'That'} is not it. Try again.` }, correction: null };
+  }
   const teaching = buildTeachingFeedback(state.lastOutcome);
   return {
     ...state,

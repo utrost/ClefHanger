@@ -62,7 +62,7 @@ Use Practice to learn.
 - Correct answer plays the pitch and moves to another practice note.
 - **Next practice note** skips only the current prompt. It does not count as correct, wrong, or missed, does not change the score or streak, and does not add analytics or outcome evidence. The visible learning suggestion may change because it can describe the newly active prompt.
 - **Restart practice**, in Settings, resets the current session while retaining saved lesson progress.
-- The recent-progress line counts up to ten independent attempts. Listening-assisted attempts are listed separately. Eight correct out of ten offers a **Next lesson** button without restricting manual lesson choice. Progress is local to this browser/device, with no account or cloud sync.
+- The recent-progress line counts up to ten independent attempts. Listening- or visually-assisted attempts are listed separately. Eight correct out of ten offers a **Next lesson** button without restricting manual lesson choice. Progress is local to this browser/device, with no account or cloud sync.
 - Playback scoring is suspended through the tone and a short acoustic tail. **Stop mic** and **Use note buttons** are available beside Check mic.
 
 ### Rush
@@ -259,7 +259,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Open Settings → About ClefHanger and confirm `Slice 70: guided practice`.
+2. Open Settings → About ClefHanger and confirm `Slice 71: lesson clarity`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus a staff correction label, with no answer-button pre-highlight.
 5. Tap the correct answer and verify score increases and a pitch plays.
@@ -285,3 +285,9 @@ If the active prompt is A, this should score after the stability window. If the 
 - Chord singing is not designed yet.
 - Phone/browser microphone behavior varies; Mic Lab exists because real devices disagree.
 - All high scores are local to the browser/device.
+
+## Learning with the note guide
+
+In Treble Practice, open **Learn these notes** to see each lesson note on a labelled staff, followed by its line/space description. First steps uses only middle C, D immediately below the staff, and bottom-line E. Close the guide when you want to answer independently. Answers after viewing the guide, hearing a reference, or seeing a correction count as practice with help. This changes neither access to lessons nor the score; it keeps the progress suggestion honest.
+
+Turning off **Show hints after mistakes** in Settings → Lesson help hides both the answer explanation and its staff label. It does not remove help already seen for the current prompt.

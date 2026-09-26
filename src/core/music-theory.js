@@ -78,3 +78,42 @@ export function getPromptFrequencies(prompt) {
   const frequency = getPitchFrequency(prompt.noteName, prompt.octave, prompt.accidental);
   return frequency === null ? [] : [frequency];
 }
+
+function ordinal(value) {
+  const words = ['zeroth', 'first', 'second', 'third', 'fourth', 'fifth'];
+  if (words[value]) return words[value];
+  const remainder100 = value % 100;
+  if (remainder100 >= 11 && remainder100 <= 13) return `${value}th`;
+  if (value % 10 === 1) return `${value}st`;
+  if (value % 10 === 2) return `${value}nd`;
+  if (value % 10 === 3) return `${value}rd`;
+  return `${value}th`;
+}
+
+export function describeStaffPosition(staffStep = 0) {
+  if (staffStep === -1) return 'space immediately below staff';
+  if (staffStep === 9) return 'space immediately above staff';
+  if (staffStep < -1) {
+    const ledgerNumber = Math.floor(Math.abs(staffStep) / 2);
+    return staffStep % 2 === 0
+      ? `${ordinal(ledgerNumber)} ledger line below staff`
+      : `space below ${ordinal(ledgerNumber)} ledger line below staff`;
+  }
+  if (staffStep > 9) {
+    const ledgerNumber = Math.floor((staffStep - 8) / 2);
+    return staffStep % 2 === 0
+      ? `${ordinal(ledgerNumber)} ledger line above staff`
+      : `space above ${ordinal(ledgerNumber)} ledger line above staff`;
+  }
+  if (staffStep % 2 === 0) {
+    const line = (staffStep / 2) + 1;
+    if (line === 1) return 'bottom line of staff';
+    if (line === 3) return 'middle line of staff';
+    if (line === 5) return 'top line of staff';
+    return `${ordinal(line)} line from bottom`;
+  }
+  const space = ((staffStep - 1) / 2) + 1;
+  if (space === 1) return 'bottom space of staff';
+  if (space === 4) return 'top space of staff';
+  return `${ordinal(space)} space from bottom`;
+}

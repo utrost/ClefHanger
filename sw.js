@@ -1,5 +1,5 @@
-const APP_VERSION = 'clefhanger-slice70-guided-practice-2026-09-26';
-const CACHE_NAME = 'clefhanger-pwa-v65';
+const APP_VERSION = 'clefhanger-slice71-lesson-clarity-2026-09-26';
+const CACHE_NAME = 'clefhanger-pwa-v66';
 const APP_SHELL = [
   './',
   './index.html',
@@ -18,6 +18,7 @@ const APP_SHELL = [
   './src/core/lessons.js',
   './src/core/music-theory.js',
   './src/ui/staff-renderer.js',
+  './src/ui/lesson-guide.js',
   './src/ui/semantic-presenter.js',
   './src/ui/summary-focus.js',
   './src/platform/storage.js',
@@ -71,7 +72,7 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))),
+      Promise.all(keys.filter((key) => key.startsWith('clefhanger-pwa-') && key !== CACHE_NAME).map((key) => caches.delete(key))),
     ).then(() => self.clients.claim()),
   );
 });

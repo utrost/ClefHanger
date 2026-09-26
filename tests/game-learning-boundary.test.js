@@ -56,15 +56,15 @@ test('learning layer converts neutral outcomes into existing beginner feedback a
   const feedback = buildTeachingFeedback(outcome);
   assert.deepEqual(feedback.feedback, {
     kind: 'wrong',
-    text: 'F is not it. That was E: a staff line note.',
+    text: 'F is not it. That was E: bottom line of staff.',
     correctAnswer: 'E',
   });
   assert.deepEqual(feedback.correction, {
     answer: 'E',
     label: 'E',
-    location: 'a staff line note',
+    location: 'bottom line of staff',
     shouldFreezeNote: true,
-    ariaLabel: 'Correction: E, a staff line note',
+    ariaLabel: 'Correction: E, bottom line of staff',
   });
 });
 
@@ -77,7 +77,7 @@ test('applicable learning feedback preserves practice wrong-answer freeze metada
   const enriched = applyLearningFeedback(answered, 1200);
 
   assert.equal(enriched.activeNote.answer, 'E');
-  assert.equal(enriched.feedback.text, 'F is not it. That was E: a staff line note.');
+  assert.equal(enriched.feedback.text, 'F is not it. That was E: bottom line of staff.');
   assert.equal(enriched.correction.answer, 'E');
   assert.equal(enriched.correction.frozenAtMs, 1200);
   assert.equal(enriched.correction.frozenUntilMs, 2600);

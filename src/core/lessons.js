@@ -3,9 +3,10 @@ export const BEGINNER_LESSONS = [
     id: 'first-steps',
     label: 'First steps',
     title: 'Start with C, D, E',
-    body: 'Sing or hum C, D, or E. The fallback buttons stay small while you learn the direction.',
+    body: 'Start with middle C, the space just above it (D), and the bottom staff line (E). Hear a note when you need help, then sing it back.',
     answers: ['C', 'D', 'E'],
     noteNames: ['C', 'D', 'E'],
+    staffSteps: [-2, -1, 0],
   },
   {
     id: 'line-notes',
@@ -19,6 +20,7 @@ export const BEGINNER_LESSONS = [
     },
     answers: ['E', 'G', 'B', 'D', 'F'],
     noteNames: ['E', 'G', 'B', 'D', 'F'],
+    staffSteps: [0, 2, 4, 6, 8],
   },
   {
     id: 'space-notes',
@@ -32,6 +34,7 @@ export const BEGINNER_LESSONS = [
     },
     answers: ['F', 'A', 'C', 'E'],
     noteNames: ['F', 'A', 'C', 'E'],
+    staffSteps: [1, 3, 5, 7],
   },
   {
     id: 'ledger-notes',
@@ -75,7 +78,7 @@ export function buildTutorialSteps() {
   return [
     { title: 'Notes move upward', body: 'Sing or hum the note you see. Notes climb upward through A B C D E F G, then repeat.' },
     { title: 'Treble staff anchor', body: 'This is a treble staff. The curl wraps the G line; nearby notes step up or down from there.' },
-    { title: 'Sing safely', body: 'Sing, hum, or play one steady note before the cliff. If you are unsure, try it — ClefHanger shows the right note.' },
+    { title: 'Sing safely', body: 'Practice has no timer. Hear the note if you need help, then sing, hum, or play it back steadily.' },
   ];
 }
 
