@@ -9,9 +9,9 @@ test('version consistency check accepts the current cache-busted PWA markers', (
   const result = validateVersionConsistency({ rootDir: new URL('..', import.meta.url) });
 
   assert.deepEqual(result.errors, []);
-  assert.equal(result.appVersion, 'clefhanger-slice71-lesson-clarity-2026-09-26');
-  assert.equal(result.sliceMarker, 'Slice 71: lesson clarity');
-  assert.equal(result.cacheName, 'clefhanger-pwa-v66');
+  assert.equal(result.appVersion, 'clefhanger-slice72-settings-status-2026-09-26');
+  assert.equal(result.sliceMarker, 'Slice 72: settings and status');
+  assert.equal(result.cacheName, 'clefhanger-pwa-v67');
   assert.ok(result.checkedFiles.includes('index.html'));
   assert.ok(result.checkedFiles.includes('src/app.js'));
   assert.ok(result.checkedFiles.includes('sw.js'));
@@ -33,16 +33,16 @@ test('slice 69 documentation markers match the runtime release', () => {
 test('version consistency check catches stale ES-module query strings', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice71-lesson-clarity-2026-09-26">
+<html data-app-version="clefhanger-slice72-settings-status-2026-09-26">
   <body>
     <p class="microcopy">Slice 62: microphone lifecycle</p>
     <script type="module" src="./src/app.js?v=old-version"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice71-lesson-clarity-2026-09-26')</script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice72-settings-status-2026-09-26')</script>
   </body>
 </html>`,
-    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-const appVersion = 'clefhanger-slice71-lesson-clarity-2026-09-26';`,
+    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice72-settings-status-2026-09-26';
+const appVersion = 'clefhanger-slice72-settings-status-2026-09-26';`,
     'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v63';
 const APP_SHELL = ['./', './index.html', './src/app.js'];`,
   };
@@ -55,16 +55,16 @@ const APP_SHELL = ['./', './index.html', './src/app.js'];`,
 test('version consistency check catches service-worker asset drift', () => {
   const fixtures = {
     'index.html': `<!doctype html>
-<html data-app-version="clefhanger-slice71-lesson-clarity-2026-09-26">
+<html data-app-version="clefhanger-slice72-settings-status-2026-09-26">
   <body>
     <p class="microcopy">Slice 62: microphone lifecycle</p>
-    <script type="module" src="./src/app.js?v=clefhanger-slice71-lesson-clarity-2026-09-26"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice71-lesson-clarity-2026-09-26')</script>
+    <script type="module" src="./src/app.js?v=clefhanger-slice72-settings-status-2026-09-26"></script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice72-settings-status-2026-09-26')</script>
   </body>
 </html>`,
-    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-const appVersion = 'clefhanger-slice71-lesson-clarity-2026-09-26';`,
+    'src/app.js': `import { createInitialState } from './core/game.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createMicrophoneController } from './platform/microphone-controller.js?v=clefhanger-slice72-settings-status-2026-09-26';
+const appVersion = 'clefhanger-slice72-settings-status-2026-09-26';`,
     'sw.js': `const CACHE_NAME = 'clefhanger-pwa-v63';
 const APP_SHELL = ['./', './index.html'];`,
   };
@@ -80,18 +80,18 @@ test('version consistency check scans transitive ES-module imports', () => {
   try {
     mkdirSync(join(root, 'src', 'core'), { recursive: true });
     writeFileSync(join(root, 'index.html'), `<!doctype html>
-<html data-app-version="clefhanger-slice71-lesson-clarity-2026-09-26">
+<html data-app-version="clefhanger-slice72-settings-status-2026-09-26">
   <body>
-    <p class="microcopy">Slice 71: lesson clarity</p>
-    <script type="module" src="./src/app.js?v=clefhanger-slice71-lesson-clarity-2026-09-26"></script>
-    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice71-lesson-clarity-2026-09-26')</script>
+    <p class="microcopy">Slice 72: settings and status</p>
+    <script type="module" src="./src/app.js?v=clefhanger-slice72-settings-status-2026-09-26"></script>
+    <script>navigator.serviceWorker.register('./sw.js?v=clefhanger-slice72-settings-status-2026-09-26')</script>
   </body>
 </html>`);
-    writeFileSync(join(root, 'src', 'app.js'), `import './core/scoring.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-const appVersion = 'clefhanger-slice71-lesson-clarity-2026-09-26';`);
+    writeFileSync(join(root, 'src', 'app.js'), `import './core/scoring.js?v=clefhanger-slice72-settings-status-2026-09-26';
+const appVersion = 'clefhanger-slice72-settings-status-2026-09-26';`);
     writeFileSync(join(root, 'src', 'core', 'scoring.js'), `import './content.js?v=old-version';`);
     writeFileSync(join(root, 'src', 'core', 'content.js'), 'export const ok = true;');
-    writeFileSync(join(root, 'sw.js'), `const CACHE_NAME = 'clefhanger-pwa-v66';
+    writeFileSync(join(root, 'sw.js'), `const CACHE_NAME = 'clefhanger-pwa-v67';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/scoring.js', './src/core/content.js'];`);
 
     const result = validateVersionConsistency({ rootDir: root });

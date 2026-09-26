@@ -33,6 +33,10 @@ The MVP is now microphone-first:
 - Short answer rows fill the available width; Practice always uses beginner answer choices, regardless of the previous Rush difficulty.
 - PWA updates remove only obsolete ClefHanger caches. Upgrade tests preserve saved progress and another app’s cache before exercising an offline reload.
 
+## Settings/status maintenance (Slice 72)
+
+Settings presentation and microphone guidance now have focused modules with direct behavior tests. Browser coverage verifies disabled and pressed controls across Practice, Rush, and input changes. Player behavior is unchanged; physical-phone validation remains the highest priority in the [roadmap](docs/roadmap.md).
+
 ## Input modes
 
 - Primary: microphone pitch detection for singing, humming, or steady monophonic acoustic instruments, with a staff ghost note showing what the app thinks was played.

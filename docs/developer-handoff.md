@@ -17,6 +17,8 @@ Important files:
 - `src/core/game.js`: renderer-free game model and round/practice reducer.
 - `src/core/learning.js`: beginner teaching copy layer that consumes neutral game outcomes.
 - `src/core/pitch.js`: microphone and pitch logic.
+- `src/ui/settings-presenter.js`: settings view model and DOM synchronization.
+- `src/ui/status-presenter.js`: pure microphone status/guidance and calibration display decisions.
 - `src/core/mic-diagnostics.js`: Mic Lab reporting.
 - `src/core/audio.js`: Web Audio note playback.
 - `sw.js`: service-worker app shell cache.
@@ -97,9 +99,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice71-lesson-clarity-2026-09-26`.
-- Service-worker cache: `clefhanger-pwa-v66`.
-- Visible marker: `Slice 71: lesson clarity`.
+- App version: `clefhanger-slice72-settings-status-2026-09-26`.
+- Service-worker cache: `clefhanger-pwa-v67`.
+- Visible marker: `Slice 72: settings and status`.
 
 ## CI
 
@@ -297,11 +299,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice71-lesson-clarity'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice72-settings-status'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v66'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v67'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

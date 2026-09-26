@@ -15,8 +15,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice71-lesson-clarity-2026-09-26"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice71-lesson-clarity-2026-09-26'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice72-settings-status-2026-09-26"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice72-settings-status-2026-09-26'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
@@ -58,8 +58,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice71-lesson-clarity/);
-  assert.match(html, /Slice 71: lesson clarity/);
+  assert.match(html, /data-app-version="clefhanger-slice72-settings-status/);
+  assert.match(html, /Slice 72: settings and status/);
 });
 
 test('rush summary is a focus-managed modal isolated from the background game', () => {
@@ -132,7 +132,6 @@ test('first-run shell presents Sing/Play as the default primary answer path', ()
   assert.match(html, /Check mic/);
   assert.match(html, /Buttons stay available as a quiet fallback/);
   assert.match(app, /startMicrophoneMainButton/);
-  assert.match(app, /buildMicrophoneReadiness/);
   assert.match(app, /micReadinessTitleEl/);
   assert.match(app, /startMicrophoneMainButton\.addEventListener\('click', startMicrophone\)/);
   assert.match(app, /clefhangerInjectPitch: \(frequency, nowMs = performance\.now\(\)\) => \{/);
@@ -192,7 +191,6 @@ test('CI runs the full gate once with automatically discovered unit and browser 
 
 test('selector controls expose pressed state, accessible target sizes, and strong focus', () => {
   const html = read('index.html');
-  const app = read('src/app.js');
 
   assert.match(html, /data-play-style="practice"[^>]*aria-pressed="true"/);
   assert.match(html, /data-play-style="rush"[^>]*aria-pressed="false"/);
@@ -202,13 +200,6 @@ test('selector controls expose pressed state, accessible target sizes, and stron
   assert.match(html, /id="input-mode-buttons" class="input-mode-row" role="group" aria-label="Input mode selection"/);
   assert.match(html, /id="mode-buttons" role="group" aria-label="Mode selection"/);
   assert.match(html, /id="difficulty-buttons" role="group" aria-label="Difficulty selection"/);
-  assert.match(app, /function syncPressedState\(button, pressed\)/);
-  assert.match(app, /setAttribute\('aria-pressed', value\)/);
-  assert.match(app, /syncPressedState\(button, button\.dataset\.mode === selectedModeId\)/);
-  assert.match(app, /syncPressedState\(button, button\.dataset\.difficulty === selectedDifficultyId\)/);
-  assert.match(app, /syncPressedState\(button, button\.dataset\.inputMode === selectedInputMode\)/);
-  assert.match(app, /syncPressedState\(button, button\.dataset\.playStyle === selectedPlayStyle\)/);
-  assert.match(app, /speedSlider\.setAttribute\('aria-valuetext'/);
   assert.match(html, /button:focus-visible,[\s\S]*outline:\s*3px solid var\(--accent\)/);
   assert.match(html, /@media \(forced-colors: active\)[\s\S]*outline-color:\s*Highlight/);
   assert.match(html, /\.mode-button, \.speed-button, \.difficulty-button, #open-settings, #close-settings \{[\s\S]*min-height:\s*44px/);
@@ -240,7 +231,7 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v66/);
+  assert.match(sw, /clefhanger-pwa-v67/);
   for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/input-compatibility.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }
@@ -272,7 +263,6 @@ test('Chord mode resolves Sing/Play to a playable answer mode before starting', 
   assert.match(app, /ensurePlayableInputMode/);
   assert.match(app, /selectedInputMode = ensurePlayableInputMode\(selectedModeId, selectedInputMode/);
   assert.match(app, /kind: 'input-compatibility'/);
-  assert.match(app, /Chord mode needs Notes/);
   assert.doesNotMatch(app, /Sing the front note[\s\S]*selectedModeId === 'chords'/);
   assert.match(serviceWorker, /\.\/src\/core\/input-compatibility\.js/);
 });

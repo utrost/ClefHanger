@@ -25,7 +25,7 @@ Possible later stack changes, only when the app needs them:
 
 ## Initial app shape
 
-Current scaffold: dependency-free static HTML/CSS/JavaScript with a small tested core and one focused UI renderer. This keeps the app deployable under `https://simiono.com/clefhanger/` without a build step. A later Vite/TypeScript migration is still reasonable once the app needs bundled dependencies such as VexFlow and Pitchy.
+Current scaffold: dependency-free static HTML/CSS/JavaScript with a tested core and focused UI renderers/presenters. This keeps the app deployable under `https://simiono.com/clefhanger/` without a build step. A later Vite/TypeScript migration is still reasonable once the app needs bundled dependencies such as VexFlow and Pitchy.
 
 Current boundaries:
 
@@ -49,6 +49,10 @@ Current boundaries:
   - Pure SVG lesson-reference rows, labels, ledger geometry, and accessible position keys.
 - `src/ui/staff-renderer.js`
   - Renderer-only SVG staff/chord/note/ledger-line/correction-label/ghost-note markup. It consumes core state and microphone state and returns SVG markup without touching the DOM.
+- `src/ui/settings-presenter.js`
+  - Pure settings view model and DOM synchronization through injected elements; preserves disabled, pressed, selected, and accessible control state without owning events.
+- `src/ui/status-presenter.js`
+  - Pure microphone status, guidance precedence, readiness, permission-control, and calibration presentation from an explicit snapshot.
 - `src/app.js`
   - DOM adapter, compact settings summary, settings dialog, mode selector, speed slider, difficulty selector, input-mode toggle, note-button input, piano-strip input, microphone permission/listening UI, Mic Lab recording/report export UI, vocal calibration tone/readout UI, piano-like Web Audio correct-answer playback, animation loop, per-mode/per-slider-speed/per-difficulty LocalStorage high scores, and browser smoke hooks.
 - `index.html`

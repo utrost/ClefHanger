@@ -1,10 +1,10 @@
 # ClefHanger roadmap
 
-Last reviewed: **2026-09-26**, against implementation commit `3a061b1` (Slice 71).
+Last reviewed: **2026-09-26**, against the Slice 72 settings/status extraction (built on `784a18a`).
 
 This is the single planning document for product direction, delivery priorities, and architecture work. It replaces the separate MVP roadmap, product specification, and refactoring plan. Historical implementation details remain in Git; completed work below is a baseline, not an open backlog.
 
-**Next coding slice: extract the settings/status presentation from `src/app.js` without changing behavior (P2). Highest product priority: validate the mobile learning loop on physical phones (P1).** P2 can proceed while devices and testers are unavailable. Do not expand microphone-dependent lessons before P1 establishes a reliable baseline.
+**Highest product priority: validate the mobile learning loop on physical phones (P1). The settings/status extraction (P2) is complete.** While device evidence is unavailable, the next bounded maintenance slice is P5: migrate the older browser suites to the existing shared, timeout-bounded harness. Do not expand microphone-dependent lessons before P1 establishes a reliable baseline.
 
 ## Product direction
 
@@ -31,10 +31,10 @@ The app remains a static, dependency-free PWA using native JavaScript modules, S
 | Rush and exits | Timed modes, speed/difficulty controls, front-prompt scoring, pause on Settings/background, explicit Resume, replay, and Back to Practice. Results contain keyboard focus; Escape returns to Practice. |
 | Offline and upgrades | Service-worker app shell and subpath support. Upgrade regression preserves progress and unrelated applications’ caches, then verifies offline startup with the server stopped and HTTP cache disabled. |
 | Diagnostics | Mic Lab exports `.txt` JSON reports; recorded Android Firefox B2/C3 input is a regression fixture. This is limited device evidence, not a browser compatibility guarantee. |
-| Architecture | Staff renderer, music theory, content, scoring, learning, lessons, progress, storage, microphone session/controller, diagnostics, semantic presentation, and summary focus already have dedicated modules. |
-| Test gate | Automatic unit/browser test discovery, browser concurrency limit, bounded browser-command diagnostics, syntax/manifest/version checks, and GitHub CI. The Slice 71 baseline passed 202 unit and 15 browser tests. |
+| Architecture | Staff renderer, music theory, content, scoring, learning, lessons, progress, storage, microphone session/controller, diagnostics, semantic presentation, settings presentation, microphone status presentation, and summary focus already have dedicated modules. |
+| Test gate | Automatic unit/browser test discovery, browser concurrency limit, bounded browser-command diagnostics, syntax/manifest/version checks, and GitHub CI. The Slice 72 baseline passed 209 unit and 16 browser tests. |
 
-Recent milestones: Slice 70 simplified mobile Practice, added listen-and-imitate assistance and persisted lesson progress, and repaired Rush flow. Slice 71 clarified lesson notation, aligned accessible descriptions, and strengthened PWA upgrade coverage. These are completed features; follow-up work below addresses remaining evidence and limitations.
+Recent milestones: Slice 70 simplified mobile Practice, added listen-and-imitate assistance and persisted lesson progress, and repaired Rush flow. Slice 71 clarified lesson notation, aligned accessible descriptions, and strengthened PWA upgrade coverage. Slice 72 extracted settings/status presentation and added direct decision tests plus browser coverage for control transitions. These are completed features; follow-up work below addresses remaining evidence and limitations.
 
 Exact behavior and constants belong in [Current state reference](current-state-reference.md), module ownership in [Architecture](architecture.md), and interaction expectations in [User journey](user-journey.md). The recorded baseline CI run is [Slice 71 checks](https://github.com/utrost/ClefHanger/actions/runs/36230469202). Repository publication and production deployment are separate; confirm the live version using the [developer handoff](developer-handoff.md) before claiming a release is deployed.
 
@@ -59,16 +59,13 @@ The layout and synthetic browser paths are tested; microphone usability across o
 
 ### P2 — Reduce app composition complexity
 
-**Status: ready. Next coding slice; independent of P1 device availability.**
+**Status: completed in Slice 72. Further extractions require a fresh scope.**
 
-`src/app.js` is still 1,073 lines at the reviewed baseline. Earlier plans to extract the renderer, catalogs, scoring, storage, and microphone adapters are already complete. The remaining first target is settings/status presentation, not another broad rewrite.
+`src/app.js` decreased from 1,073 to 1,020 lines. `src/ui/settings-presenter.js` now owns the settings view model and DOM synchronization; `src/ui/status-presenter.js` derives microphone readiness, guidance, permission controls, and calibration copy from explicit snapshots. Both reuse existing core/presentation helpers. Event wiring, state ownership, scoring, capture, and announcement sequencing remain with their existing owners.
 
-1. Identify the settings and status decisions currently mixed with DOM updates. Capture their observable behavior with focused tests.
-2. Move the coherent view-model/presentation decisions into a small UI module with explicit inputs and outputs. Reuse the existing semantic presenter; avoid a competing rendering abstraction.
-3. Leave event wiring, state ownership, and sequencing in the composition root. Measure the reduction and remove replaced logic.
-4. Reassess before another extraction. Audio orchestration or staff geometry still in `game.js` may merit separate work only if the dependency boundary becomes clearer.
+Evidence: seven direct tests cover Practice/Rush settings, non-treble lesson scope, guidance precedence, and microphone permission/calibration states. A browser regression exercises native disabled state, ARIA disabled/pressed state, and input fallback across Practice, Rush, Chords, and Treble. Existing portrait, keyboard/focus, listen-and-imitate, progress, and offline-upgrade scenarios pass in the full gate. Superseded source-location assertions were replaced with behavioral coverage.
 
-**Done when:** the extracted decisions have direct tests, `app.js` is smaller, the module has one responsibility, and the full gate plus relevant mobile/keyboard browser scenarios passes with unchanged product behavior. Preserve smoke hooks, microphone state transitions, diagnostic schema, storage fallbacks, and service-worker asset coverage.
+The new modules are precached and versioned with runtime `clefhanger-slice72-settings-status-2026-09-26` and cache `clefhanger-pwa-v67`. No physical microphone I/O change was made; P1 remains open. Future audio-orchestration or game-geometry extraction is optional and must demonstrate a clearer boundary before work starts.
 
 **Guardrails:** do not mix UI redesign, scoring changes, or new lessons into this refactor. Game rules should not depend on teaching copy or browser APIs; platform modules own browser I/O. Some current code, including browser audio playback in `core/audio.js`, does not yet meet a fully pure-core ideal. Treat that as a boundary to evaluate, not a claim that the architecture is already pure.
 
@@ -102,7 +99,9 @@ Bass and accidental modes exist, but they do not yet have the same scaffolded be
 
 ### P5 — Keep regression coverage maintainable
 
-**Status: ready incrementally alongside P2–P4. The test gate is repaired, not pending repair.**
+**Status: in progress incrementally. Slice 72 replaced settings/status source-location assertions with direct and browser behavior tests. The test gate is repaired, not pending repair.**
+
+Next bounded slice: migrate `tests/practice-controls-browser.test.js`, `tests/input-compatibility-browser.test.js`, and `tests/pwa-offline-browser.test.js` from their duplicated launch/CDP helpers to `tests/helpers/browser.js`. Preserve all existing assertions, subpath/offline behavior, and independent browser isolation; retain explicit launch/command timeouts. Done when those suites pass using the shared helper and the complete gate remains green.
 
 Some tests inspect source text or exact documentation phrases. These can freeze an implementation or an obsolete roadmap instead of protecting player behavior.
 

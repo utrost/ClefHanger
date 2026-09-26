@@ -23,9 +23,9 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /Microphone setup/);
   assert.match(html, /Check mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice71-lesson-clarity/);
-  assert.match(app, /const appVersion = 'clefhanger-slice71-lesson-clarity-2026-09-26'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice71-lesson-clarity-2026-09-26/);
+  assert.match(html, /data-app-version="clefhanger-slice72-settings-status/);
+  assert.match(app, /const appVersion = 'clefhanger-slice72-settings-status-2026-09-26'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice72-settings-status-2026-09-26/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);
@@ -44,11 +44,8 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(microphoneSession, /navigatorObject\.permissions\.query/);
   assert.match(microphoneSession, /queryMicrophonePermissionState/);
   assert.match(app, /formatMicrophoneError/);
-  assert.match(app, /Requesting mic/);
-  assert.match(app, /calibrationReadingText/);
   assert.match(microphoneSession, /withMicrophoneRequestTimeout/);
   assert.match(microphoneSession, /Microphone request timed out/);
-  assert.match(app, /buildMicrophoneListeningMessage/);
   assert.match(app, /getCenteredRms/);
   assert.match(app, /silentFrameCount/);
   assert.match(app, /microphoneSession/);

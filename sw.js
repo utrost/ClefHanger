@@ -1,5 +1,5 @@
-const APP_VERSION = 'clefhanger-slice71-lesson-clarity-2026-09-26';
-const CACHE_NAME = 'clefhanger-pwa-v66';
+const APP_VERSION = 'clefhanger-slice72-settings-status-2026-09-26';
+const CACHE_NAME = 'clefhanger-pwa-v67';
 const APP_SHELL = [
   './',
   './index.html',
@@ -20,6 +20,8 @@ const APP_SHELL = [
   './src/ui/staff-renderer.js',
   './src/ui/lesson-guide.js',
   './src/ui/semantic-presenter.js',
+  './src/ui/settings-presenter.js',
+  './src/ui/status-presenter.js',
   './src/ui/summary-focus.js',
   './src/platform/storage.js',
   './src/platform/microphone-session.js',

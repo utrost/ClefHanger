@@ -91,7 +91,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 71: lesson clarity`.
+- Visible marker says `Slice 72: settings and status`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -503,7 +503,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice71-lesson-clarity`.
+2. Confirm the HTML contains `clefhanger-slice72-settings-status`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -522,7 +522,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v66`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v67`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:

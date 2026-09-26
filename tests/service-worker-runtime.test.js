@@ -30,7 +30,7 @@ function loadServiceWorker({ fetchImpl, keysImpl } = {}) {
   };
   const caches = {
     openCalls: [],
-    keys: keysImpl || (async () => ['clefhanger-pwa-v1', 'clefhanger-pwa-v66']),
+    keys: keysImpl || (async () => ['clefhanger-pwa-v1', 'clefhanger-pwa-v67']),
     delete: async (key) => {
       deleteCalls.push(key);
       return true;
@@ -76,7 +76,7 @@ test('activation keeps clients.claim inside the activation lifetime', async () =
   let resolveKeys;
   const worker = loadServiceWorker({
     keysImpl: () => new Promise((resolve) => {
-      resolveKeys = () => resolve(['clefhanger-pwa-v1', 'clefhanger-pwa-v66']);
+      resolveKeys = () => resolve(['clefhanger-pwa-v1', 'clefhanger-pwa-v67']);
     }),
   });
 
@@ -104,7 +104,7 @@ test('successful runtime cache writes are attached to the fetch event lifetime',
   };
 
   const { responsePromise, waitUntilPromises } = await worker.dispatch('fetch', {
-    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice71-lesson-clarity-2026-09-26'),
+    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice72-settings-status-2026-09-26'),
   });
 
   const response = await responsePromise;
@@ -125,7 +125,7 @@ test('failed HTTP responses are returned but not written into the runtime cache'
   });
 
   const { responsePromise, waitUntilPromises } = await worker.dispatch('fetch', {
-    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice71-lesson-clarity-2026-09-26'),
+    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice72-settings-status-2026-09-26'),
   });
 
   const response = await responsePromise;
@@ -136,7 +136,7 @@ test('failed HTTP responses are returned but not written into the runtime cache'
 
 test('activation deletes only obsolete ClefHanger caches and preserves other apps on the origin', async () => {
   const worker = loadServiceWorker({ keysImpl: async () => [
-    'clefhanger-pwa-v1', 'clefhanger-pwa-v66', 'another-app-v1', 'shared-assets',
+    'clefhanger-pwa-v1', 'clefhanger-pwa-v67', 'another-app-v1', 'shared-assets',
   ] });
   const { waitUntilPromises } = await worker.dispatch('activate');
   await Promise.all(waitUntilPromises);

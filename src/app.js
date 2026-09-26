@@ -1,6 +1,8 @@
-import { renderLessonGuide } from './ui/lesson-guide.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { createListenSession } from './core/listen-session.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { recordAttempt, summarizeProgress } from './core/progress.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { createSettingsPresenter } from './ui/settings-presenter.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { buildMicrophonePresentation } from './ui/status-presenter.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { renderLessonGuide } from './ui/lesson-guide.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createListenSession } from './core/listen-session.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { recordAttempt, summarizeProgress } from './core/progress.js?v=clefhanger-slice72-settings-status-2026-09-26';
 import {
   ACCIDENTAL_BUTTONS,
   DIFFICULTY_LEVELS,
@@ -13,7 +15,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+} from './core/content.js?v=clefhanger-slice72-settings-status-2026-09-26';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -28,14 +30,12 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+} from './core/game.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice72-settings-status-2026-09-26';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
-  buildMicrophoneListeningMessage,
-  buildMicrophoneReadiness,
   buildMicrophoneScoringFeedback,
   createMicrophoneState,
   detectPitchFromTimeDomain,
@@ -43,19 +43,19 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
-import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+} from './core/pitch.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice72-settings-status-2026-09-26';
 
-const appVersion = 'clefhanger-slice71-lesson-clarity-2026-09-26';
+const appVersion = 'clefhanger-slice72-settings-status-2026-09-26';
 const listenSession = createListenSession();
 let playbackRefreshTimer = null;
 const progressCache = new Map();
@@ -185,11 +185,12 @@ const microphoneController = createMicrophoneController({
   },
 });
 
-function syncPressedState(button, pressed) {
-  const value = pressed ? 'true' : 'false';
-  button.dataset.active = value;
-  button.setAttribute('aria-pressed', value);
-}
+const renderSettings = createSettingsPresenter({
+  modeLabel: modeLabelEl, modeHelp: modeHelpEl, closeButton: document.querySelector('#close-settings'),
+  speedLabel: speedLabelEl, speedSlider, difficultyLabel: difficultyLabelEl, difficultyHelp: difficultyHelpEl,
+  settingsLine: settingsLineEl, modeButtons, difficultyButtons, inputModeButtons, playStyleButtons,
+  lessonSelect, hintToggle, matchAnyOctaveToggle,
+});
 
 function getBestScore(modeId = selectedModeId, speedId = selectedSpeedId, difficultyId = selectedDifficultyId) {
   return storageAdapter.readHighScore(modeId, speedId, difficultyId);
@@ -244,14 +245,6 @@ if (typeof reducedMotionQuery.addEventListener === 'function') {
   reducedMotionQuery.addEventListener('change', handleReducedMotionChange);
 } else if (typeof reducedMotionQuery.addListener === 'function') {
   reducedMotionQuery.addListener(handleReducedMotionChange);
-}
-
-function calibrationReadingText() {
-  if (microphoneState.calibration?.message) return microphoneState.calibration.message;
-  if (microphoneState.permission === 'requesting' || microphoneState.permission === 'blocked' || microphoneState.permission === 'granted') {
-    return microphoneStatusText();
-  }
-  return 'Check mic, then sing any steady comfortable note; Play A is only a reference.';
 }
 
 function isLessonScopedMode(modeId = selectedModeId) {
@@ -345,16 +338,12 @@ function renderHud(nowMs) {
   pauseRushButton.hidden = !['running', 'paused'].includes(state.phase);
   syncElementText(pauseRushButton, state.phase === 'paused' ? 'Resume Rush' : 'Pause Rush');
   startButton.hidden = state.phase === 'paused';
-  stopMicrophoneMainButton.hidden = !microphoneState.listening && microphoneState.permission !== 'requesting';
-  let micGuidance = 'Listen to the note, then sing it back.';
-  if (!listenSession.canScore(nowMs)) micGuidance = 'Listen… scoring waits until the sound finishes.';
-  else if (state.phase === 'paused') micGuidance = 'Rush paused. Resume when you are ready.';
-  else if (settingsDialog.open) micGuidance = 'Close Settings to continue.';
-  else if (microphoneState.scoringMessage) micGuidance = microphoneState.scoringMessage;
-  syncElementText(micGuidanceEl, micGuidance);
-  const mode = getMode(selectedModeId);
-  const speed = getSpeed(selectedSpeedId);
-  const difficulty = getDifficulty(selectedDifficultyId);
+  const micView = buildMicrophonePresentation({
+    microphone: microphoneState, canScore: listenSession.canScore(nowMs), phase: state.phase,
+    settingsOpen: settingsDialog.open, trackState: getCurrentMicrophoneTrackState(),
+  });
+  stopMicrophoneMainButton.hidden = micView.stopHidden;
+  syncElementText(micGuidanceEl, micView.guidance);
   syncElementText(scoreEl, state.score);
   syncElementText(streakEl, state.streak);
   semanticPresenter.updateTimer(timerEl, getRemainingSeconds(state, nowMs));
@@ -365,66 +354,33 @@ function renderHud(nowMs) {
   syncElementText(learningCoachEl, coachMessage.text);
   learningCoachEl.dataset.kind = coachMessage.kind;
   syncElementText(bestEl, getBestScore(selectedModeId, selectedSpeedId, selectedDifficultyId));
-  syncElementText(modeLabelEl, mode.label);
-  syncElementText(modeHelpEl, mode.help);
-  const inputLabel = selectedInputMode === 'piano' ? 'Piano' : selectedInputMode === 'microphone' ? 'Sing/Play' : 'Notes';
-  const lesson = getBeginnerLesson(selectedLessonId);
-  const lessonApplies = isLessonScopedMode();
-  const practiceSelected = isPracticeSelected();
-  syncElementText(document.querySelector('#close-settings'), state.phase === 'paused' ? 'Done — keep paused' : 'Done');
-  const speedDisplay = practiceSelected ? 'Practice only' : speed.label;
-  const difficultyDisplay = practiceSelected ? 'Practice only' : difficulty.label;
-  syncElementText(speedLabelEl, speedDisplay);
-  speedSlider.value = speed.id;
-  speedSlider.disabled = practiceSelected;
-  speedSlider.setAttribute('aria-disabled', practiceSelected ? 'true' : 'false');
-  syncElementText(difficultyLabelEl, difficultyDisplay);
-  syncElementText(difficultyHelpEl, practiceSelected ? 'Practice ignores speed and difficulty: it is always untimed Beginner at the easiest speed.' : difficulty.help);
-  const settingsParts = practiceSelected
-    ? [mode.label, lessonApplies ? `Practice: ${lesson.label}` : 'Practice', inputLabel]
-    : [mode.label, difficulty.label, speed.label, inputLabel, lessonApplies ? lesson.label : 'Rush'];
-  syncElementText(settingsLineEl, settingsParts.join(' · '));
+  renderSettings({
+    modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId,
+    lessonId: selectedLessonId, inputMode: selectedInputMode, playStyle: selectedPlayStyle,
+    phase: state.phase, showHints, matchAnyOctave,
+  });
   syncElementText(startButton, state.phase === 'running' ? 'Restart sprint' : state.phase === 'ended' ? 'Play another 60s rush' : state.phase === 'practice' ? 'Next practice note' : selectedPlayStyle === 'practice' ? 'Start practice' : 'Start 60s sprint');
   restartPracticeButton.hidden = state.phase !== 'practice';
-  for (const button of modeButtons.querySelectorAll('button')) syncPressedState(button, button.dataset.mode === selectedModeId);
-  for (const button of difficultyButtons.querySelectorAll('button')) {
-    syncPressedState(button, button.dataset.difficulty === selectedDifficultyId);
-    button.disabled = practiceSelected;
-    button.setAttribute('aria-disabled', practiceSelected ? 'true' : 'false');
-    button.title = practiceSelected ? 'Practice ignores difficulty; Rush uses this selection.' : '';
-  }
-  for (const button of inputModeButtons.querySelectorAll('button')) {
-    syncPressedState(button, button.dataset.inputMode === selectedInputMode);
-    button.disabled = selectedModeId === 'chords' && ['microphone', 'piano'].includes(button.dataset.inputMode);
-    button.setAttribute('aria-disabled', button.disabled ? 'true' : 'false');
-    button.title = button.disabled ? 'Chord mode needs Notes answers.' : '';
-  }
-  for (const button of playStyleButtons) syncPressedState(button, button.dataset.playStyle === selectedPlayStyle);
-  speedSlider.setAttribute('aria-valuetext', practiceSelected ? 'Practice ignores speed' : speed.label);
-  lessonSelect.value = selectedLessonId;
-  hintToggle.checked = showHints;
-  matchAnyOctaveToggle.checked = matchAnyOctave;
   const roundEnded = state.phase === 'ended';
   buttons.hidden = roundEnded || selectedInputMode !== 'buttons';
   pianoStrip.hidden = roundEnded || selectedInputMode !== 'piano';
   microphonePanel.hidden = roundEnded || selectedInputMode !== 'microphone';
-  const micReadiness = buildMicrophoneReadiness(microphoneState);
+  const micReadiness = micView.readiness;
   micReadinessEl.dataset.status = micReadiness.status;
   micReadinessEl.dataset.ready = micReadiness.ready ? 'true' : 'false';
   syncElementText(micReadinessTitleEl, micReadiness.title);
   syncElementText(micReadinessBodyEl, micReadiness.body);
   syncElementText(startMicrophoneMainButton, micReadiness.action);
-  const microphoneStarting = microphoneState.permission === 'requesting';
-  startMicrophoneButton.disabled = microphoneStarting;
-  startMicrophoneMainButton.disabled = microphoneStarting;
-  stopMicrophoneButton.disabled = !microphoneStarting && getCurrentMicrophoneTrackState() === 'none';
-  syncElementText(microphoneStatusEl, microphoneStatusText());
+  startMicrophoneButton.disabled = micView.startDisabled;
+  startMicrophoneMainButton.disabled = micView.startDisabled;
+  stopMicrophoneButton.disabled = micView.stopDisabled;
+  syncElementText(microphoneStatusEl, micView.status);
   semanticPresenter.updatePitch(heardNoteEl, { message: buildHeardNoteMessage(microphoneState.note), hasPitch: Boolean(microphoneState.note), nowMs });
   syncElementText(microphoneRecordingDiagnosticEl, microphoneRecordingDiagnostic);
   syncElementText(microphoneDebugTextEl, microphoneDebugText);
   syncElementText(micReportPreviewEl, lastMicReport ? `Last report: ${lastMicReport.capture.label} · ${lastMicReport.interpretation}` : 'No exported report yet.');
-  syncElementText(calibrationReadingEl, calibrationReadingText());
-  calibrationReadingEl.dataset.status = microphoneState.calibration?.status || microphoneState.permission;
+  syncElementText(calibrationReadingEl, micView.calibrationText);
+  calibrationReadingEl.dataset.status = micView.calibrationStatus;
 
   let roundEndedAnnouncement = null;
   if (state.phase === 'ended') {
@@ -596,15 +552,6 @@ function playCalibrationTone() {
   playPianoVoice(context, tone.frequency, context.currentTime);
   feedbackEl.dataset.kind = 'correct';
   feedbackEl.textContent = `${tone.label}: ${tone.help}`;
-}
-
-function microphoneStatusText() {
-  if (microphoneState.permission === 'requesting') return 'Requesting mic… check the browser permission prompt.';
-  if (microphoneState.permission === 'blocked') return `Mic blocked: ${microphoneState.error || 'permission denied'}`;
-  const listeningMessage = buildMicrophoneListeningMessage(microphoneState);
-  if (listeningMessage) return listeningMessage;
-  if (microphoneState.permission === 'granted') return 'Mic ready. Sing notes to answer.';
-  return 'Mic off. Check mic to calibrate and sing answers.';
 }
 
 function getCurrentMicrophoneTrackState() {

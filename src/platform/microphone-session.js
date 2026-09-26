@@ -1,4 +1,4 @@
-import { getBuiltInVocalMicrophoneConstraints } from '../core/pitch.js?v=clefhanger-slice71-lesson-clarity-2026-09-26';
+import { getBuiltInVocalMicrophoneConstraints } from '../core/pitch.js?v=clefhanger-slice72-settings-status-2026-09-26';
 
 export function formatMicrophoneError(error) {
   const message = error?.message || String(error || 'permission denied');
