@@ -70,7 +70,7 @@ test('beginner lesson copy teaches singing first while keeping buttons as fallba
 test('beginner lesson cards stay mic-first after the canonical flow', () => {
   const lessons = read('src/core/lessons.js');
   const currentState = read('docs/current-state-reference.md');
-  const roadmap = read('docs/mvp-roadmap.md');
+  const roadmap = read('docs/roadmap.md');
 
   assert.match(lessons, /Line notes[\s\S]*see the line[\s\S]*sing it steadily/i);
   assert.match(lessons, /Space notes[\s\S]*space[\s\S]*sing the pitch/i);
@@ -81,7 +81,7 @@ test('beginner lesson cards stay mic-first after the canonical flow', () => {
   assert.doesNotMatch(lessons, /Find the space, then sing or play F A C E/);
 
   assert.match(currentState, /Mic-first lesson cards/i);
-  assert.match(roadmap, /Slice 61 — Mic-first lesson cards — implemented/i);
+  assert.match(roadmap, /Mic-first lesson cards and interval hints are implemented/i);
   assert.doesNotMatch(roadmap, /First steps \/ Practice \/ Notes/);
   assert.doesNotMatch(roadmap, /Piano or Sing\/Play only after/);
 });
@@ -317,9 +317,9 @@ test('interval practice teaches repeated notes, steps, and skips without chord t
 });
 
 test('interval lesson appears in the documented beginner ramp', () => {
-  const roadmap = read('docs/mvp-roadmap.md');
+  const roadmap = read('docs/roadmap.md');
   const guide = read('docs/player-tester-guide.md');
-  assert.match(roadmap, /Slice 8f .* implemented/i);
+  assert.match(roadmap, /Interval jumps \(C4–G4\)/i);
   assert.match(guide, /Interval jumps/i);
   assert.match(guide, /same note, step, or skip/i);
 });
@@ -357,16 +357,15 @@ test('user journey documents the learning contract before adding more notation',
 
 test('docs define the microphone-first product direction and roadmap', () => {
   const readme = read('README.md');
-  const roadmap = read('docs/mvp-roadmap.md');
-  const spec = read('docs/product-specification.md');
+  const roadmap = read('docs/roadmap.md');
   const guide = read('docs/player-tester-guide.md');
 
   assert.match(readme, /microphone-first/i);
   assert.match(readme, /Buttons and piano remain fallback/i);
-  assert.match(roadmap, /Slice 9 — Microphone-first reorientation — in progress/i);
-  assert.match(roadmap, /Friendly mic readiness card: implemented/i);
+  assert.match(roadmap, /Verified implemented baseline/i);
+  assert.match(roadmap, /Visible Check mic, Stop mic, note-button fallback, and pitch guidance/i);
   assert.match(roadmap, /Sing\/Play is the default input/i);
-  assert.match(spec, /Primary answer path: microphone/i);
+  assert.match(roadmap, /Primary answer path: microphone/i);
   assert.match(guide, /Start with Sing\/Play/i);
 });
 

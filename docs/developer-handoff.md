@@ -26,7 +26,7 @@ Important files:
 - `docs/player-tester-guide.md`: first-time player/tester guide.
 - `docs/human-test-handbook.md`: repeatable human-executable pass/fail test scripts for manual local, live, phone, PWA, and microphone validation.
 - `docs/smoke-checklist.md`: manual local/live smoke checklist.
-- `docs/refactoring-plan.md`: architecture cleanup plan for extracting renderers/core catalogs/platform adapters while avoiding god files.
+- `docs/roadmap.md`: canonical product direction, delivery priorities, architecture work, and completion criteria.
 
 ## Commands
 
@@ -312,8 +312,7 @@ Browser-smoke after deploy; static curl checks are not enough because stale ES m
 Keep these docs aligned:
 
 - README: short project orientation and docs index.
-- `docs/product-specification.md`: product intent and implemented capability summary.
-- `docs/mvp-roadmap.md`: implemented slices vs future candidates.
+- `docs/roadmap.md`: product intent, verified implemented baseline, and actionable product/architecture priorities.
 - `docs/architecture.md`: module architecture and current behavior summary.
 - `docs/user-journey.md`: what a normal player is supposed to do.
 - `docs/current-state-reference.md`: exact current facts and constants.

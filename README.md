@@ -101,8 +101,6 @@ Then open `http://localhost:4173/`.
 - [Human test handbook](docs/human-test-handbook.md) — repeatable pass/fail scripts for manual local, live, phone, PWA, and microphone testing.
 - [Current state reference](docs/current-state-reference.md) — exact implemented behavior, constants, scoring, mic rules, persistence, and known limits.
 - [Developer handoff](docs/developer-handoff.md) — code ownership, TDD/deploy workflow, ES-module cache rules, and continuation notes.
-- [Refactoring plan](docs/refactoring-plan.md) — architecture cleanup sequence to prevent god files while preserving the current teaching prototype.
-- [Product specification](docs/product-specification.md)
-- [MVP implementation roadmap](docs/mvp-roadmap.md)
+- [Roadmap](docs/roadmap.md) — product direction, verified capabilities, prioritized next slices, and completion criteria.
 - [Architecture notes](docs/architecture.md)
 - [Smoke checklist](docs/smoke-checklist.md)
