@@ -1,15 +1,15 @@
-import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { answerLabel } from './music-theory.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { getBeginnerLesson, getLessonPool } from './lessons.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { answerLabel } from './music-theory.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 import {
   BASS_NOTES,
   LEVEL_ONE_NOTES,
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+} from './content.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { buildRoundSummary, calculatePoints } from './scoring.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+export { SEMITONES_FROM_C, accidentalSymbol, answerLabel, createGhostNoteFromPitch, getPitchFrequency, getPromptFrequencies, getStaffStepForPitch } from './music-theory.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+export { buildRoundSummary, calculateAccuracy, calculatePoints, getHighScoreKey, getSpeedBonus, getStreakBonus } from './scoring.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 export {
   ACCIDENTAL_BUTTONS,
   BASS_NOTES,
@@ -27,7 +27,7 @@ export {
   getDifficulty,
   getMode,
   getSpeed,
-} from './content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+} from './content.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 
 
 export const STAFF_LAYOUT = {
@@ -267,7 +267,7 @@ export function answerActiveNote(state, answer, nowMs) {
 }
 
 export function missExpiredNotes(state, nowMs) {
-  if (state.phase === 'practice' || !state.activeNote || nowMs <= state.activeNote.deadlineMs) return cloneState(state);
+  if (state.phase === 'paused' || state.phase === 'practice' || !state.activeNote || nowMs <= state.activeNote.deadlineMs) return cloneState(state);
   const next = cloneState(state);
   next.missed += 1;
   next.streak = 0;
@@ -292,7 +292,29 @@ export function maybeEndRound(state, nowMs) {
   return cloneState(state);
 }
 
+export function pauseRound(state, nowMs) {
+  if (state.phase !== 'running') return cloneState(state);
+  const next = updateRound(state, nowMs);
+  if (next.phase === 'ended') return next;
+  next.phase = 'paused';
+  next.pausedAtMs = nowMs;
+  return next;
+}
+
+export function resumeRound(state, nowMs) {
+  if (state.phase !== 'paused') return cloneState(state);
+  const next = cloneState(state);
+  const elapsed = Math.max(0, nowMs - state.pausedAtMs);
+  next.endsAtMs += elapsed;
+  next.noteQueue = next.noteQueue.map((note) => ({ ...note, spawnedAtMs: note.spawnedAtMs + elapsed, deadlineMs: note.deadlineMs + elapsed }));
+  next.activeNote = next.noteQueue[0] || null;
+  next.phase = 'running';
+  next.pausedAtMs = null;
+  return next;
+}
+
 export function updateRound(state, nowMs) {
+  if (state.phase === 'paused') return cloneState(state);
   let next = missExpiredNotes(state, nowMs);
   next = maybeEndRound(next, nowMs);
   if (next.phase === 'running') next = spawnNextNote(next, nowMs);
@@ -301,7 +323,7 @@ export function updateRound(state, nowMs) {
 
 export function getRemainingSeconds(state, nowMs) {
   if (state.phase === 'practice' || state.endsAtMs === null) return '∞';
-  return Math.max(0, Math.ceil((state.endsAtMs - nowMs) / 1000));
+  return Math.max(0, Math.ceil((state.endsAtMs - (state.phase === 'paused' ? state.pausedAtMs : nowMs)) / 1000));
 }
 
 export function getRoundSummary(state) {

@@ -2,7 +2,7 @@
 
 **Goal:** keep ClefHanger maintainable while the first teaching version grows, with no god files and no accidental coupling between notation, game state, learning copy, browser APIs, and microphone diagnostics.
 
-**Current baseline:** the app is a dependency-free static PWA using native ES modules. Local checks are green at the time this plan was refreshed (`npm run check`: 119 tests passing). The main architecture risk is not missing tests; it is continued feature work accumulating in `src/app.js` and broadening `src/core/game.js`.
+**Current baseline:** the app is a dependency-free static PWA using native ES modules. Local checks are green at the time this plan was refreshed (run `npm run check` for the current discovered test count). The main architecture risk is not missing tests; it is continued feature work accumulating in `src/app.js` and broadening `src/core/game.js`.
 
 **Refactoring style:** small TDD slices, no rewrite, no bundler migration yet. Each slice should preserve behavior, update docs only where boundaries change, and finish with `npm run check` plus browser smoke if DOM/audio/mic code moved.
 
@@ -609,7 +609,7 @@ export async function startMicrophoneSession({ navigator, audioContext, analyser
 
 **Objective:** give refactors an external green/red signal.
 
-**Implementation note:** landed as `.github/workflows/check.yml`. The workflow runs on `push` and `pull_request`, checks out the repository, sets up Node.js 24 to match local verification, prints Node/npm/Python versions, then runs `npm test` and `npm run check` as separate readable Actions steps.
+**Implementation note:** landed as `.github/workflows/check.yml`. The workflow runs on `push` and `pull_request`, checks out the repository, sets up Node.js 24 to match local verification, prints Node/npm/Python versions, then runs `npm run check` once; it includes both automatically discovered unit and browser suites.
 
 **Create:**
 
@@ -630,7 +630,6 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-      - run: npm test
       - run: npm run check
 ```
 

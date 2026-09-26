@@ -1,6 +1,6 @@
-import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { getMode } from './content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { getMode } from './content.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+export { BEGINNER_LESSONS, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './lessons.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 function explainPrompt(prompt) {
   if (!prompt) return 'Keep going.';
   if (prompt.label) return prompt.label;

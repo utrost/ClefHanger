@@ -138,9 +138,9 @@ test('clean install makes versioned ES modules available from the installed serv
   const result = await cdp.evaluate(`(async () => ({
     appVersion: window.__clefHanger.appVersion,
     cachedModules: await Promise.all([
-      './src/app.js?v=clefhanger-slice69-tester-readiness-2026-09-16',
-      './src/core/game.js?v=clefhanger-slice69-tester-readiness-2026-09-16',
-      './src/ui/staff-renderer.js?v=clefhanger-slice69-tester-readiness-2026-09-16',
+      './src/app.js?v=clefhanger-slice70-guided-practice-2026-09-26',
+      './src/core/game.js?v=clefhanger-slice70-guided-practice-2026-09-26',
+      './src/ui/staff-renderer.js?v=clefhanger-slice70-guided-practice-2026-09-26',
     ].map(async (url) => {
       const response = await fetch(url);
       return { url, ok: response.ok, text: await response.text() };
@@ -150,12 +150,12 @@ test('clean install makes versioned ES modules available from the installed serv
     startCopy: document.querySelector('#start-round')?.textContent,
   }))()`);
   assert.equal(requests.length, onlineRequestCount, 'versioned module fetches must complete after the HTTP server is unavailable');
-  assert.equal(result.appVersion, 'clefhanger-slice69-tester-readiness-2026-09-16');
+  assert.equal(result.appVersion, 'clefhanger-slice70-guided-practice-2026-09-26');
   assert.deepEqual(result.cachedModules.map(({ ok }) => ok), [true, true, true]);
-  assert.match(result.cachedModules[0].text, /const appVersion = 'clefhanger-slice69-tester-readiness-2026-09-16'/);
+  assert.match(result.cachedModules[0].text, /const appVersion = 'clefhanger-slice70-guided-practice-2026-09-26'/);
   assert.match(result.cachedModules[1].text, /export function createInitialState/);
   assert.match(result.cachedModules[2].text, /export function renderStaffSvg/);
-  assert.equal(result.marker, 'Slice 69: tester readiness');
+  assert.equal(result.marker, 'Slice 70: guided practice');
   assert.equal(result.controller, true);
   assert.equal(result.startCopy, 'Start practice');
 });

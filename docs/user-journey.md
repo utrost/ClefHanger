@@ -25,7 +25,7 @@ The canonical first-user workflow is **Sing/Play/Practice/First steps**.
 A first-time user should be able to do this without opening Settings:
 
 1. Open `https://simiono.com/clefhanger/` on a phone.
-2. Read the short tutorial card: sing or hum the note you see.
+2. See the staff, lesson selector, and main actions together. Optional instructions are in Settings → Lesson help.
 3. Stay with the default setup:
    - Practice style;
    - Treble mode;
@@ -37,14 +37,14 @@ A first-time user should be able to do this without opening Settings:
 5. Allow microphone permission if the browser asks.
 6. Sing or hum any comfortable steady note so the app can show what it hears.
 7. Tap **Start practice**.
-8. Look at the front staff note.
-9. Sing, hum, or play that note steadily.
+8. Look at the front staff note. Tap **Hear this note** if you need a pitch reference.
+9. Wait for playback to finish, then sing, hum, or play that note steadily.
 10. Read the feedback:
     - `Good — I hear E4` means the mic path is alive;
     - `I hear G2 — need E` means adjust pitch toward the shown note;
     - `Almost E — a little high/low` means keep the note name and adjust tuning.
 11. Repeat until C, D, and E feel familiar.
-12. Use Notes or Piano only as a quiet fallback, comparison, or debugging path.
+12. Tap **Use note buttons** on the main screen for quiet practice; Piano remains in Settings.
 
 The user is not expected to configure anything before the first practice run. The only permission step is the microphone prompt.
 
@@ -134,10 +134,10 @@ The user should:
 1. Pick one lesson.
 2. Tap **Check mic** if the mic is not already ready.
 3. Tap **Start practice**.
-4. Sing or hum slowly.
+4. Tap **Hear this note** when needed, listen, then sing or hum slowly.
 5. Treat wrong notes as hints.
 6. Repeat until the note positions become familiar.
-7. Move to a broader lesson only when the current one feels boring.
+7. Use the optional **Next lesson** action after eight of the last ten independent attempts are correct, or select any lesson at any time. Listening-assisted attempts are counted separately. Progress survives reloads and restarting a session on this device.
 
 Recommended order:
 
@@ -162,7 +162,8 @@ In Rush, the user should:
 2. Sing or play before the note reaches the cliff.
 3. Accept that missed notes reset the streak.
 4. Try to improve score and accuracy over short 60-second rounds.
-5. Replay immediately if the round felt close.
+5. Replay if the round felt close, or choose **Back to Practice**. Escape also returns to Practice.
+6. Opening Settings or hiding the page pauses Rush. Close Settings and tap **Resume Rush** when ready.
 
 Rush is for fluency and recall speed. It is not the best place to learn a brand-new note position.
 

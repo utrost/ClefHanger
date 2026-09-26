@@ -30,7 +30,7 @@ function loadServiceWorker({ fetchImpl, keysImpl } = {}) {
   };
   const caches = {
     openCalls: [],
-    keys: keysImpl || (async () => ['old-cache', 'clefhanger-pwa-v64']),
+    keys: keysImpl || (async () => ['old-cache', 'clefhanger-pwa-v65']),
     delete: async (key) => {
       deleteCalls.push(key);
       return true;
@@ -76,7 +76,7 @@ test('activation keeps clients.claim inside the activation lifetime', async () =
   let resolveKeys;
   const worker = loadServiceWorker({
     keysImpl: () => new Promise((resolve) => {
-      resolveKeys = () => resolve(['old-cache', 'clefhanger-pwa-v64']);
+      resolveKeys = () => resolve(['old-cache', 'clefhanger-pwa-v65']);
     }),
   });
 
@@ -104,7 +104,7 @@ test('successful runtime cache writes are attached to the fetch event lifetime',
   };
 
   const { responsePromise, waitUntilPromises } = await worker.dispatch('fetch', {
-    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice69-tester-readiness-2026-09-16'),
+    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice70-guided-practice-2026-09-26'),
   });
 
   const response = await responsePromise;
@@ -125,7 +125,7 @@ test('failed HTTP responses are returned but not written into the runtime cache'
   });
 
   const { responsePromise, waitUntilPromises } = await worker.dispatch('fetch', {
-    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice69-tester-readiness-2026-09-16'),
+    request: new Request('https://example.test/clefhanger/src/runtime-only.js?v=clefhanger-slice70-guided-practice-2026-09-26'),
   });
 
   const response = await responsePromise;

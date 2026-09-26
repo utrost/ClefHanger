@@ -97,18 +97,13 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice69-tester-readiness-2026-09-16`.
-- Service-worker cache: `clefhanger-pwa-v64`.
-- Visible marker: `Slice 69: tester readiness`.
+- App version: `clefhanger-slice70-guided-practice-2026-09-26`.
+- Service-worker cache: `clefhanger-pwa-v65`.
+- Visible marker: `Slice 70: guided practice`.
 
 ## CI
 
-GitHub Actions are enabled for the public `utrost/ClefHanger` repo. `.github/workflows/check.yml` runs on `push` and `pull_request` with Node.js 24 and executes:
-
-```bash
-npm test
-npm run check
-```
+GitHub Actions runs `.github/workflows/check.yml` on pushes and pull requests with Node.js 24. CI executes `npm run check` once. `scripts/run-tests.js` discovers current unit and browser test filenames; do not reintroduce a manually maintained file list. Browser tests require Chrome/Chromium (or `CHROME_BIN`).
 
 Use `gh run list --branch main --limit 5` after pushing to verify the current head has a green `check` run.
 
@@ -302,11 +297,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice69-tester-readiness'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice70-guided-practice'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v64'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v65'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 

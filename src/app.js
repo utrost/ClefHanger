@@ -1,3 +1,5 @@
+import { createListenSession } from './core/listen-session.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { recordAttempt, summarizeProgress } from './core/progress.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 import {
   ACCIDENTAL_BUTTONS,
   DIFFICULTY_LEVELS,
@@ -10,11 +12,13 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+} from './core/content.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 import {
   STAFF_LAYOUT,
   createInitialState,
   startRound,
+  pauseRound,
+  resumeRound,
   startPractice,
   restartPractice,
   skipPracticeNote,
@@ -23,9 +27,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+} from './core/game.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -38,19 +42,22 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+} from './core/pitch.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 
-const appVersion = 'clefhanger-slice69-tester-readiness-2026-09-16';
+const appVersion = 'clefhanger-slice70-guided-practice-2026-09-26';
+const listenSession = createListenSession();
+let playbackRefreshTimer = null;
+const progressCache = new Map();
 const appBackground = document.querySelector('#app-background');
 const staff = document.querySelector('#staff');
 const notationStage = document.querySelector('#notation-stage');
@@ -82,6 +89,13 @@ const inputModeButtons = document.querySelector('#input-mode-buttons');
 const modeButtons = document.querySelector('#mode-buttons');
 const speedSlider = document.querySelector('#speed-slider');
 const difficultyButtons = document.querySelector('#difficulty-buttons');
+const hearNoteButton = document.querySelector('#hear-note');
+const micGuidanceEl = document.querySelector('#mic-guidance');
+const lessonProgressEl = document.querySelector('#lesson-progress');
+const nextLessonButton = document.querySelector('#next-lesson');
+const pauseRushButton = document.querySelector('#pause-rush');
+const stopMicrophoneMainButton = document.querySelector('#stop-microphone-main');
+const summaryPracticeButton = document.querySelector('#summary-practice');
 const startButton = document.querySelector('#start-round');
 const restartPracticeButton = document.querySelector('#restart-practice');
 const tutorialCard = document.querySelector('#tutorial-card');
@@ -154,6 +168,7 @@ const summaryFocusManager = createSummaryFocusManager({
   summaryElement: summaryEl,
   replayButton: summaryRestartButton,
   playfieldElement: notationStage,
+  onExit: returnToPractice,
 });
 const microphoneController = createMicrophoneController({
   startSession: (options) => startMicrophoneSession(options),
@@ -161,7 +176,7 @@ const microphoneController = createMicrophoneController({
     if (microphoneRafId !== null) cancelAnimationFrame(microphoneRafId);
     microphoneRafId = null;
     clearMicrophoneSession();
-    microphoneState = { ...microphoneState, permission: 'idle', listening: false, trackState: 'none', frequency: null, note: null, cents: null, inputLevel: 0, vocalCandidate: null };
+    microphoneState = { ...microphoneState, permission: 'idle', listening: false, scoringMessage: null, trackState: 'none', frequency: null, note: null, cents: null, inputLevel: 0, vocalCandidate: null };
     render();
   },
 });
@@ -194,7 +209,6 @@ function ensurePlayableInputMode(modeId, inputMode, { persist = false, announce 
     selectedInputMode = resolvedInputMode;
     microphoneController.selectInputMode(selectedInputMode);
     if (persist) storageAdapter.writePreference('selectedInputMode', selectedInputMode);
-    if (selectedInputMode !== 'microphone') stopMicrophone();
   }
   if (announce && compatibilityMessage) {
     semanticPresenter.announce({ kind: 'input-compatibility', id: `${modeId}:${normalizedInputMode}:${resolvedInputMode}`, message: compatibilityMessage.text });
@@ -205,6 +219,7 @@ function ensurePlayableInputMode(modeId, inputMode, { persist = false, announce 
 selectedInputMode = ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: false });
 
 function renderStaff(nowMs) {
+  if (state.phase === 'paused') nowMs = state.pausedAtMs;
   staff.innerHTML = renderStaffSvg({ state, selectedInputMode, microphoneState, nowMs, reducedMotion: prefersReducedMotion });
   syncNotationAccessibility({
     promptElement: notationPrompt,
@@ -253,6 +268,26 @@ function renderLessonIntro() {
   syncElementText(lessonIntroExamples, intro.examples.join(' · '));
 }
 
+function progressContextKey() {
+  return `${selectedModeId}:${selectedModeId === 'basics' ? selectedLessonId : 'all'}`;
+}
+
+function currentProgress() {
+  const key = progressContextKey();
+  if (!progressCache.has(key)) progressCache.set(key, storageAdapter.readProgress(selectedModeId, selectedLessonId));
+  return progressCache.get(key);
+}
+
+function savePracticeAttempt(outcome) {
+  if (!outcome || outcome.phase !== 'practice') return;
+  const progress = recordAttempt(currentProgress(), {
+    correct: outcome.result === 'correct',
+    assisted: listenSession.wasAssisted(outcome.prompt?.id),
+  });
+  progressCache.set(progressContextKey(), progress);
+  storageAdapter.writeProgress(selectedModeId, selectedLessonId, progress);
+}
+
 function currentLearningRecommendation() {
   const accidentalHint = buildAccidentalLearningHint({ modeId: selectedModeId, prompt: state.activeNote });
   if (accidentalHint) return accidentalHint;
@@ -260,6 +295,12 @@ function currentLearningRecommendation() {
     ? buildIntervalLearningHint({ previousPrompt: state.previousPrompt, prompt: state.activeNote })
     : null;
   if (intervalHint) return intervalHint;
+  if (selectedPlayStyle === 'practice') {
+    const progress = summarizeProgress(currentProgress());
+    if (progress.ready) return { kind: 'ready', text: 'At least 8 of your last 10 independent answers were correct. Try the next lesson or Rush.' };
+    if (progress.recent.length && !progress.recent.at(-1)) return { kind: 'review-mistake', text: 'Read the correction, then try again. You can hear the note for help.' };
+    return { kind: 'practice', text: 'Read the note. Hear it if you need help, then sing or play it back.' };
+  }
   const attempts = state.correct + state.wrong + state.missed;
   const accuracy = attempts > 0 ? Math.round((state.correct / attempts) * 100) : 0;
   const microphoneStable = selectedInputMode !== 'microphone' || Boolean(microphoneState.note && microphoneState.frequency);
@@ -279,6 +320,29 @@ function currentLearningRecommendation() {
 }
 
 function renderHud(nowMs) {
+  appBackground.dataset.playStyle = selectedPlayStyle;
+  syncElementText(document.querySelector('#session-label'), selectedPlayStyle === 'practice' ? 'Your practice' : 'Your Rush');
+  const progress = summarizeProgress(currentProgress());
+  lessonProgressEl.hidden = selectedPlayStyle !== 'practice';
+  syncElementText(lessonProgressEl, progress.attempts
+    ? `Recent: ${progress.recentCorrect}/${progress.recent.length} on your own · ${progress.assisted} with help`
+    : 'Progress saved on this device · listening help welcome');
+  const nextLesson = BEGINNER_LESSONS[BEGINNER_LESSONS.findIndex((lesson) => lesson.id === selectedLessonId) + 1];
+  nextLessonButton.hidden = selectedPlayStyle !== 'practice' || selectedModeId !== 'basics' || !progress.ready || !nextLesson;
+  if (nextLesson) syncElementText(nextLessonButton, `Next lesson: ${nextLesson.label}`);
+  hearNoteButton.hidden = selectedPlayStyle !== 'practice';
+  hearNoteButton.disabled = !listenSession.canScore(nowMs);
+  syncElementText(hearNoteButton, listenSession.canScore(nowMs) ? 'Hear this note' : 'Listen…');
+  pauseRushButton.hidden = !['running', 'paused'].includes(state.phase);
+  syncElementText(pauseRushButton, state.phase === 'paused' ? 'Resume Rush' : 'Pause Rush');
+  startButton.hidden = state.phase === 'paused';
+  stopMicrophoneMainButton.hidden = !microphoneState.listening && microphoneState.permission !== 'requesting';
+  let micGuidance = 'Listen to the note, then sing it back.';
+  if (!listenSession.canScore(nowMs)) micGuidance = 'Listen… scoring waits until the sound finishes.';
+  else if (state.phase === 'paused') micGuidance = 'Rush paused. Resume when you are ready.';
+  else if (settingsDialog.open) micGuidance = 'Close Settings to continue.';
+  else if (microphoneState.scoringMessage) micGuidance = microphoneState.scoringMessage;
+  syncElementText(micGuidanceEl, micGuidance);
   const mode = getMode(selectedModeId);
   const speed = getSpeed(selectedSpeedId);
   const difficulty = getDifficulty(selectedDifficultyId);
@@ -298,6 +362,7 @@ function renderHud(nowMs) {
   const lesson = getBeginnerLesson(selectedLessonId);
   const lessonApplies = isLessonScopedMode();
   const practiceSelected = isPracticeSelected();
+  syncElementText(document.querySelector('#close-settings'), state.phase === 'paused' ? 'Done — keep paused' : 'Done');
   const speedDisplay = practiceSelected ? 'Practice only' : speed.label;
   const difficultyDisplay = practiceSelected ? 'Practice only' : difficulty.label;
   syncElementText(speedLabelEl, speedDisplay);
@@ -392,6 +457,8 @@ function tick(nowMs) {
 }
 
 function resetIdleState() {
+  listenSession.reset();
+  microphoneState.scoringMessage = null;
   if (rafId !== null) cancelAnimationFrame(rafId);
   rafId = null;
   state = createInitialState({ roundLengthMs: 60000, nowMs: performance.now(), seed: state.seed, modeId: selectedModeId, speedId: selectedSpeedId, difficultyId: selectedDifficultyId, lessonId: selectedLessonId });
@@ -407,14 +474,18 @@ function beginRound() {
   if (selectedPlayStyle === 'practice') {
     if (state.phase === 'practice') {
       state = skipPracticeNote(state, now);
+      microphoneState.vocalCandidate = null;
+      microphoneState.scoringMessage = null;
       render(now);
       return;
     }
+    listenSession.reset();
     state = startPractice(state, now, selectedModeId, selectedLessonId);
     summaryEl.hidden = true;
     render(now);
     return;
   }
+  listenSession.reset();
   state = startRound(state, now, selectedModeId, selectedSpeedId, selectedDifficultyId);
   summaryEl.hidden = true;
   render(now);
@@ -422,6 +493,7 @@ function beginRound() {
 }
 
 function restartPracticeSession() {
+  listenSession.reset();
   if (rafId !== null) cancelAnimationFrame(rafId);
   rafId = null;
   const now = performance.now();
@@ -435,6 +507,50 @@ function replayRound() {
   summaryFocusManager.closeForReplay();
 }
 
+function returnToPractice() {
+  selectedPlayStyle = 'practice';
+  storageAdapter.writePreference('selectedPlayStyle', selectedPlayStyle);
+  resetIdleState();
+  beginRound();
+  summaryFocusManager.closeForReplay();
+  notationStage.focus();
+}
+
+function toggleRushPause() {
+  if (state.phase === 'paused') {
+    state = resumeRound(state, performance.now());
+    microphoneState.vocalCandidate = null;
+    rafId = requestAnimationFrame(tick);
+  } else if (state.phase === 'running') {
+    if (rafId !== null) cancelAnimationFrame(rafId);
+    rafId = null;
+    state = pauseRound(state, performance.now());
+    if (state.phase === 'ended') setBestScore(state.score, state.modeId, state.speedId, state.difficultyId);
+  }
+  render();
+}
+
+function refreshAfterPlayback(durationMs) {
+  clearTimeout(playbackRefreshTimer);
+  playbackRefreshTimer = setTimeout(() => render(), durationMs + 320);
+}
+
+function hearCurrentNote() {
+  if (selectedPlayStyle !== 'practice' || !listenSession.canScore(performance.now())) return;
+  if (state.phase !== 'practice') beginRound();
+  const prompt = state.activeNote;
+  const durationMs = playPromptAudio(prompt);
+  if (!durationMs) {
+    state.feedback = { kind: 'practice', text: 'Audio is unavailable. Try note buttons or enable browser sound.' };
+  } else {
+    listenSession.hear(prompt.id, performance.now(), durationMs);
+    microphoneState.vocalCandidate = null;
+    microphoneState.scoringMessage = null;
+    state.feedback = { kind: 'practice', text: `Listen to ${prompt.answer}, then sing or play it back.` };
+  }
+  render();
+}
+
 function getAudioContext() {
   if (!window.AudioContext && !window.webkitAudioContext) return null;
   if (!audioContext) {
@@ -446,18 +562,27 @@ function getAudioContext() {
 }
 
 function playPromptAudio(prompt) {
+  if (!prompt) return 0;
   const context = getAudioContext();
-  if (!context) return;
+  if (!context) return 0;
   const frequencies = getPromptFrequencies(prompt);
+  const durationMs = 1100 + Math.max(0, frequencies.length - 1) * 85;
+  listenSession.block(performance.now(), durationMs);
+  microphoneState.vocalCandidate = null;
+  refreshAfterPlayback(durationMs);
   frequencies.forEach((frequency, index) => {
     const startAt = context.currentTime + index * 0.085;
     playPianoVoice(context, frequency, startAt);
   });
+  return durationMs;
 }
 
 function playCalibrationTone() {
   const context = getAudioContext();
   if (!context) return;
+  listenSession.block(performance.now(), 1100);
+  microphoneState.vocalCandidate = null;
+  refreshAfterPlayback(1100);
   const tone = getCalibrationTone();
   playPianoVoice(context, tone.frequency, context.currentTime);
   feedbackEl.dataset.kind = 'correct';
@@ -605,11 +730,12 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
     const note = frequencyToNearestPitch(frequency);
     const calibration = buildCalibrationReading(frequency);
     microphoneState = { ...microphoneState, frequency, note, cents: note?.cents ?? null, inputLevel, silentFrameCount: 0, trackState: getCurrentMicrophoneTrackState(), calibration };
-    if (selectedInputMode === 'microphone' && ['running', 'practice'].includes(state.phase)) {
+    if (selectedInputMode === 'microphone' && ['running', 'practice'].includes(state.phase) && listenSession.canScore(nowMs) && !settingsDialog.open) {
       const match = evaluateVocalMatchFrame({ prompt: state.activeNote, frequency, nowMs, previousCandidate: microphoneState.vocalCandidate, lastAcceptedAtMs: microphoneState.lastAcceptedAtMs, matchAnyOctave });
       const scoringFeedback = buildMicrophoneScoringFeedback(match, { prompt: state.activeNote });
       microphoneState = { ...microphoneState, vocalCandidate: match.candidate };
       microphoneDebugText = scoringFeedback.text;
+      microphoneState.scoringMessage = scoringFeedback.text;
       if (match.status === 'match') {
         microphoneState = { ...microphoneState, lastAcceptedAtMs: nowMs };
         handleAnswer(match.answer);
@@ -629,15 +755,21 @@ function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.no
     };
   }
 
+  if (!frequency || !listenSession.canScore(nowMs) || settingsDialog.open) {
+    microphoneState.vocalCandidate = null;
+    if (!frequency) microphoneState.scoringMessage = null;
+  }
   render(nowMs);
   if (microphoneState.listening && frequencyOverride === null) microphoneRafId = requestAnimationFrame((timestamp) => processMicrophoneFrame(null, timestamp));
   return microphoneState;
 }
 
 function handleAnswer(answer) {
+  if (!['practice', 'running'].includes(state.phase) || settingsDialog.open) return;
   const now = performance.now();
   const answeredPrompt = state.activeNote;
   state = answerActiveNote(state, answer, now);
+  savePracticeAttempt(state.lastOutcome);
   if (state.phase === 'practice') state = applyLearningFeedback(state, now);
   if (!showHints && state.feedback.kind === 'wrong') state.feedback.text = `${answer} is not it. Try again.`;
   if (state.feedback.kind === 'correct') playPromptAudio(answeredPrompt);
@@ -697,8 +829,7 @@ function installInputModes() {
   for (const button of inputModeButtons.querySelectorAll('button')) {
     button.addEventListener('click', () => {
       const requestedInputMode = normalizeInputMode(button.dataset.inputMode);
-      selectedInputMode = requestedInputMode;
-      ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: true, announce: true });
+      ensurePlayableInputMode(selectedModeId, requestedInputMode, { persist: true, announce: true });
       storageAdapter.writePreference('selectedInputMode', selectedInputMode);
       render();
     });
@@ -706,6 +837,7 @@ function installInputModes() {
 }
 
 function openSettings() {
+  if (state.phase === 'running') toggleRushPause();
   if (typeof settingsDialog.showModal === 'function') settingsDialog.showModal();
   else settingsDialog.setAttribute('open', '');
 }
@@ -713,6 +845,8 @@ function openSettings() {
 function closeSettings() {
   if (typeof settingsDialog.close === 'function') settingsDialog.close();
   else settingsDialog.removeAttribute('open');
+  microphoneState.vocalCandidate = null;
+  render();
 }
 
 function installModes() {
@@ -743,9 +877,6 @@ function installSpeedSlider() {
 }
 
 function installBeginnerControls() {
-  for (const step of buildTutorialSteps()) {
-    // Keep tutorial content available through the imported contract.
-  }
   for (const lesson of BEGINNER_LESSONS) {
     const option = document.createElement('option');
     option.value = lesson.id;
@@ -812,6 +943,25 @@ function installDifficulties() {
   }
 }
 
+hearNoteButton.addEventListener('click', hearCurrentNote);
+pauseRushButton.addEventListener('click', toggleRushPause);
+summaryPracticeButton.addEventListener('click', returnToPractice);
+stopMicrophoneMainButton.addEventListener('click', stopMicrophone);
+document.querySelector('#use-note-buttons').addEventListener('click', () => {
+  ensurePlayableInputMode(selectedModeId, 'buttons', { persist: true });
+  render();
+});
+nextLessonButton.addEventListener('click', () => {
+  const next = BEGINNER_LESSONS[BEGINNER_LESSONS.findIndex((lesson) => lesson.id === selectedLessonId) + 1];
+  if (!next) return;
+  selectedLessonId = next.id;
+  storageAdapter.writePreference('selectedLesson', selectedLessonId);
+  resetIdleState();
+  beginRound();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && state.phase === 'running') toggleRushPause();
+});
 startButton.addEventListener('click', beginRound);
 restartPracticeButton.addEventListener('click', restartPracticeSession);
 summaryRestartButton.addEventListener('click', replayRound);
@@ -872,8 +1022,7 @@ window.__clefHanger = {
     resetIdleState();
   },
   selectInputMode: (inputMode) => {
-    selectedInputMode = normalizeInputMode(inputMode);
-    ensurePlayableInputMode(selectedModeId, selectedInputMode, { persist: false, announce: true });
+    ensurePlayableInputMode(selectedModeId, normalizeInputMode(inputMode), { persist: false, announce: true });
     render();
   },
   setMatchAnyOctave: (enabled) => {

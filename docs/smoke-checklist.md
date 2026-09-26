@@ -18,10 +18,10 @@ For exact current rules and constants, see [Current State Reference](./current-s
 - Treble mode shows the treble-clef loop anchored on the G line rather than floating above it.
 - Bass mode shows a bass clef and lower-register natural notes.
 - The beginner default shows Practice selected, First steps selected, Sing/Play selected, and the main **Check mic** path.
-- Select Line notes, Space notes, Ledger lines, and Interval jumps; each should show a small lesson intro card with concrete examples.
+- Select Line notes, Space notes, Ledger lines, and Interval jumps; Settings → Lesson help should show the selected lesson explanation with examples.
 - Ledger lines practice should show only C/A answer buttons and notes on the first ledger lines below/above the treble staff.
 - Interval jumps practice should show C/D/E/F/G buttons; after one correct answer, the learning suggestion should describe same note, step, skip, or jump movement from the previous prompt.
-- Tap **Start practice**. The timer should show `∞`, the note should stay in place long enough to study it, and no sprint summary should appear.
+- Tap **Start practice**. The timer should be hidden, the note should stay in place long enough to study it, and no sprint summary should appear.
 - Tap a wrong note in Practice. The feedback should name the correct answer and the staff should show a small correction label on the note; answer buttons should not be pre-highlighted before or after the miss.
 - Switch to **Rush** and tap **Start 60s sprint**.
 - A treble note or triad appears and moves toward the red cliff edge.
@@ -40,15 +40,25 @@ For exact current rules and constants, see [Current State Reference](./current-s
 - Tapping a wrong note leaves the note active and shows wrong-answer feedback.
 - Letting a note reach the cliff records a miss.
 - Let the Rush timer reach `0`; the playfield should show a centered **Time! Sprint complete** splash with points, accuracy, correct/wrong/missed counts, best streak, and a **Play another 60s rush** button.
-- Confirm focus enters on Replay once; Tab and Shift+Tab remain on Replay; background controls cannot be reached; Escape keeps the summary open; the result heading is not repeated as the dialog name; the result is spoken only by the round-ended live announcement; and Replay returns focus to the new rush playfield.
+- Confirm focus enters on Replay once; Tab and Shift+Tab cycle through Replay and Back to Practice; background controls cannot be reached; Escape returns to Practice; the result heading is not repeated as the dialog name; the result is spoken only by the round-ended live announcement; and Replay returns focus to the new rush playfield.
 - Browser console has no errors.
 
 ## Live smoke
 
 - Open `https://simiono.com/clefhanger/` with a cache-busting query.
-- Verify the HTML contains `clefhanger-slice67-shortcut-launch`.
+- Verify the HTML contains `clefhanger-slice70-guided-practice`.
 - Verify `src/app.js`, `src/core/game.js`, `src/core/content.js`, `src/core/scoring.js`, `src/core/learning.js`, `src/core/lessons.js`, `src/core/audio.js`, `src/core/pitch.js`, `src/platform/storage.js`, `src/platform/microphone-session.js`, `src/platform/mic-recording-diagnostic.js`, `manifest.webmanifest`, `sw.js`, PNG icons, and SVG icons return HTTP 200.
 - Verify the manifest has `id: /clefhanger/`, `start_url: ./`, `scope: ./`, `display: standalone`, and `orientation: portrait`.
 - In browser devtools/Application or on a phone, verify the install/add-to-home-screen affordance appears.
 - After first load, switch the browser offline and reload; the app shell should still open from the service worker cache.
 - Repeat the local browser smoke steps against the live URL.
+
+## Guided Practice regression checks
+
+- At 390×844 and 360×740, confirm the staff, Hear this note, Check mic, and mic guidance are visible together without scrolling.
+- Hear a prompt, remain silent, and confirm the app does not score its own playback. Sing after playback; verify Hold steady / wrong-note guidance appears outside Settings.
+- Complete an assisted attempt and reload. Its assisted count should persist without claiming independent mastery.
+- Make one wrong independent answer, then ten correct answers. Confirm the next-lesson suggestion appears and works; switching lessons preserves separate histories.
+- Start the microphone, switch to Notes, and confirm the microphone track stops.
+- Open Settings during Rush. Confirm timer/notes freeze, closing leaves it paused, and Resume continues without losing time. Repeat after hiding and returning to the page.
+- At results, test Back to Practice, Escape, forward/backward Tab wrapping, and replay.

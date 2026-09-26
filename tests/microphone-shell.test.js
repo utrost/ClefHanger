@@ -20,12 +20,12 @@ test('settings expose microphone input and live calibration controls', () => {
   assert.match(html, /id="stop-microphone"/);
   assert.match(html, /id="microphone-status"/);
   assert.match(html, /id="calibration-reading"/);
-  assert.match(html, /Actual calibration/);
+  assert.match(html, /Microphone setup/);
   assert.match(html, /Check mic/);
   assert.match(html, /Sing any comfortable note/);
-  assert.match(html, /data-app-version="clefhanger-slice69-tester-readiness/);
-  assert.match(app, /const appVersion = 'clefhanger-slice69-tester-readiness-2026-09-16'/);
-  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice69-tester-readiness-2026-09-16/);
+  assert.match(html, /data-app-version="clefhanger-slice70-guided-practice/);
+  assert.match(app, /const appVersion = 'clefhanger-slice70-guided-practice-2026-09-26'/);
+  assert.match(app, /\.\/core\/mic-diagnostics\.js\?v=clefhanger-slice70-guided-practice-2026-09-26/);
   assert.match(html, /id="record-microphone-diagnostic"/);
   assert.match(html, /id="microphone-recording-diagnostic"/);
   assert.match(html, /Record 1s test/);

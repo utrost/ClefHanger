@@ -1,11 +1,13 @@
-const APP_VERSION = 'clefhanger-slice69-tester-readiness-2026-09-16';
-const CACHE_NAME = 'clefhanger-pwa-v64';
+const APP_VERSION = 'clefhanger-slice70-guided-practice-2026-09-26';
+const CACHE_NAME = 'clefhanger-pwa-v65';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.webmanifest',
   './src/app.js',
   './src/core/audio.js',
+  './src/core/progress.js',
+  './src/core/listen-session.js',
   './src/core/game.js',
   './src/core/content.js',
   './src/core/input-compatibility.js',

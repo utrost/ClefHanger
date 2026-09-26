@@ -91,7 +91,7 @@ Steps:
 Expected:
 
 - Page loads without a blank screen.
-- Visible marker says `Slice 69: tester readiness`.
+- Visible marker says `Slice 70: guided practice`.
 - Main controls fit in portrait.
 - Console has no runtime errors.
 
@@ -142,7 +142,7 @@ Steps:
 
 Expected:
 
-- Timer shows `∞`.
+- Timer and score panels are hidden in Practice.
 - A single note appears.
 - No rush summary appears.
 - The user can start without opening Settings.
@@ -279,8 +279,8 @@ Steps:
 2. Answer several notes.
 3. Let at least one note reach the cliff.
 4. Wait until timer reaches 0.
-5. Confirm keyboard or screen-reader focus moves to **Play another 60s rush** once. Press Tab and Shift+Tab repeatedly; focus must remain on that sole modal control and never reach browser chrome or the dimmed game controls.
-6. Press Escape. Confirm the summary stays open and focus remains on **Play another 60s rush**.
+5. Confirm keyboard or screen-reader focus moves to **Play another 60s rush** once. Press Tab and Shift+Tab repeatedly; focus must cycle through Replay and Back to Practice without reaching the dimmed game controls.
+6. Press Escape. Confirm the summary closes, untimed Practice starts, and focus moves to the staff.
 7. Activate **Play another 60s rush** with touch, mouse, keyboard, or a screen-reader command.
 
 Expected:
@@ -289,7 +289,7 @@ Expected:
 - Missed notes count as misses and reset streak.
 - At time-up, centered summary appears with score, accuracy, correct/wrong/missed counts, and best streak.
 - The result is spoken once by the round-ended live announcement; focus identifies Replay as the next action without separately focusing/re-speaking the result heading as the dialog name. The background is unavailable to keyboard and screen-reader navigation, and repeated renders do not steal focus again.
-- Escape deliberately does not dismiss the terminal result; it puts focus on Replay so the player makes an explicit choice.
+- Escape returns to Practice; Replay and Back to Practice are both reachable in the modal.
 - Replay starts a new rush, closes the summary, and puts focus on the live playfield for every activation method.
 
 Evidence:
@@ -503,7 +503,7 @@ Setup:
 Steps:
 
 1. Open `https://simiono.com/clefhanger/?verify=<verify>`.
-2. Confirm the HTML contains `clefhanger-slice69-tester-readiness`.
+2. Confirm the HTML contains `clefhanger-slice70-guided-practice`.
 3. Confirm these assets return HTTP 200:
    - `manifest.webmanifest`
    - `sw.js`
@@ -522,7 +522,7 @@ Steps:
    - `src/platform/storage.js`
    - `src/ui/staff-renderer.js`
    - icons
-4. Confirm `sw.js` contains `clefhanger-pwa-v64`.
+4. Confirm `sw.js` contains `clefhanger-pwa-v65`.
 5. Confirm `https://simiono.com/` still serves the main Garden site, not the ClefHanger app.
 
 Expected:
@@ -649,3 +649,7 @@ For a game/core/scoring/lesson change, run HT-03 through HT-11 and HT-18.
 For a microphone change, run HT-10 through HT-15 and HT-18 on desktop, then at least HT-12 through HT-15 on one real phone.
 
 For a full release candidate, run all test cases.
+
+## Guided Practice release checks
+
+Use the [Guided Practice regression checks](./smoke-checklist.md#guided-practice-regression-checks) for the compact first screen, listen/imitate protection, saved progress, microphone cleanup, and Rush pause/exit flows. Automated tests use Chrome and synthetic pitch input; still verify physical voice/speaker behavior on Android Chrome/Firefox and iOS Safari. Compare assisted and independent progress after reloading the same browser profile.

@@ -16,7 +16,7 @@ The current build is beginner-first:
 
 ## First run
 
-Start with Sing/Play. Tap **Check mic**, sing or hum any comfortable steady note, then play the first Practice lesson. Use Notes or Piano from Settings only when you need a quiet fallback or a debugging comparison.
+Start with Sing/Play. Tap **Check mic**, sing or hum any comfortable steady note, then play the first Practice lesson. Use **Use note buttons** on the main screen for quiet practice; Piano is in Settings.
 
 
 1. Open `https://simiono.com/clefhanger/`.
@@ -26,24 +26,24 @@ Start with Sing/Play. Tap **Check mic**, sing or hum any comfortable steady note
    - Speed 5
    - Sing/Play
    - First steps
-3. Read the tiny lesson card.
+3. Read the short instruction; detailed lesson help is available in Settings.
 4. Tap **Check mic** and allow microphone permission.
 5. Sing or hum any comfortable steady note until the app shows what it hears.
 6. Tap **Start practice**.
-7. Sing or hum the visible C/D/E prompt.
+7. Tap **Hear this note** if needed, wait for playback to finish, then sing or hum the visible C/D/E prompt.
 8. If you sing the wrong pitch, look at:
    - the feedback text;
    - the heard-note readout;
-   - the correction label on the staff.
+   - the visible microphone guidance (hold steady, wrong note, or octave mismatch).
 
-Practice has no timer. The timer shows `∞`.
+Practice has no timer or score panels. These appear in Rush.
 
 ## Reading the screen
 
-- **Score**: total points this run.
-- **Streak**: current chain of correct answers.
-- **High**: local best score for the current mode/speed/difficulty combination.
-- **Today’s sprint**: compact summary of mode, difficulty, speed, input type, and current lesson/play style.
+- **Score** (Rush): total points this run.
+- **Streak** (Rush): current chain of correct answers.
+- **High** (Rush): local best score for the current mode/speed/difficulty combination.
+- **Your practice / Your Rush**: compact summary of mode, difficulty, speed, input type, and current lesson/play style.
 - **Staff**: where the prompt appears.
 - **Cliff**: red line on the right. In Rush, a note is missed when it reaches the cliff.
 - **Feedback**: tells you whether the answer was correct, wrong, missed, or whether a round ended.
@@ -61,7 +61,9 @@ Use Practice to learn.
 - Teaching feedback says what the note was and where it sits.
 - Correct answer plays the pitch and moves to another practice note.
 - **Next practice note** skips only the current prompt. It does not count as correct, wrong, or missed, does not change the score or streak, and does not add analytics or outcome evidence. The visible learning suggestion may change because it can describe the newly active prompt.
-- **Restart practice** is a separate deliberate action that resets the practice session and its progress.
+- **Restart practice**, in Settings, resets the current session while retaining saved lesson progress.
+- The recent-progress line counts up to ten independent attempts. Listening-assisted attempts are listed separately. Eight correct out of ten offers a **Next lesson** button without restricting manual lesson choice. Progress is local to this browser/device, with no account or cloud sync.
+- Playback scoring is suspended through the tone and a short acoustic tail. **Stop mic** and **Use note buttons** are available beside Check mic.
 
 ### Rush
 
@@ -71,7 +73,8 @@ Use Rush when the lesson feels familiar.
 - Notes move toward the cliff.
 - Missing a note resets the streak.
 - Normal and Hard can show preview notes behind the front note.
-- At time-up, the app shows score, accuracy, correct/wrong/missed counts, and best streak.
+- Opening Settings or hiding the page pauses Rush. Closing Settings does not resume; tap **Resume Rush** explicitly.
+- At time-up, the app shows score, accuracy, correct/wrong/missed counts, and best streak. Choose replay or **Back to Practice**; Escape also returns to Practice.
 
 ## Lessons
 
@@ -256,7 +259,7 @@ A useful report contains:
 Use this when checking a fresh deploy.
 
 1. Open a cache-busted URL, e.g. `https://simiono.com/clefhanger/?verify=<commit>`.
-2. Confirm the page shows `Slice 67: shortcut launch`.
+2. Open Settings → About ClefHanger and confirm `Slice 70: guided practice`.
 3. Tap **Start practice**.
 4. Tap a wrong C/D/E answer and verify teaching feedback plus a staff correction label, with no answer-button pre-highlight.
 5. Tap the correct answer and verify score increases and a pitch plays.

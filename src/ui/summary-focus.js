@@ -3,6 +3,7 @@ export function createSummaryFocusManager({
   summaryElement,
   replayButton,
   playfieldElement,
+  onExit,
 }) {
   let active = false;
 
@@ -38,10 +39,24 @@ export function createSummaryFocusManager({
 
     handleKeydown(event) {
       if (!active) return false;
-      if (event.key === 'Escape' || event.key === 'Tab') {
+      if (event.key === 'Escape') {
         event.preventDefault();
-        replayButton.focus();
+        if (onExit) onExit();
+        else { close(); playfieldElement.focus(); }
         return true;
+      }
+      if (event.key === 'Tab') {
+        const controls = summaryElement.querySelectorAll
+          ? [...summaryElement.querySelectorAll('button:not([disabled])')].filter((element) => !element.hidden && element.getClientRects().length)
+          : [replayButton];
+        const first = controls[0];
+        const last = controls.at(-1);
+        const focused = summaryElement.ownerDocument?.activeElement || replayButton;
+        if (first && (controls.length === 1 || (event.shiftKey ? focused === first : focused === last))) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+          return true;
+        }
       }
       return false;
     },

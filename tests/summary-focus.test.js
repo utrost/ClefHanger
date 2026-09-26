@@ -80,8 +80,8 @@ test('replay focus cannot pass when the playfield lacks a programmatic focus tar
   assert.notEqual(document.activeElement, playfieldElement);
 });
 
-test('Escape deliberately keeps the terminal result open and keeps focus on Replay', () => {
-  const { manager, document, summaryElement, replayButton } = setup();
+test('Escape closes the result and restores the playfield without forcing replay', () => {
+  const { manager, document, summaryElement, playfieldElement } = setup();
   manager.sync(true);
   let prevented = false;
 
@@ -89,9 +89,8 @@ test('Escape deliberately keeps the terminal result open and keeps focus on Repl
 
   assert.equal(handled, true);
   assert.equal(prevented, true);
-  assert.equal(summaryElement.hidden, false);
-  assert.equal(document.activeElement, replayButton);
-  assert.equal(replayButton.focusCount, 2);
+  assert.equal(summaryElement.hidden, true);
+  assert.equal(document.activeElement, playfieldElement);
 });
 
 test('Tab and Shift+Tab remain contained on the summary Replay control', () => {

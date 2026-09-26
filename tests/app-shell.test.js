@@ -15,8 +15,8 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes"/);
   assert.match(html, /<link rel="apple-touch-icon" href="\.\/icons\/icon-192\.png"/);
   assert.match(html, /rel="manifest" href="\.\/manifest\.webmanifest"/);
-  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice69-tester-readiness-2026-09-16"/);
-  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice69-tester-readiness-2026-09-16'\)/);
+  assert.match(html, /src="\.\/src\/app\.js\?v=clefhanger-slice70-guided-practice-2026-09-26"/);
+  assert.match(html, /navigator\.serviceWorker\s*\.register\('\.\/sw\.js\?v=clefhanger-slice70-guided-practice-2026-09-26'\)/);
   assert.match(html, /registration\) => registration\.update\(\)/);
   assert.match(html, /@media \(max-width: 720px\)/);
   assert.match(html, /id="staff"/);
@@ -54,12 +54,12 @@ test('ships a mobile-first PWA shell for ClefHanger', () => {
   assert.match(html, /aria-label="Speed slider"/);
   assert.match(html, /id="difficulty-buttons"/);
   assert.match(html, /id="difficulty-label"/);
-  assert.match(html, /Today.s Sprint/);
+  assert.match(html, /Your practice/);
   assert.match(html, /href="https:\/\/simiono\.com\/"/);
   assert.match(html, />simiono<\/a>/);
   assert.match(html, /Bass/);
-  assert.match(html, /data-app-version="clefhanger-slice69-tester-readiness/);
-  assert.match(html, /Slice 69: tester readiness/);
+  assert.match(html, /data-app-version="clefhanger-slice70-guided-practice/);
+  assert.match(html, /Slice 70: guided practice/);
 });
 
 test('rush summary is a focus-managed modal isolated from the background game', () => {
@@ -121,7 +121,7 @@ test('first-run shell presents Sing/Play as the default primary answer path', ()
   const html = read('index.html');
   const app = read('src/app.js');
 
-  assert.match(html, /<p class="tagline">Sing, hum, or play the staff note before it drops\./);
+  assert.match(html, /<p class="tagline">Read a note\. Hear it\. Make it yours\./);
   assert.match(html, /<div id="settings-line">Treble · Beginner · Speed 5 · Sing\/Play/);
   assert.match(html, /data-input-mode="microphone"[^>]*data-active="true"[^>]*>Sing\/Play/);
   assert.match(html, /<div id="microphone-panel" aria-label="Microphone answer status">/);
@@ -180,15 +180,14 @@ test('app honors OS reduced-motion preference for Rush presentation', () => {
   assert.match(html, /\.rush-progress/);
 });
 
-test('CI exposes browser integration tests as a separate gate', () => {
+test('CI runs the full gate once with automatically discovered unit and browser suites', () => {
   const pkg = JSON.parse(read('package.json'));
   const workflow = read('.github/workflows/check.yml');
-
-  assert.match(pkg.scripts['test:unit'], /node --test/);
-  assert.match(pkg.scripts['test:browser'], /\*browser\*\.test\.js/);
+  assert.equal(pkg.scripts['test:unit'], 'node scripts/run-tests.js unit');
+  assert.equal(pkg.scripts['test:browser'], 'node scripts/run-tests.js browser');
   assert.match(pkg.scripts.check, /npm run test:unit && npm run test:browser/);
-  assert.match(workflow, /Run unit tests[\s\S]*npm run test:unit/);
-  assert.match(workflow, /Run browser integration tests[\s\S]*npm run test:browser/);
+  assert.equal((workflow.match(/run: npm run check/g) || []).length, 1);
+  assert.doesNotMatch(workflow, /run: npm (test|run test:unit|run test:browser)/);
 });
 
 test('selector controls expose pressed state, accessible target sizes, and strong focus', () => {
@@ -241,7 +240,7 @@ test('manifest and service worker describe an installable subpath-safe app shell
   }
 
   const sw = read('sw.js');
-  assert.match(sw, /clefhanger-pwa-v64/);
+  assert.match(sw, /clefhanger-pwa-v65/);
   for (const asset of ['./', './index.html', './manifest.webmanifest', './src/app.js', './src/core/audio.js', './src/core/game.js', './src/core/content.js', './src/core/input-compatibility.js', './src/core/scoring.js', './src/core/pitch.js', './src/core/mic-diagnostics.js', './src/core/learning.js', './src/core/lessons.js', './src/core/music-theory.js', './src/ui/staff-renderer.js', './src/platform/storage.js', './icons/icon-192.svg', './icons/icon-512.svg', './icons/icon-192.png', './icons/icon-512.png']) {
     assert.ok(sw.includes(`'${asset}'`), `service worker precaches ${asset}`);
   }

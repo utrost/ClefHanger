@@ -1,7 +1,8 @@
-import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
-import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice69-tester-readiness-2026-09-16';
+import { normalizeProgress } from '../core/progress.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice70-guided-practice-2026-09-26';
+import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice70-guided-practice-2026-09-26';
 
 export const STORAGE_KEYS = {
   selectedMode: 'clefhanger.selectedMode.v3',
@@ -104,7 +105,24 @@ export function createStorageAdapter(storage = undefined) {
     }
   }
 
+  function progressKey(modeId, lessonId) {
+    const mode = getMode(modeId).id;
+    const lesson = mode === 'basics' ? getBeginnerLesson(lessonId).id : 'all';
+    return `clefhanger.progress.${mode}.${lesson}.v1`;
+  }
+
+  function readProgress(modeId, lessonId) {
+    try { return normalizeProgress(JSON.parse(getSafe(backingStorage, progressKey(modeId, lessonId)))); }
+    catch { return normalizeProgress(null); }
+  }
+
+  function writeProgress(modeId, lessonId, progress) {
+    setSafe(backingStorage, progressKey(modeId, lessonId), JSON.stringify(normalizeProgress(progress)));
+  }
+
   return {
+    readProgress,
+    writeProgress,
     readPreferences,
     writePreference,
     readHighScore,

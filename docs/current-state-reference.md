@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice69-tester-readiness-2026-09-16`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice70-guided-practice-2026-09-26`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Microphone-first scope
 
@@ -12,9 +12,9 @@ The current product direction is microphone-first: the default answer path is Si
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice69-tester-readiness-2026-09-16`.
-- Current visible slice marker: `Slice 69: tester readiness`.
-- Current service-worker cache: `clefhanger-pwa-v64`.
+- Current app marker: `clefhanger-slice70-guided-practice-2026-09-26`.
+- Current visible slice marker: `Slice 70: guided practice`.
+- Current service-worker cache: `clefhanger-pwa-v65`.
 
 A valid `?mode=` launch query takes precedence over the stored LocalStorage mode for that launch without overwriting the saved preference. The relative manifest URLs use the same contract for browser, installed shortcut, and offline navigation; missing or invalid mode values safely retain the stored mode.
 
@@ -199,30 +199,37 @@ The reducer uses these phases:
 - `idle`: no active round; feedback says `Tap Start when ready.`
 - `practice`: untimed single-note lesson.
 - `running`: 60-second Rush round.
+- `paused`: frozen Rush timer and note deadlines; explicit resume required.
 - `ended`: Rush is complete; active notes and queue are cleared.
 
 ### Practice
 
 - Starts with `startPractice`.
-- No end time; timer display is `∞`.
+- No end time; the timer and score panels are hidden in Practice. The core timer helper still returns `∞`.
 - Uses Speed 1 internally and Beginner difficulty; the runtime summary labels Practice as effective settings instead of showing stored Rush speed/difficulty.
 - Speed slider and difficulty buttons are disabled with explanatory copy while Practice is selected; switching back to Rush restores the stored selections.
 - Always keeps one active prompt.
 - Wrong answers keep the same prompt active.
 - If a correct answer empties the queue, the DOM handler spawns the next note immediately.
 - **Next practice note** replaces exactly the current prompt. It does not count as correct, wrong, or missed and does not change the score or streak. The last answered prompt remains available for meaningful interval hints; skipped prompts do not become learning history or recommendation evidence.
-- **Restart practice** is a separate, deliberate action that resets practice counts, score, streak, and prompt history.
+- **Restart practice**, in Settings, resets session counts, score, streak, and prompt history; persisted lesson progress remains.
+- **Hear this note** starts Practice if idle, plays the current prompt, and marks subsequent attempts on that prompt as assisted. Skipping records no attempt.
+- `src/core/listen-session.js` excludes microphone scoring during all app tone playback plus 300 ms. Candidates reset during playback and modal Settings; target-relative guidance is visible in `#mic-guidance`.
+- `src/core/progress.js` tracks lifetime attempts, correct answers, assisted attempts, and a bounded list of ten independent outcomes. The optional next-lesson action requires at least eight correct in a full ten-attempt window. No lesson is locked.
+- Progress is stored under `clefhanger.progress.<mode>.<lesson>.v1`; non-Treble modes use `all` for the lesson. Only scored Practice answers update this history; transient microphone pitch adjustments are guidance, not wrong answers. Corrupt/unavailable storage safely falls back to empty progress.
 
 ### Rush
 
 - Starts with `startRound`.
 - Treble Rush uses the selected beginner lesson pool, so “try Rush on the same lesson” stays true for First steps, Line notes, Space notes, Ledger lines, Interval jumps, and Mixed notes.
 - Round length: 60,000 ms.
+- Opening Settings, tapping Pause Rush, or hiding the page pauses the round. Closing Settings keeps it paused. Resume shifts every queued note’s spawn/deadline and the round end by the paused duration. Microphone answers cannot score while paused.
+- Back to Practice and Escape leave the results without starting another Rush.
 - Notes move horizontally toward the cliff using each note's spawn/deadline timing.
 - Expired notes count as missed if they reach their deadline before answer.
-- On timeout, phase becomes `ended`, active notes/queue are cleared, and the time-up summary appears. Replay receives focus once, Tab and Shift+Tab remain on that sole modal control, and the game background becomes `inert` and `aria-hidden`.
+- On timeout, phase becomes `ended`, active notes/queue are cleared, and the time-up summary appears. Replay receives focus once, Tab and Shift+Tab cycle through Replay and Back to Practice, and the game background becomes `inert` and `aria-hidden`. Escape returns to Practice.
 - The issue #3 round-ended live announcement remains the single result-speech path. The modal uses a generic `Rush result` dialog label, while focusing Replay supplies the next action without also focusing or naming the dialog from the result heading.
-- Escape intentionally keeps the terminal summary open and focuses its Replay action. Replay closes the summary, restores the game surface, starts the next rush, and focuses the programmatically focusable playfield (`tabindex="-1"`).
+- Escape and Back to Practice close the summary and start untimed Practice. Replay starts a new Rush. Both restore the game surface and focus the programmatically focusable playfield (`tabindex="-1"`).
 - Late answers after `ended` do not mutate the result.
 
 ## Learning recommendations
@@ -231,9 +238,9 @@ The reducer uses these phases:
 
 Current thresholds and messages:
 
-- Practice with at least 8 correct, 0 wrong/missed, and best streak at least 8: suggest Rush on the same lesson.
-- Practice with mistakes: suggest pausing on the correction and naming line/space/ledger before answering again.
-- Practice before readiness: suggest practicing the current lesson until about 8 out of 10 feel easy.
+- Practice uses persisted recent independent outcomes: at least eight correct in the last ten suggests the next lesson or Rush.
+- Practice after a recent independent mistake suggests reviewing the correction; later correct answers clear that reminder. Earlier mistakes do not permanently pin the recommendation.
+- Practice before readiness explains the read/listen/imitate loop. Accidental and interval hints still take priority when applicable.
 - Rush below 70% accuracy: suggest repeating the current lesson in Practice.
 - Rush at or above 80% accuracy with another beginner lesson available: suggest the next lesson.
 - Rush at or above 80% accuracy with no next lesson: suggest changing only one setting for more challenge.
@@ -242,7 +249,7 @@ Current thresholds and messages:
 - Sharp/flat prompts in Sharps or Flats mode: explain that the accidental uses the same staff spot as the natural note, then raises or lowers it by one small step.
 - Interval jumps lesson prompts after the first completed answer: compare the current prompt against the previous prompt as same note, step up/down, skip up/down, or larger jump.
 
-The line renders under the main feedback as `#learning-coach` with `aria-label="Learning suggestion"`. The ending splash repeats the recommendation in its detail text.
+The line renders after the answer controls as `#learning-coach` with `aria-label="Learning suggestion"`. The ending splash repeats the recommendation in its detail text.
 
 ## Difficulty and speed
 
@@ -570,7 +577,7 @@ npm run check
 
 It runs:
 
-- `npm test` (`node --test tests/*.test.js`);
+- `npm run test:unit` and `npm run test:browser`, using `scripts/run-tests.js` to discover every top-level `tests/*.test.js` file, partitioned by `browser` in the filename;
 - syntax checks for `src/app.js`, all core JS modules, and `sw.js`;
 - manifest JSON validation;
 - `git diff --check`.
@@ -581,7 +588,8 @@ Current automated suite covers:
 - Staff/clef/ledger geometry.
 - Beginner lessons, tutorial, correction overlay, scaffolded answers.
 - Difficulty/queue/speed/high-score separation.
-- Core scoring and round lifecycle.
+- Core scoring, pause/resume, playback protection, progress normalization and persistence.
+- Real touch input at phone viewports, listen/imitate scoring exclusion, reload persistence, next-lesson navigation, microphone cleanup, and keyboard/touch result exits.
 - Mode-specific note pools, accidentals, chords, piano input mapping.
 - Audio voice plan and A4 calibration tone.
 - Microphone pitch conversion, calibration copy, constraints, pitch detector, low male voice recordings, quiet levels, any-octave matching, recorded chunk diagnostics.
