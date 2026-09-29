@@ -1,6 +1,6 @@
-import { describeStaffPosition } from '../core/music-theory.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { getLedgerLinesForStaffStep, getClefPresentation } from '../core/game.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { yForStaffStep } from './staff-renderer.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { describeStaffPosition } from '../core/music-theory.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { getLedgerLinesForStaffStep, getClefPresentation } from '../core/game.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { yForStaffStep } from './staff-renderer.js?v=clefhanger-slice73-progress-export-2026-09-30';
 
 const escape = (value) => String(value).replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
 

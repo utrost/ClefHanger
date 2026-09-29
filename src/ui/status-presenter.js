@@ -1,4 +1,4 @@
-import { buildMicrophoneListeningMessage, buildMicrophoneReadiness } from '../core/pitch.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { buildMicrophoneListeningMessage, buildMicrophoneReadiness } from '../core/pitch.js?v=clefhanger-slice73-progress-export-2026-09-30';
 
 function microphoneStatusText(microphone) {
   if (microphone.permission === 'requesting') return 'Requesting mic… check the browser permission prompt.';

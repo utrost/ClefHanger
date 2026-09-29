@@ -1,8 +1,8 @@
-import { normalizeProgress } from '../core/progress.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { normalizeProgress } from '../core/progress.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { DIFFICULTY_LEVELS, GAME_MODES, SPEED_SETTINGS, getDifficulty, getMode, getSpeed } from '../core/content.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { BEGINNER_LESSONS, getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { normalizeMicrophoneInputMode } from '../core/pitch.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { getHighScoreKey } from '../core/scoring.js?v=clefhanger-slice73-progress-export-2026-09-30';
 
 export const STORAGE_KEYS = {
   selectedMode: 'clefhanger.selectedMode.v3',
@@ -120,6 +120,31 @@ export function createStorageAdapter(storage = undefined) {
     setSafe(backingStorage, progressKey(modeId, lessonId), JSON.stringify(normalizeProgress(progress)));
   }
 
+  function exportProgress() {
+    const progress = {};
+    for (const lesson of BEGINNER_LESSONS) {
+      const value = readProgress('basics', lesson.id);
+      if (value.attempts > 0) progress[lesson.id] = value;
+    }
+    for (const mode of GAME_MODES.filter((entry) => entry.id !== 'basics')) {
+      const value = readProgress(mode.id, 'all');
+      if (value.attempts > 0) progress[`mode.${mode.id}`] = value;
+    }
+    const highScores = {};
+    for (const mode of GAME_MODES) {
+      for (const speed of SPEED_SETTINGS) {
+        for (const difficulty of DIFFICULTY_LEVELS) {
+          const score = readHighScore(mode.id, speed.id, difficulty.id);
+          if (score > 0) {
+            const nativeMode = mode.id === 'basics' ? 'treble' : mode.id;
+            highScores[`rush.highScore.${nativeMode}.speed${speed.id}.${difficulty.id}`] = score;
+          }
+        }
+      }
+    }
+    return { schema: 'clefhanger-progress-transfer-v1', exportedAt: new Date().toISOString(), progress, highScores };
+  }
+
   return {
     readProgress,
     writeProgress,
@@ -127,5 +152,6 @@ export function createStorageAdapter(storage = undefined) {
     writePreference,
     readHighScore,
     writeHighScore,
+    exportProgress,
   };
 }

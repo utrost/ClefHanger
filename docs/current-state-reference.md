@@ -1,6 +1,6 @@
 # ClefHanger Current State Reference
 
-This document describes what exists in code today in `clefhanger-slice72-settings-status-2026-09-26`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
+This document describes what exists in code today in `clefhanger-slice73-progress-export-2026-09-30`. It is an implementation reference, not a future roadmap. For the product-level path a normal player is supposed to follow, see [User Journey](./user-journey.md). For repeatable manual pass/fail test cases, see [Human Test Handbook](./human-test-handbook.md).
 
 ## Microphone-first scope
 
@@ -12,9 +12,9 @@ The current product direction is microphone-first: the default answer path is Si
 - Public URL: `https://simiono.com/clefhanger/`.
 - Local entry point: `index.html` loading `src/app.js` as an ES module.
 - `src/app.js` delegates staff SVG markup to `src/ui/staff-renderer.js` and keeps the DOM assignment/composition role.
-- Current app marker: `clefhanger-slice72-settings-status-2026-09-26`.
-- Current visible slice marker: `Slice 72: settings and status`.
-- Current service-worker cache: `clefhanger-pwa-v67`.
+- Current app marker: `clefhanger-slice73-progress-export-2026-09-30`.
+- Current visible slice marker: `Slice 73: progress export`.
+- Current service-worker cache: `clefhanger-pwa-v68`.
 
 A valid `?mode=` launch query takes precedence over the stored LocalStorage mode for that launch without overwriting the saved preference. The relative manifest URLs use the same contract for browser, installed shortcut, and offline navigation; missing or invalid mode values safely retain the stored mode.
 
@@ -32,7 +32,7 @@ Accessibility announcements use separate responsibilities: notation changes rema
   - `src/ui/settings-presenter.js`: settings labels, summary, and accessible control synchronization; event wiring stays in the app.
   - `src/ui/status-presenter.js`: microphone readiness/status, playback/pause/settings guidance precedence, and calibration display decisions.
   - `src/ui/staff-renderer.js`: SVG staff, note, chord, ledger-line, correction-label, and microphone ghost-note markup.
-  - `src/platform/storage.js`: safe LocalStorage adapter for preferences, legacy fallback keys, high-score reads/writes, and unavailable-storage errors.
+  - `src/platform/storage.js`: safe LocalStorage adapter for preferences, legacy fallback keys, high-score reads/writes, progress-transfer JSON export, and unavailable-storage errors.
   - `src/platform/microphone-session.js`: permission preflight, timeout-wrapped `getUserMedia`, built-in vocal constraints, Web Audio analyser/keepalive graph setup, track-state snapshots, and stop cleanup.
   - `src/platform/mic-recording-diagnostic.js`: one-second MediaRecorder capture orchestration, chunk collection, blob creation, Web Audio decode handoff, decoded RMS, recorded-pitch extraction, and byte/sample evidence for reports.
   - `scripts/check-version-consistency.js`: cache-busting guard for app version, module query strings, service-worker registration, cache name, and precached ES modules.
@@ -572,6 +572,8 @@ Stored in `localStorage`:
 - `clefhanger.lessonIntroHidden.v1`
 - `clefhanger.tutorialDismissed.v1`
 - high scores under `clefhanger.highScore.<mode>.speed<speed>.<difficulty>.v5`
+
+Settings offers **Export progress JSON** for the native Android port. The file contains only nonempty Practice lesson/mode records and positive Rush best scores, using `clefhanger-progress-transfer-v1`; it excludes microphone reports, raw audio, and browser settings. The Android app's Settings imports this file through the system picker after a preview, keeping whichever progress record has more attempts and whichever score is higher. This transfer is manual and does not create cloud sync.
 
 There is no cloud sync and no account system.
 

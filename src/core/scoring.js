@@ -1,4 +1,4 @@
-import { getDifficulty, getMode, getSpeed } from './content.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { getDifficulty, getMode, getSpeed } from './content.js?v=clefhanger-slice73-progress-export-2026-09-30';
 
 export function getSpeedBonus(speed = getSpeed('5')) {
   return speed.value >= 8 ? 40 : speed.value >= 6 ? 20 : 0;

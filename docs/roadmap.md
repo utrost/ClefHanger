@@ -1,8 +1,10 @@
 # ClefHanger roadmap
 
-Last reviewed: **2026-09-26**, against the Slice 72 settings/status extraction (built on `784a18a`).
+Last reviewed: **2026-09-30**, against the Slice 73 progress export and the isolated Flutter/Rust Android port on `feat/flutter-rust-port`.
 
 This is the single planning document for product direction, delivery priorities, and architecture work. It replaces the separate MVP roadmap, product specification, and refactoring plan. Historical implementation details remain in Git; completed work below is a baseline, not an open backlog.
+
+The native branch now covers Practice, Rush, five notation modes, touch/piano answers, microphone guidance, teaching, diagnostic capture, local progress, and a manual PWA-to-Android progress transfer. The PWA remains the available product. Native release readiness still requires real-phone microphone and audio testing, accessibility review, and a distribution/signing decision; see [native parity](../native/docs/parity.md) and [validation](../native/docs/validation.md).
 
 **Highest product priority: validate the mobile learning loop on physical phones (P1). The settings/status extraction (P2) is complete.** While device evidence is unavailable, the next bounded maintenance slice is P5: migrate the older browser suites to the existing shared, timeout-bounded harness. Do not expand microphone-dependent lessons before P1 establishes a reliable baseline.
 
@@ -27,14 +29,14 @@ The app remains a static, dependency-free PWA using native JavaScript modules, S
 | Notation help | Optional “Learn these notes” guide with small SVG rows and text keys. Shared staff-position descriptions support accessible labels and correction copy; disabling hints also hides the answer overlay. |
 | Listen and imitate | “Hear this note” plays the current Practice target and can start an idle Practice session. App-generated audio blocks microphone scoring through playback plus a 300 ms acoustic tail. Listening and visible teaching help mark the prompt assisted. |
 | Mic readiness | Visible Check mic, Stop mic, note-button fallback, and pitch guidance. Any octave by default, optional written-octave matching. Chords use Notes only. |
-| Practice progress | Local totals for attempts, correct answers, and assistance, plus the last ten independent scored outcomes per treble lesson or other mode. A recommendation becomes available after at least 8 correct in that ten-outcome window. Assisted outcomes do not enter that window; skipping is neutral. Restarting a session keeps saved progress. |
+| Practice progress | Local totals for attempts, correct answers, and assistance, plus the last ten independent scored outcomes per treble lesson or other mode. A recommendation becomes available after at least 8 correct in that ten-outcome window. Assisted outcomes do not enter that window; skipping is neutral. Restarting a session keeps saved progress. Slice 73 adds a JSON export for manual Android transfer. |
 | Rush and exits | Timed modes, speed/difficulty controls, front-prompt scoring, pause on Settings/background, explicit Resume, replay, and Back to Practice. Results contain keyboard focus; Escape returns to Practice. |
 | Offline and upgrades | Service-worker app shell and subpath support. Upgrade regression preserves progress and unrelated applications’ caches, then verifies offline startup with the server stopped and HTTP cache disabled. |
 | Diagnostics | Mic Lab exports `.txt` JSON reports; recorded Android Firefox B2/C3 input is a regression fixture. This is limited device evidence, not a browser compatibility guarantee. |
 | Architecture | Staff renderer, music theory, content, scoring, learning, lessons, progress, storage, microphone session/controller, diagnostics, semantic presentation, settings presentation, microphone status presentation, and summary focus already have dedicated modules. |
-| Test gate | Automatic unit/browser test discovery, browser concurrency limit, bounded browser-command diagnostics, syntax/manifest/version checks, and GitHub CI. The Slice 72 baseline passed 209 unit and 16 browser tests. |
+| Test gate | Automatic unit/browser test discovery, browser concurrency limit, bounded browser-command diagnostics, syntax/manifest/version checks, and GitHub CI. Slice 73 passes 210 unit and 17 browser tests locally; the native suite passes 38 tests. |
 
-Recent milestones: Slice 70 simplified mobile Practice, added listen-and-imitate assistance and persisted lesson progress, and repaired Rush flow. Slice 71 clarified lesson notation, aligned accessible descriptions, and strengthened PWA upgrade coverage. Slice 72 extracted settings/status presentation and added direct decision tests plus browser coverage for control transitions. These are completed features; follow-up work below addresses remaining evidence and limitations.
+Recent milestones: Slice 70 simplified mobile Practice, added listen-and-imitate assistance and persisted lesson progress, and repaired Rush flow. Slice 71 clarified lesson notation, aligned accessible descriptions, and strengthened PWA upgrade coverage. Slice 72 extracted settings/status presentation and added direct decision tests plus browser coverage for control transitions. Slice 73 added manual progress export for the Android port. These are completed features; follow-up work below addresses remaining evidence and limitations.
 
 Exact behavior and constants belong in [Current state reference](current-state-reference.md), module ownership in [Architecture](architecture.md), and interaction expectations in [User journey](user-journey.md). The recorded baseline CI run is [Slice 71 checks](https://github.com/utrost/ClefHanger/actions/runs/36230469202). Repository publication and production deployment are separate; confirm the live version using the [developer handoff](developer-handoff.md) before claiming a release is deployed.
 

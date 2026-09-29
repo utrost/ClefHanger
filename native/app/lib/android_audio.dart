@@ -9,6 +9,7 @@ abstract class AudioBridge {
   Future<void> playTone(double frequency);
   Future<void> playChord(List<double> frequencies);
   Future<void> openSettings();
+  Future<String?> pickProgressFile();
   Future<String?> readProgress(String lessonId);
   Future<void> writeProgress(String lessonId, String value);
 }
@@ -31,6 +32,9 @@ class AndroidAudioBridge implements AudioBridge {
       _methods.invokeMethod<void>('playChord', {'frequencies': frequencies});
   @override
   Future<void> openSettings() => _methods.invokeMethod<void>('openSettings');
+  @override
+  Future<String?> pickProgressFile() =>
+      _methods.invokeMethod<String>('pickProgressFile');
   @override
   Future<String?> readProgress(String lessonId) =>
       _methods.invokeMethod<String>('readProgress', {'key': lessonId});

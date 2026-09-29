@@ -112,6 +112,22 @@ test('storage adapter reads and writes high scores with comparable scoring keys'
   assert.equal(adapter.readHighScore('bass', '7', 'hard'), 400);
 });
 
+test('progress export maps browser lessons and scores to native keys', () => {
+  const adapter = createStorageAdapter(createFakeStorage());
+  adapter.writeProgress('basics', 'line-notes', { attempts: 2, correct: 1, assisted: 1, recent: [false] });
+  adapter.writeProgress('flats', 'all', { attempts: 3, correct: 2, assisted: 0, recent: [true, false, true] });
+  adapter.writeHighScore(340, 'basics', '5', 'beginner');
+  adapter.writeHighScore(410, 'flats', '8', 'hard');
+  const transfer = adapter.exportProgress();
+  assert.equal(transfer.schema, 'clefhanger-progress-transfer-v1');
+  assert.equal(transfer.progress['line-notes'].attempts, 2);
+  assert.equal(transfer.progress['mode.flats'].correct, 2);
+  assert.equal(transfer.highScores['rush.highScore.treble.speed5.beginner'], 340);
+  assert.equal(transfer.highScores['rush.highScore.flats.speed8.hard'], 410);
+  assert.equal(Object.keys(transfer.progress).length, 2);
+  assert.equal(Object.keys(transfer.highScores).length, 2);
+});
+
 test('storage adapter swallows unavailable storage errors', () => {
   const adapter = createStorageAdapter(createThrowingStorage());
 

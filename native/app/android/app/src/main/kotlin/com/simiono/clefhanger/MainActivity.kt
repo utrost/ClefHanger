@@ -1,6 +1,7 @@
 package com.simiono.clefhanger
 
 import android.Manifest
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.content.Intent
 import android.net.Uri
@@ -18,6 +19,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodChannel
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.io.ByteArrayOutputStream
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.PI
 import kotlin.math.max
@@ -31,8 +33,10 @@ class MainActivity : FlutterActivity() {
     private var captureThread: Thread? = null
     private var sink: EventChannel.EventSink? = null
     private var pendingStart: MethodChannel.Result? = null
+    private var pendingProgressImport: MethodChannel.Result? = null
     private val sampleRate = 16_000
     private val permissionCode = 8104
+    private val progressPickerCode = 8105
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -45,6 +49,18 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "startMic" -> startMic(result)
+                    "pickProgressFile" -> {
+                        if (pendingProgressImport != null) {
+                            result.error("import_busy", "A progress file is already being selected.", null)
+                        } else {
+                            pendingProgressImport = result
+                            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                                type = "application/json"
+                            }
+                            startActivityForResult(intent, progressPickerCode)
+                        }
+                    }
                     "openSettings" -> {
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
                         startActivity(intent)
@@ -90,6 +106,35 @@ class MainActivity : FlutterActivity() {
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != progressPickerCode) return
+        val result = pendingProgressImport ?: return
+        pendingProgressImport = null
+        if (resultCode != Activity.RESULT_OK || data?.data == null) {
+            result.success(null)
+            return
+        }
+        try {
+            val output = ByteArrayOutputStream()
+            contentResolver.openInputStream(data.data!!).use { input ->
+                if (input == null) throw IllegalStateException("Cannot open selected file")
+                val chunk = ByteArray(4096)
+                while (true) {
+                    val count = input.read(chunk)
+                    if (count < 0) break
+                    if (output.size() + count > 131072) {
+                        throw IllegalArgumentException("Progress file exceeds 128 KiB")
+                    }
+                    output.write(chunk, 0, count)
+                }
+            }
+            result.success(output.toString(Charsets.UTF_8.name()))
+        } catch (error: Exception) {
+            result.error("import_failed", error.message ?: "Could not read progress file.", null)
+        }
     }
 
     private fun startMic(result: MethodChannel.Result) {

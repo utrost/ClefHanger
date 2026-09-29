@@ -1,6 +1,6 @@
-import { getMode, getSpeed, getDifficulty } from '../core/content.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { syncElementText } from './semantic-presenter.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { getMode, getSpeed, getDifficulty } from '../core/content.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { getBeginnerLesson } from '../core/lessons.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { syncElementText } from './semantic-presenter.js?v=clefhanger-slice73-progress-export-2026-09-30';
 
 export function buildSettingsPresentation({ modeId, speedId, difficultyId, lessonId, inputMode, playStyle, phase }) {
   const mode = getMode(modeId);

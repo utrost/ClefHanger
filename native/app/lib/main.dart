@@ -13,6 +13,7 @@ import 'lesson_guide.dart';
 import 'piano_input.dart';
 import 'mic_diagnostic.dart';
 import 'practice_session.dart';
+import 'progress_transfer.dart';
 import 'rush_page.dart';
 import 'staff.dart';
 
@@ -504,6 +505,79 @@ class _PracticePageState extends State<PracticePage>
     );
   }
 
+  Future<void> _importBrowserProgress() async {
+    try {
+      final source = await widget.audio.pickProgressFile();
+      if (!mounted || source == null) return;
+      final transfer = ProgressTransfer.parse(source);
+      if (transfer.progress.isEmpty && transfer.highScores.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('This export has no saved progress yet.'),
+          ),
+        );
+        return;
+      }
+      final approved = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Import browser progress?'),
+          content: Text(
+            '${transfer.progress.length} lesson/mode records and ${transfer.highScores.length} Rush scores found. Records with more attempts and higher scores replace local values. Your other settings stay here.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Import'),
+            ),
+          ],
+        ),
+      );
+      if (approved != true || !mounted) return;
+      var changed = 0;
+      for (final entry in transfer.progress.entries) {
+        final mode = entry.key.startsWith('mode.')
+            ? NotationMode.values.firstWhere(
+                (value) => value.name == entry.key.substring(5),
+              )
+            : NotationMode.treble;
+        final lesson = mode == NotationMode.treble
+            ? lessonIds.indexOf(entry.key)
+            : 0;
+        final current = session.progressFor(mode, lesson);
+        if (entry.value.attempts <= current.attempts) continue;
+        await widget.audio.writeProgress(
+          entry.key,
+          jsonEncode(entry.value.toJson()),
+        );
+        session.setProgressFor(mode, lesson, entry.value);
+        changed++;
+      }
+      for (final entry in transfer.highScores.entries) {
+        final current =
+            int.tryParse(await widget.audio.readProgress(entry.key) ?? '0') ??
+            0;
+        if (entry.value <= current) continue;
+        await widget.audio.writeProgress(entry.key, '${entry.value}');
+        changed++;
+      }
+      if (!mounted) return;
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Imported $changed newer progress records.')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Progress import failed: $error')));
+    }
+  }
+
   Future<void> _selectMode(NotationMode mode) async {
     if (mode == session.mode) return;
     await _stopMic();
@@ -649,6 +723,7 @@ class _PracticePageState extends State<PracticePage>
             const SizedBox(height: 8),
             PracticeStaff(
               note: prompt,
+              emptyClef: session.mode == NotationMode.bass ? 'bass' : 'treble',
               revealAnswer: _hints && session.correctionVisible,
               detectedMidi: _detectedMidi,
               height: MediaQuery.sizeOf(context).height < 750 ? 185 : 238,
@@ -923,6 +998,12 @@ class _PracticePageState extends State<PracticePage>
                       setState(() => _hints = value);
                       _persistPreferences();
                     },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.file_open),
+                    title: const Text('Import browser progress'),
+                    subtitle: const Text('Choose a ClefHanger JSON export'),
+                    onTap: _importBrowserProgress,
                   ),
                   const Padding(
                     padding: EdgeInsets.all(12),

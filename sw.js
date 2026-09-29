@@ -1,5 +1,5 @@
-const APP_VERSION = 'clefhanger-slice72-settings-status-2026-09-26';
-const CACHE_NAME = 'clefhanger-pwa-v67';
+const APP_VERSION = 'clefhanger-slice73-progress-export-2026-09-30';
+const CACHE_NAME = 'clefhanger-pwa-v68';
 const APP_SHELL = [
   './',
   './index.html',

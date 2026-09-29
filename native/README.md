@@ -10,7 +10,9 @@ This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The
 - Practice offers Listen and imitate, visible microphone guidance, note-button and one-octave piano fallbacks, a first-run three-tip tutorial, an illustrated swipe-through note guide, session restart, corrections, saved assisted/independent progress and settings, an 8-of-10 next-lesson invitation, and a Mic Lab one-second PCM test with a copyable measurements-only report. Chords use touch answers because single-pitch detection cannot identify a chord.
 - Android ARM64 and emulator x64 Rust libraries are cross-compiled into the debug APK.
 
-Scope gaps: migration of progress from browser LocalStorage is not ported. See the [parity tracker](docs/parity.md) and [recorded emulator validation](docs/validation.md). The existing PWA remains available. Emulator startup and touch behavior do not establish physical microphone accuracy; test on Android phones before treating the native audio path as reliable. iOS has not been configured.
+Scope gaps: physical-device microphone/audio validation, accessibility review, and a release signing/distribution decision remain. See the [parity tracker](docs/parity.md) and [recorded emulator validation](docs/validation.md). The existing PWA remains available. Emulator startup and touch behavior do not establish physical microphone accuracy; test on Android phones before treating the native audio path as reliable. iOS has not been configured.
+
+To move existing Practice progress and Rush best scores, open the PWA's Settings and choose **Export progress JSON**. Move the downloaded file to the Android device, then choose **Import browser progress** in the native app's Settings. Review the record count before confirming. Import keeps the record with more attempts and the higher score; it does not replace other native settings. The export contains no microphone audio or reports.
 
 ## Build and run
 
@@ -48,4 +50,4 @@ cargo test --manifest-path native/core/Cargo.toml
 
 `core/src/lib.rs` mirrors the PWA's natural treble note pool, lesson filters, 50-cent/any-octave matching, and first strong autocorrelation peak. `app/lib/native_core.dart` is the explicit C ABI wrapper. `app/lib/mode_catalog.dart` holds the additional PWA-matched notation pools and answer spellings; Rust still supplies their seed progression and pitch operations. `app/lib/practice_session.dart` and `app/lib/rush_session.dart` own the learning and timed scoring rules. `app/lib/main.dart` owns Flutter presentation. `MainActivity.kt` is the Android microphone, audio, and persistence adapter. The app uses package `com.simiono.clefhanger` and is a separate install from the PWA.
 
-Browser progress stays in the browser origin; Android app-private storage has no access to it. A deliberate export/import path would be needed before replacing the PWA for existing players. Keep the port behavior aligned with `docs/current-state-reference.md` when extending it, then use real phone evidence to decide whether a full migration is warranted.
+Browser progress stays in the browser origin; Android app-private storage has no direct access to it. The manual JSON export/import path bridges them. Keep the port behavior aligned with `docs/current-state-reference.md` when extending it, then use real phone evidence before treating the port as a replacement for the PWA.

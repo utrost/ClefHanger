@@ -17,6 +17,7 @@ class FakeAudio implements AudioBridge {
   int chordPlays = 0;
   int settingsOpens = 0;
   Object? startError;
+  String? progressFile;
   @override
   Stream<Uint8List> get samples => controller.stream;
   @override
@@ -42,6 +43,9 @@ class FakeAudio implements AudioBridge {
   }
 
   @override
+  Future<String?> pickProgressFile() async => progressFile;
+
+  @override
   Future<String?> readProgress(String lessonId) async => saved[lessonId];
   @override
   Future<void> writeProgress(String lessonId, String value) async {
@@ -50,6 +54,32 @@ class FakeAudio implements AudioBridge {
 }
 
 void main() {
+  testWidgets('browser import previews and persists newer progress', (
+    tester,
+  ) async {
+    final audio = FakeAudio()
+      ..progressFile =
+          '{"schema":"clefhanger-progress-transfer-v1","progress":{"first-steps":{"attempts":3,"correct":2,"assisted":1,"recent":[true,false]}},"highScores":{"rush.highScore.treble.speed5.beginner":340}}';
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Settings'), 160);
+    await tester.ensureVisible(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Import browser progress'), 160);
+    await tester.ensureVisible(find.text('Import browser progress'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Import browser progress'));
+    await tester.pumpAndSettle();
+    expect(find.text('Import browser progress?'), findsOneWidget);
+    expect(audio.saved['first-steps'], isNull);
+    await tester.tap(find.text('Import').last);
+    await tester.pumpAndSettle();
+    expect(audio.saved['first-steps'], contains('"attempts":3'));
+    expect(audio.saved['rush.highScore.treble.speed5.beginner'], '340');
+  });
+
   testWidgets('Mic Lab records a bounded sample and reports no raw audio', (
     tester,
   ) async {

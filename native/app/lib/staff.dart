@@ -11,6 +11,7 @@ class PracticeStaff extends StatelessWidget {
     this.travelProgress,
     this.previewNotes = const [],
     this.height = 238,
+    this.emptyClef = 'treble',
   });
   final NativeNote? note;
   final bool revealAnswer;
@@ -18,10 +19,11 @@ class PracticeStaff extends StatelessWidget {
   final double? travelProgress;
   final List<NativeNote> previewNotes;
   final double height;
+  final String emptyClef;
   @override
   Widget build(BuildContext context) => Semantics(
     label: note == null
-        ? 'Empty treble staff. Start practice to see a note.'
+        ? 'Empty $emptyClef staff. Start practice to see a note.'
         : note!.isChord
         ? revealAnswer
               ? 'Treble staff chord ${note!.displayName}.'
@@ -43,6 +45,7 @@ class PracticeStaff extends StatelessWidget {
           detectedMidi: detectedMidi,
           travelProgress: travelProgress,
           previewNotes: previewNotes,
+          emptyClef: emptyClef,
         ),
         child: const SizedBox.expand(),
       ),
@@ -65,12 +68,14 @@ class _StaffPainter extends CustomPainter {
     required this.detectedMidi,
     required this.travelProgress,
     required this.previewNotes,
+    required this.emptyClef,
   });
   final NativeNote? note;
   final bool revealAnswer;
   final int? detectedMidi;
   final double? travelProgress;
   final List<NativeNote> previewNotes;
+  final String emptyClef;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -89,10 +94,10 @@ class _StaffPainter extends CustomPainter {
     final compact = size.height < 190;
     final clef = TextPainter(
       text: TextSpan(
-        text: note?.clef == 'bass' ? '𝄢' : '𝄞',
+        text: (note?.clef ?? emptyClef) == 'bass' ? '𝄢' : '𝄞',
         style: TextStyle(
           fontFamily: 'Noto Music',
-          fontSize: note?.clef == 'bass'
+          fontSize: (note?.clef ?? emptyClef) == 'bass'
               ? (compact ? 70 : 82)
               : (compact ? 78 : 91),
           color: const Color(0xFF241A28),
@@ -105,7 +110,7 @@ class _StaffPainter extends CustomPainter {
       Offset(
         11,
         bottom -
-            (note?.clef == 'bass'
+            ((note?.clef ?? emptyClef) == 'bass'
                 ? (compact ? 82 : 94)
                 : (compact ? 105 : 116)),
       ),
@@ -292,5 +297,6 @@ class _StaffPainter extends CustomPainter {
       old.revealAnswer != revealAnswer ||
       old.detectedMidi != detectedMidi ||
       old.travelProgress != travelProgress ||
-      old.previewNotes != previewNotes;
+      old.previewNotes != previewNotes ||
+      old.emptyClef != emptyClef;
 }

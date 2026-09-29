@@ -1,8 +1,8 @@
-import { createSettingsPresenter } from './ui/settings-presenter.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { buildMicrophonePresentation } from './ui/status-presenter.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { renderLessonGuide } from './ui/lesson-guide.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { createListenSession } from './core/listen-session.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { recordAttempt, summarizeProgress } from './core/progress.js?v=clefhanger-slice72-settings-status-2026-09-26';
+import { createSettingsPresenter } from './ui/settings-presenter.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { buildMicrophonePresentation } from './ui/status-presenter.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { renderLessonGuide } from './ui/lesson-guide.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { createListenSession } from './core/listen-session.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { recordAttempt, summarizeProgress } from './core/progress.js?v=clefhanger-slice73-progress-export-2026-09-30';
 import {
   ACCIDENTAL_BUTTONS,
   DIFFICULTY_LEVELS,
@@ -15,7 +15,7 @@ import {
   getDifficulty,
   getMode,
   getSpeed,
-} from './core/content.js?v=clefhanger-slice72-settings-status-2026-09-26';
+} from './core/content.js?v=clefhanger-slice73-progress-export-2026-09-30';
 import {
   STAFF_LAYOUT,
   createInitialState,
@@ -30,9 +30,9 @@ import {
   updateRound,
   getRemainingSeconds,
   getRoundSummary,
-} from './core/game.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice72-settings-status-2026-09-26';
+} from './core/game.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { getPromptFrequencies } from './core/music-theory.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { getCalibrationTone, playPianoVoice } from './core/audio.js?v=clefhanger-slice73-progress-export-2026-09-30';
 import {
   buildCalibrationReading,
   buildHeardNoteMessage,
@@ -43,19 +43,19 @@ import {
   frequencyToNearestPitch,
   getCenteredRms,
   normalizeMicrophoneInputMode,
-} from './core/pitch.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice72-settings-status-2026-09-26';
-import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice72-settings-status-2026-09-26';
+} from './core/pitch.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { buildMicDiagnosticReport, buildMicDiagnosticTextFile, formatDiagnosticLevelPercent } from './core/mic-diagnostics.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { BEGINNER_LESSONS, applyLearningFeedback, buildAccidentalLearningHint, buildBeginnerMicMessage, buildIntervalLearningHint, buildLearningRecommendation, buildTutorialSteps, getBeginnerLesson, getLessonIntroCard, getLessonPool, getScaffoldedAnswerOptions } from './core/learning.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { renderStaffSvg, syncNotationAccessibility } from './ui/staff-renderer.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { createSemanticPresenter, syncElementText } from './ui/semantic-presenter.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { createSummaryFocusManager } from './ui/summary-focus.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { startMicrophoneSession, formatMicrophoneError } from './platform/microphone-session.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { createMicrophoneController, startAndPublishMicrophoneSession } from './platform/microphone-controller.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { runMicrophoneRecordingDiagnostic } from './platform/mic-recording-diagnostic.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { createStorageAdapter, resolveStartupPreferences } from './platform/storage.js?v=clefhanger-slice73-progress-export-2026-09-30';
+import { buildInputCompatibilityMessage, resolvePlayableInputMode } from './core/input-compatibility.js?v=clefhanger-slice73-progress-export-2026-09-30';
 
-const appVersion = 'clefhanger-slice72-settings-status-2026-09-26';
+const appVersion = 'clefhanger-slice73-progress-export-2026-09-30';
 const listenSession = createListenSession();
 let playbackRefreshTimer = null;
 const progressCache = new Map();
@@ -72,6 +72,7 @@ const startMicrophoneMainButton = document.querySelector('#start-microphone-main
 const stopMicrophoneButton = document.querySelector('#stop-microphone');
 const recordMicrophoneDiagnosticButton = document.querySelector('#record-microphone-diagnostic');
 const exportMicReportButton = document.querySelector('#export-mic-report');
+const exportProgressButton = document.querySelector('#export-progress');
 const micLabLabelEl = document.querySelector('#mic-lab-label');
 const micReportPreviewEl = document.querySelector('#mic-report-preview');
 const microphonePanel = document.querySelector('#microphone-panel');
@@ -673,6 +674,20 @@ function downloadMicReport() {
   return file;
 }
 
+function downloadProgress() {
+  const transfer = storageAdapter.exportProgress();
+  const blob = new Blob([JSON.stringify(transfer, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'clefhanger-progress.json';
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  return transfer;
+}
+
 function processMicrophoneFrame(frequencyOverride = null, nowMs = performance.now()) {
   let frequency = frequencyOverride;
   let inputLevel = microphoneState.inputLevel || 0;
@@ -939,6 +954,7 @@ startMicrophoneMainButton.addEventListener('click', startMicrophone);
 stopMicrophoneButton.addEventListener('click', stopMicrophone);
 recordMicrophoneDiagnosticButton.addEventListener('click', recordMicrophoneDiagnostic);
 exportMicReportButton.addEventListener('click', downloadMicReport);
+exportProgressButton.addEventListener('click', downloadProgress);
 openSettingsButton.addEventListener('click', openSettings);
 closeSettingsButton.addEventListener('click', closeSettings);
 installInputModes();
@@ -1006,6 +1022,7 @@ window.__clefHanger = {
   recordMicrophoneDiagnostic,
   buildCurrentMicReport,
   downloadMicReport,
+  downloadProgress,
   processMicrophoneFrame,
   clefhangerInjectPitch: (frequency, nowMs = performance.now()) => {
     microphoneState = { ...microphoneState, permission: 'granted', listening: true, trackState: 'live', error: null };

@@ -99,9 +99,9 @@ When changing JS behavior or import/export contracts, update all of these togeth
 
 Current marker set:
 
-- App version: `clefhanger-slice72-settings-status-2026-09-26`.
-- Service-worker cache: `clefhanger-pwa-v67`.
-- Visible marker: `Slice 72: settings and status`.
+- App version: `clefhanger-slice73-progress-export-2026-09-30`.
+- Service-worker cache: `clefhanger-pwa-v68`.
+- Visible marker: `Slice 73: progress export`.
 
 ## CI
 
@@ -252,6 +252,8 @@ Current keys are documented in [Current State Reference](./current-state-referen
 - update the high-score key only when score comparability changes;
 - update docs and tests together.
 
+The PWA Settings now exports `clefhanger-progress-transfer-v1` JSON from the storage adapter. The isolated native branch imports it with a system picker and merges newer records and higher Rush scores. Keep the schema, mode mapping (`basics` → `treble`), and max file size aligned; test the export and native parser together when changing progress fields.
+
 ## Manual browser smoke
 
 Use local smoke after any DOM, CSS, audio, mic, or service-worker change.
@@ -299,11 +301,11 @@ Short version:
 Typical live checks:
 
 ```bash
-curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice72-settings-status'
+curl -fsSL 'https://simiono.com/clefhanger/?verify=<sha>' | grep 'clefhanger-slice73-progress-export'
 curl -fsSL 'https://simiono.com/clefhanger/src/app.js?verify=<sha>' | grep 'clefhangerInjectPitch'
 curl -fsSL 'https://simiono.com/clefhanger/src/platform/mic-recording-diagnostic.js?verify=<sha>' | grep 'runMicrophoneRecordingDiagnostic'
 curl -fsSL 'https://simiono.com/clefhanger/src/core/pitch.js?verify=<sha>' | grep 'evaluateVocalMatchFrame'
-curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v67'
+curl -fsSL 'https://simiono.com/clefhanger/sw.js?verify=<sha>' | grep 'clefhanger-pwa-v68'
 curl -fsSL 'https://simiono.com/' | head -5
 ```
 
