@@ -211,6 +211,26 @@ List<NativeNote> modeNotes(NotationMode mode) => switch (mode) {
   NotationMode.chords => chordNotes,
 };
 
+String writtenNoteHint(NativeNote note) {
+  if (note.isChord) return 'The three noteheads form a ${note.name} stack.';
+  final step = note.staffStep;
+  final place = step == -2
+      ? 'the ledger line below the staff'
+      : step == -1
+      ? 'the space below the staff'
+      : step == 10
+      ? 'the first ledger line above the staff'
+      : step > 8
+      ? 'above the staff'
+      : '${step.isEven ? 'line' : 'space'} ${(step ~/ 2) + 1} from the bottom';
+  final accidental = note.accidental == '♯'
+      ? ' The sharp raises the written note by one semitone.'
+      : note.accidental == '♭'
+      ? ' The flat lowers the written note by one semitone.'
+      : '';
+  return '${note.name} sits at $place in the ${note.clef} clef.$accidental';
+}
+
 List<ModeAnswer> modeAnswers(NotationMode mode) => switch (mode) {
   NotationMode.sharps => const [
     ModeAnswer('C♯', 'C♯'),

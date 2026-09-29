@@ -50,6 +50,49 @@ class FakeAudio implements AudioBridge {
 }
 
 void main() {
+  testWidgets('Mic Lab records a bounded sample and reports no raw audio', (
+    tester,
+  ) async {
+    final audio = FakeAudio();
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Mic Lab'), 160);
+    await tester.ensureVisible(find.text('Mic Lab'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Mic Lab'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Record 1-second mic test'), 160);
+    await tester.ensureVisible(find.text('Record 1-second mic test'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Record 1-second mic test'));
+    await tester.pump();
+    audio.controller.add(Uint8List(8192));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1100));
+    expect(find.textContaining('Captured 8192 bytes'), findsOneWidget);
+  });
+
+  testWidgets('first-run tips can be dismissed and stay dismissed', (
+    tester,
+  ) async {
+    final audio = FakeAudio();
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Next tip'), 160);
+    await tester.ensureVisible(find.text('Next tip'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Next tip'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('G line'), findsOneWidget);
+    await tester.tap(find.text('Got it'));
+    await tester.pumpAndSettle();
+    expect(audio.saved['preferences'], contains('"tutorialDismissed":true'));
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    expect(find.text('Start with a lesson'), findsNothing);
+  });
+
   testWidgets('chord mode stays touch-only, plays a chord and saves progress', (
     tester,
   ) async {
@@ -226,6 +269,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Try a 60-second Rush'), 180);
+    await tester.ensureVisible(find.text('Try a 60-second Rush'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Try a 60-second Rush'));
     await tester.pumpAndSettle();
     expect(find.text('Start 60-second Rush'), findsOneWidget);

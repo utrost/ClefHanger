@@ -68,6 +68,7 @@ class PracticeSession {
   String feedback = 'Tap Start practice or Hear this note.';
   int _playbackBlockedUntilMs = 0;
   int? _candidateSinceMs;
+  NativeNote? _previousAnswered;
   final List<LessonProgress> progress = List.filled(6, const LessonProgress());
   final Map<NotationMode, LessonProgress> modeProgress = {};
   LessonProgress progressFor(NotationMode targetMode, int targetLesson) =>
@@ -98,6 +99,7 @@ class PracticeSession {
     helped = false;
     correctionVisible = false;
     _candidateSinceMs = null;
+    _previousAnswered = null;
     feedback = 'Ready for ${lessonLabels[lesson]}. Tap Start practice.';
   }
 
@@ -108,16 +110,21 @@ class PracticeSession {
     helped = false;
     correctionVisible = false;
     _candidateSinceMs = null;
+    _previousAnswered = null;
     feedback = 'Ready for ${mode.label}. Tap Start practice.';
   }
 
   void start() {
     prompt = null;
     completed = false;
+    _previousAnswered = null;
     next();
   }
 
   void next() {
+    if (completed && mode == NotationMode.treble && lesson == 4) {
+      _previousAnswered = prompt;
+    }
     prompt = promptForMode(core, mode, lesson, _seed);
     _seed = core.nextSeed(_seed);
     completed = false;
@@ -131,6 +138,8 @@ class PracticeSession {
 
   void skip() {
     if (!started) return;
+    completed = false;
+    _previousAnswered = null;
     next();
     feedback = 'Skipped. Here is another practice note.';
   }
@@ -163,11 +172,12 @@ class PracticeSession {
     if (right) {
       completed = true;
       correctionVisible = false;
-      feedback = '$name — correct. Ready for the next note.';
+      feedback =
+          '$name — correct. ${writtenNoteHint(prompt!)}${_intervalHint(prompt!)} Ready for the next note.';
       return AnswerResult.correct;
     }
     feedback = showCorrection
-        ? '$name is not it. The note is ${prompt!.name}; try again.'
+        ? '$name is not it. The note is ${prompt!.name}. ${writtenNoteHint(prompt!)} Try again.'
         : '$name is not it. Try again.';
     correctionVisible = showCorrection;
     if (showCorrection) {
@@ -175,6 +185,21 @@ class PracticeSession {
     }
     _candidateSinceMs = null;
     return AnswerResult.wrong;
+  }
+
+  String _intervalHint(NativeNote note) {
+    if (mode != NotationMode.treble ||
+        lesson != 4 ||
+        _previousAnswered == null) {
+      return '';
+    }
+    final steps = note.staffStep - _previousAnswered!.staffStep;
+    final direction = steps >= 0 ? 'up' : 'down';
+    final distance = steps.abs();
+    if (distance == 0) return ' Same staff spot as the last note.';
+    if (distance == 1) return ' One step $direction from the last note.';
+    if (distance == 2) return ' A skip $direction over one note.';
+    return ' A jump $direction from the last note.';
   }
 
   /// Continuous microphone guidance never records wrong attempts.

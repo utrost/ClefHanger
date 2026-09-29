@@ -166,6 +166,26 @@ void main() {
     expect(session.currentProgress.recent, [true]);
   });
 
+  test('feedback explains staff position, accidentals and interval steps', () {
+    final session = PracticeSession(FakeCore(), seed: 6)
+      ..selectMode(NotationMode.flats)
+      ..start();
+    expect(session.answer('E♭'), AnswerResult.wrong);
+    expect(session.feedback, contains('flat lowers'));
+    expect(session.feedback, contains('space below'));
+
+    final intervals = PracticeSession(FakeCore(), seed: 0)
+      ..selectLesson(4)
+      ..start();
+    expect(intervals.answer('C'), AnswerResult.correct);
+    intervals.next();
+    expect(intervals.answer('D'), AnswerResult.correct);
+    expect(intervals.feedback, contains('One step up'));
+    intervals.skip();
+    expect(intervals.answer(intervals.prompt!.name), AnswerResult.correct);
+    expect(intervals.feedback, isNot(contains('from the last note')));
+  });
+
   test(
     'progress parsing bounds corrupt data and readiness uses last ten independent answers',
     () {

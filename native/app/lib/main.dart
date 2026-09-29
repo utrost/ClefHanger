@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'android_audio.dart';
 import 'native_core.dart';
 import 'mode_catalog.dart';
+import 'lesson_guide.dart';
 import 'piano_input.dart';
 import 'mic_diagnostic.dart';
 import 'practice_session.dart';
@@ -90,11 +91,17 @@ class _PracticePageState extends State<PracticePage>
   bool _pianoInput = false;
   bool _anyOctave = true;
   bool _hints = true;
+  bool _tutorialDismissed = false;
+  int _tutorialStep = 0;
   String _micGuide = 'Tap Check mic, then sing or hum one steady note.';
   String? _storageError;
   int? _detectedMidi;
   double _inputLevel = 0;
   double _lastFrequency = 0;
+  bool _recordingTest = false;
+  MicDiagnosticCapture? _recordCapture;
+  MicCaptureSummary? _lastRecording;
+  String _recordMessage = 'No recording test yet.';
   final Stopwatch _clock = Stopwatch()..start();
 
   @override
@@ -130,6 +137,9 @@ class _PracticePageState extends State<PracticePage>
         _pianoInput = session.mode.supportsMic && value['input'] == 'piano';
         if (value['anyOctave'] is bool) _anyOctave = value['anyOctave'];
         if (value['hints'] is bool) _hints = value['hints'];
+        if (value['tutorialDismissed'] is bool) {
+          _tutorialDismissed = value['tutorialDismissed'];
+        }
       });
     } catch (_) {
       // Corrupt preferences fall back to readable beginner defaults.
@@ -152,6 +162,7 @@ class _PracticePageState extends State<PracticePage>
               : 'notes',
           'anyOctave': _anyOctave,
           'hints': _hints,
+          'tutorialDismissed': _tutorialDismissed,
         }),
       );
     } catch (_) {
@@ -280,6 +291,8 @@ class _PracticePageState extends State<PracticePage>
   }
 
   Future<void> _stopMic() async {
+    _recordingTest = false;
+    _recordCapture = null;
     await _micSubscription?.cancel();
     _micSubscription = null;
     await widget.audio.stop();
@@ -296,6 +309,10 @@ class _PracticePageState extends State<PracticePage>
 
   void _onSamples(Uint8List packet) {
     if (!_micOn || packet.isEmpty) return;
+    if (_recordingTest) {
+      _recordCapture?.add(packet);
+      return;
+    }
     if (packet.length >= _window.length) {
       _window = Uint8List.fromList(
         packet.sublist(packet.length - _window.length),
@@ -424,6 +441,7 @@ class _PracticePageState extends State<PracticePage>
       lessonId: session.mode == NotationMode.treble
           ? lessonIds[session.lesson]
           : 'mode.${session.mode.name}',
+      recording: _lastRecording,
     );
     await Clipboard.setData(ClipboardData(text: report));
     if (mounted) {
@@ -431,6 +449,30 @@ class _PracticePageState extends State<PracticePage>
         context,
       ).showSnackBar(const SnackBar(content: Text('Mic report copied.')));
     }
+  }
+
+  Future<void> _recordMicTest() async {
+    if (_recordingTest) return;
+    if (!_micOn) await _startMic();
+    if (!mounted || !_micOn) return;
+    setState(() {
+      _recordingTest = true;
+      _recordCapture = MicDiagnosticCapture();
+      _recordMessage = 'Recording for one second… sing a steady note.';
+    });
+    await Future<void>.delayed(const Duration(seconds: 1));
+    if (!mounted || !_recordingTest) return;
+    final summary = _recordCapture!.finish(widget.core);
+    setState(() {
+      _recordingTest = false;
+      _recordCapture = null;
+      _lastRecording = summary;
+      _recordMessage = summary.bytes == 0
+          ? 'No microphone samples arrived. Check permission and retry.'
+          : summary.frequency <= 0
+          ? 'Captured ${summary.bytes} bytes · level ${(summary.rms * 100).toStringAsFixed(1)}%. No steady pitch found.'
+          : 'Captured ${summary.bytes} bytes · level ${(summary.rms * 100).toStringAsFixed(1)}% · ${summary.frequency.toStringAsFixed(1)} Hz.';
+    });
   }
 
   Future<void> _openSettings() async {
@@ -759,6 +801,49 @@ class _PracticePageState extends State<PracticePage>
                 ),
               ),
             ),
+            if (!_tutorialDismissed)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Start with a lesson',
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _tutorialStep == 1 &&
+                                session.mode != NotationMode.treble
+                            ? modeIntroduction(session.mode)
+                            : const [
+                                'Sing or hum the note you see. Notes climb upward through A B C D E F G, then repeat.',
+                                'On the treble staff, the clef curls around the G line. Nearby notes step up or down from there.',
+                                'Practice has no timer. Hear the note if you need help, then sing, hum, or play it back steadily.',
+                              ][_tutorialStep],
+                      ),
+                      Row(
+                        children: [
+                          TextButton(
+                            onPressed: () => setState(
+                              () => _tutorialStep = (_tutorialStep + 1) % 3,
+                            ),
+                            child: const Text('Next tip'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              setState(() => _tutorialDismissed = true);
+                              _persistPreferences();
+                            },
+                            child: const Text('Got it'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             Card(
               child: ExpansionTile(
                 title: const Text('Learn these notes'),
@@ -775,6 +860,11 @@ class _PracticePageState extends State<PracticePage>
                           : modeIntroduction(session.mode),
                     ),
                   ),
+                  LessonGuide(
+                    core: widget.core,
+                    mode: session.mode,
+                    lesson: session.lesson,
+                  ),
                 ],
               ),
             ),
@@ -790,6 +880,19 @@ class _PracticePageState extends State<PracticePage>
                       child: Text(
                         'Level: ${(_inputLevel * 100).toStringAsFixed(1)}% · Pitch: ${_lastFrequency > 0 ? '${_lastFrequency.toStringAsFixed(1)} Hz' : 'none'}',
                       ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(_recordMessage),
+                  ),
+                  TextButton.icon(
+                    onPressed: _recordingTest ? null : _recordMicTest,
+                    icon: const Icon(Icons.mic),
+                    label: Text(
+                      _recordingTest
+                          ? 'Recording…'
+                          : 'Record 1-second mic test',
                     ),
                   ),
                   TextButton.icon(
@@ -830,6 +933,16 @@ class _PracticePageState extends State<PracticePage>
                 ],
               ),
             ),
+            if (session.started)
+              TextButton.icon(
+                onPressed: () async {
+                  await _stopMic();
+                  if (!mounted) return;
+                  setState(session.start);
+                },
+                icon: const Icon(Icons.restart_alt),
+                label: const Text('Restart practice'),
+              ),
             Card(
               child: ListTile(
                 title: const Text('Try a 60-second Rush'),
