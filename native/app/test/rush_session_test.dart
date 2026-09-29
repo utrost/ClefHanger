@@ -1,4 +1,5 @@
 import 'package:clefhanger/rush_session.dart';
+import 'package:clefhanger/mode_catalog.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'practice_session_test.dart' show FakeCore;
@@ -82,5 +83,24 @@ void main() {
     expect(session.answer(session.front!.note.name, 10), true);
     expect(session.score, ((100 + 40) * 1.8).round());
     expect(session.queue.length, 3);
+  });
+
+  test('each notation mode uses its own prompts, points and score key', () {
+    for (final mode in NotationMode.values.skip(1)) {
+      final session = RushSession(FakeCore(), lesson: 0, mode: mode, seed: 0)
+        ..start(0);
+      expect(modeNotes(mode), contains(session.front!.note));
+      expect(session.highScoreKey, contains('.${mode.name}.'));
+      expect(session.answer(session.front!.note.name, 10), true);
+      expect(session.score, mode.basePoints);
+    }
+    final chords = RushSession(
+      FakeCore(),
+      lesson: 0,
+      mode: NotationMode.chords,
+      seed: 0,
+    )..start(0);
+    expect(chords.hearFrequency(440, 1000), false);
+    expect(chords.correct, 0);
   });
 }

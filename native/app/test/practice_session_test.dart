@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:clefhanger/native_core.dart';
+import 'package:clefhanger/mode_catalog.dart';
 import 'package:clefhanger/practice_session.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -123,6 +124,45 @@ void main() {
       session.hearFrequency(core.frequency(60), 1450),
       AnswerResult.correct,
     );
+    expect(session.currentProgress.recent, [true]);
+  });
+
+  test(
+    'mode progress stays separate and written flats accept sounding pitch',
+    () {
+      final core = FakeCore();
+      final session = PracticeSession(core, seed: 6);
+      session.selectMode(NotationMode.flats);
+      session.start();
+      expect(session.prompt!.name, 'D♭');
+      expect(session.prompt!.staffStep, -1);
+      expect(
+        session.hearFrequency(core.frequency(61), 100),
+        AnswerResult.ignored,
+      );
+      expect(
+        session.hearFrequency(core.frequency(61), 250),
+        AnswerResult.correct,
+      );
+      expect(session.currentProgress.correct, 1);
+      session.selectMode(NotationMode.treble);
+      expect(session.currentProgress.attempts, 0);
+      session.selectMode(NotationMode.flats);
+      expect(session.currentProgress.correct, 1);
+    },
+  );
+
+  test('chords use touch answers and reject single-pitch mic scoring', () {
+    final core = FakeCore();
+    final session = PracticeSession(core, seed: 0)
+      ..selectMode(NotationMode.chords)
+      ..start();
+    expect(session.prompt!.name, 'D minor');
+    expect(
+      session.hearFrequency(core.frequency(62), 1000),
+      AnswerResult.ignored,
+    );
+    expect(session.answer('D minor'), AnswerResult.correct);
     expect(session.currentProgress.recent, [true]);
   });
 

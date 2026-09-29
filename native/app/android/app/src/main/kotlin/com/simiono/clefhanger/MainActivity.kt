@@ -61,7 +61,16 @@ class MainActivity : FlutterActivity() {
                         if (frequency == null || frequency !in 80.0..1000.0) {
                             result.error("bad_frequency", "Expected an audible note", null)
                         } else {
-                            playTone(frequency)
+                            playNotes(listOf(frequency))
+                            result.success(null)
+                        }
+                    }
+                    "playChord" -> {
+                        val frequencies = call.argument<List<Double>>("frequencies")
+                        if (frequencies == null || frequencies.size != 3 || frequencies.any { it !in 80.0..1000.0 }) {
+                            result.error("bad_frequency", "Expected three audible chord notes", null)
+                        } else {
+                            playNotes(frequencies)
                             result.success(null)
                         }
                     }
@@ -153,13 +162,15 @@ class MainActivity : FlutterActivity() {
     }
 
     /** Short piano-like reference tone. Dart blocks scoring until sound + acoustic tail ends. */
-    private fun playTone(frequency: Double) {
+    private fun playNotes(frequencies: List<Double>) {
         Thread {
             val length = (sampleRate * 0.58).toInt()
             val pcm = ShortArray(length) { index ->
                 val t = index.toDouble() / sampleRate
                 val envelope = (1.0 - index.toDouble() / length).let { it * it }
-                val wave = sin(2 * PI * frequency * t) + 0.25 * sin(4 * PI * frequency * t)
+                val wave = frequencies.sumOf { frequency ->
+                    sin(2 * PI * frequency * t) + 0.25 * sin(4 * PI * frequency * t)
+                } / frequencies.size
                 (wave * envelope * 9000).toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
             }
             var output: AudioTrack? = null

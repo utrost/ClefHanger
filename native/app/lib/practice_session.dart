@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'native_core.dart';
+import 'mode_catalog.dart';
 
 class LessonProgress {
   const LessonProgress({
@@ -59,6 +60,7 @@ class PracticeSession {
   final PracticeCore core;
   int _seed;
   int lesson = 0;
+  NotationMode mode = NotationMode.treble;
   NativeNote? prompt;
   bool completed = false;
   bool helped = false;
@@ -67,7 +69,24 @@ class PracticeSession {
   int _playbackBlockedUntilMs = 0;
   int? _candidateSinceMs;
   final List<LessonProgress> progress = List.filled(6, const LessonProgress());
-  LessonProgress get currentProgress => progress[lesson];
+  final Map<NotationMode, LessonProgress> modeProgress = {};
+  LessonProgress progressFor(NotationMode targetMode, int targetLesson) =>
+      targetMode == NotationMode.treble
+      ? progress[targetLesson]
+      : modeProgress[targetMode] ?? const LessonProgress();
+  void setProgressFor(
+    NotationMode targetMode,
+    int targetLesson,
+    LessonProgress value,
+  ) {
+    if (targetMode == NotationMode.treble) {
+      progress[targetLesson] = value;
+    } else {
+      modeProgress[targetMode] = value;
+    }
+  }
+
+  LessonProgress get currentProgress => progressFor(mode, lesson);
   bool get started => prompt != null;
   bool canScore(int nowMs) => nowMs >= _playbackBlockedUntilMs;
 
@@ -82,6 +101,16 @@ class PracticeSession {
     feedback = 'Ready for ${lessonLabels[lesson]}. Tap Start practice.';
   }
 
+  void selectMode(NotationMode value) {
+    mode = value;
+    prompt = null;
+    completed = false;
+    helped = false;
+    correctionVisible = false;
+    _candidateSinceMs = null;
+    feedback = 'Ready for ${mode.label}. Tap Start practice.';
+  }
+
   void start() {
     prompt = null;
     completed = false;
@@ -89,14 +118,15 @@ class PracticeSession {
   }
 
   void next() {
-    prompt = core.promptNote(lesson, _seed);
+    prompt = promptForMode(core, mode, lesson, _seed);
     _seed = core.nextSeed(_seed);
     completed = false;
     helped = false;
     correctionVisible = false;
     _candidateSinceMs = null;
-    feedback =
-        'Read the note. Hear it if you need help, then sing or play it back.';
+    feedback = mode == NotationMode.chords
+        ? 'Read the stack. Hear the chord if you need help, then name it.'
+        : 'Read the note. Hear it if you need help, then sing or play it back.';
   }
 
   void skip() {
@@ -113,8 +143,9 @@ class PracticeSession {
       _playbackBlockedUntilMs,
       nowMs + playbackMs + 300,
     );
-    feedback =
-        'Listen, then sing the note back. Scoring waits until the sound finishes.';
+    feedback = mode == NotationMode.chords
+        ? 'Listen to the chord, then name it. This answer will count as assisted.'
+        : 'Listen, then sing the note back. Scoring waits until the sound finishes.';
   }
 
   void revealGuide() {
@@ -124,7 +155,11 @@ class PracticeSession {
   AnswerResult answer(String name, {bool showCorrection = true}) {
     if (prompt == null || completed) return AnswerResult.ignored;
     final right = prompt!.name == name;
-    progress[lesson] = currentProgress.record(correct: right, helped: helped);
+    setProgressFor(
+      mode,
+      lesson,
+      currentProgress.record(correct: right, helped: helped),
+    );
     if (right) {
       completed = true;
       correctionVisible = false;
@@ -144,7 +179,7 @@ class PracticeSession {
 
   /// Continuous microphone guidance never records wrong attempts.
   AnswerResult hearFrequency(double hz, int nowMs, {bool anyOctave = true}) {
-    if (prompt == null || completed || !canScore(nowMs)) {
+    if (prompt == null || completed || !mode.supportsMic || !canScore(nowMs)) {
       return AnswerResult.ignored;
     }
     final status = core.classify(hz, prompt!.midi, anyOctave: anyOctave);

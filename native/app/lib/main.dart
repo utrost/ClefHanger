@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 
 import 'android_audio.dart';
 import 'native_core.dart';
+import 'mode_catalog.dart';
+import 'piano_input.dart';
 import 'mic_diagnostic.dart';
 import 'practice_session.dart';
 import 'rush_page.dart';
@@ -85,6 +87,7 @@ class _PracticePageState extends State<PracticePage>
   bool _micStarting = false;
   bool _permissionDenied = false;
   bool _notesInput = false;
+  bool _pianoInput = false;
   bool _anyOctave = true;
   bool _hints = true;
   String _micGuide = 'Tap Check mic, then sing or hum one steady note.';
@@ -117,6 +120,14 @@ class _PracticePageState extends State<PracticePage>
         if (lesson is int && lesson >= 0 && lesson < lessonIds.length) {
           session.selectLesson(lesson);
         }
+        for (final mode in NotationMode.values) {
+          if (mode.name == value['mode']) session.selectMode(mode);
+        }
+        _notesInput =
+            !session.mode.supportsMic ||
+            value['input'] == 'notes' ||
+            value['input'] == 'piano';
+        _pianoInput = session.mode.supportsMic && value['input'] == 'piano';
         if (value['anyOctave'] is bool) _anyOctave = value['anyOctave'];
         if (value['hints'] is bool) _hints = value['hints'];
       });
@@ -131,6 +142,14 @@ class _PracticePageState extends State<PracticePage>
         'preferences',
         jsonEncode({
           'lesson': session.lesson,
+          'mode': session.mode.name,
+          'input': session.mode.supportsMic
+              ? !_notesInput
+                    ? 'microphone'
+                    : _pianoInput
+                    ? 'piano'
+                    : 'notes'
+              : 'notes',
           'anyOctave': _anyOctave,
           'hints': _hints,
         }),
@@ -164,13 +183,34 @@ class _PracticePageState extends State<PracticePage>
         }
       }
     }
+    for (final mode in NotationMode.values.skip(1)) {
+      try {
+        final json = await widget.audio.readProgress('mode.${mode.name}');
+        if (json != null && mounted) {
+          setState(
+            () => session.setProgressFor(
+              mode,
+              0,
+              LessonProgress.fromJson(jsonDecode(json)),
+            ),
+          );
+        }
+      } catch (_) {
+        if (mounted) {
+          setState(
+            () =>
+                _storageError = 'Progress could not be loaded on this device.',
+          );
+        }
+      }
+    }
   }
 
-  Future<void> _persist(int lesson) async {
+  Future<void> _persist(NotationMode mode, int lesson) async {
     try {
       await widget.audio.writeProgress(
-        lessonIds[lesson],
-        jsonEncode(session.progress[lesson].toJson()),
+        mode == NotationMode.treble ? lessonIds[lesson] : 'mode.${mode.name}',
+        jsonEncode(session.progressFor(mode, lesson).toJson()),
       );
       if (mounted && _storageError != null) {
         setState(() => _storageError = null);
@@ -307,7 +347,7 @@ class _PracticePageState extends State<PracticePage>
     }
     final prompt = session.prompt;
     final result = session.hearFrequency(hz, now, anyOctave: _anyOctave);
-    if (result != AnswerResult.ignored) _persist(session.lesson);
+    if (result != AnswerResult.ignored) _persist(session.mode, session.lesson);
     final status = prompt == null
         ? 0
         : widget.core.classify(hz, prompt.midi, anyOctave: _anyOctave);
@@ -339,17 +379,25 @@ class _PracticePageState extends State<PracticePage>
 
   void _answer(String name) {
     final lesson = session.lesson;
+    final mode = session.mode;
     final result = session.answer(name, showCorrection: _hints);
     if (result == AnswerResult.ignored) return;
     setState(() {});
-    _persist(lesson);
+    _persist(mode, lesson);
   }
 
   Future<void> _hear() async {
     final now = _clock.elapsedMilliseconds;
     setState(() => session.hear(now));
     try {
-      await widget.audio.playTone(widget.core.frequency(session.prompt!.midi));
+      final prompt = session.prompt!;
+      if (prompt.isChord) {
+        await widget.audio.playChord([
+          for (final midi in prompt.chordMidis) widget.core.frequency(midi),
+        ]);
+      } else {
+        await widget.audio.playTone(widget.core.frequency(prompt.midi));
+      }
     } catch (_) {
       if (mounted) {
         setState(
@@ -373,7 +421,9 @@ class _PracticePageState extends State<PracticePage>
           ? null
           : widget.core.cents(_lastFrequency, midi),
       matchAnyOctave: _anyOctave,
-      lessonId: lessonIds[session.lesson],
+      lessonId: session.mode == NotationMode.treble
+          ? lessonIds[session.lesson]
+          : 'mode.${session.mode.name}',
     );
     await Clipboard.setData(ClipboardData(text: report));
     if (mounted) {
@@ -405,20 +455,36 @@ class _PracticePageState extends State<PracticePage>
           core: widget.core,
           audio: widget.audio,
           lesson: session.lesson,
+          mode: session.mode,
           nowMs: widget.rushNowMs,
         ),
       ),
     );
   }
 
+  Future<void> _selectMode(NotationMode mode) async {
+    if (mode == session.mode) return;
+    await _stopMic();
+    if (!mounted) return;
+    setState(() {
+      session.selectMode(mode);
+      _notesInput = !mode.supportsMic;
+      _pianoInput = false;
+      _detectedMidi = null;
+    });
+    _persistPreferences();
+  }
+
   @override
   Widget build(BuildContext context) {
     final progress = session.currentProgress;
     final prompt = session.prompt;
-    final answers = <String>{
-      for (var i = 0; i < widget.core.lessonLength(session.lesson); i++)
-        widget.core.lessonNote(session.lesson, i).name,
-    }.toList();
+    final answers = session.mode == NotationMode.treble
+        ? <String>{
+            for (var i = 0; i < widget.core.lessonLength(session.lesson); i++)
+              widget.core.lessonNote(session.lesson, i).name,
+          }.map((name) => ModeAnswer(name, name)).toList()
+        : modeAnswers(session.mode);
     const amber = Color(0xFFF6C84A);
     return Scaffold(
       body: SafeArea(
@@ -444,53 +510,80 @@ class _PracticePageState extends State<PracticePage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'YOUR PRACTICE',
-                      style: TextStyle(
-                        fontSize: 11,
-                        letterSpacing: 1.4,
-                        color: amber,
-                      ),
-                    ),
                     Row(
                       children: [
-                        const Text(
-                          'Tiny lesson  ',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                        Expanded(
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<int>(
-                              value: session.lesson,
-                              isExpanded: true,
-                              isDense: true,
-                              items: [
-                                for (var i = 0; i < lessonIds.length; i++)
-                                  DropdownMenuItem(
-                                    value: i,
-                                    child: Text(lessonLabels[i]),
-                                  ),
-                              ],
-                              onChanged: (value) {
-                                if (value == null) return;
-                                setState(() {
-                                  session.selectLesson(value);
-                                  _detectedMidi = null;
-                                });
-                                _persistPreferences();
-                              },
+                        const Expanded(
+                          child: Text(
+                            'YOUR PRACTICE',
+                            style: TextStyle(
+                              fontSize: 11,
+                              letterSpacing: 1.4,
+                              color: amber,
                             ),
+                          ),
+                        ),
+                        DropdownButtonHideUnderline(
+                          child: DropdownButton<NotationMode>(
+                            value: session.mode,
+                            isDense: true,
+                            items: [
+                              for (final mode in NotationMode.values)
+                                DropdownMenuItem(
+                                  value: mode,
+                                  child: Text(mode.label),
+                                ),
+                            ],
+                            onChanged: (mode) {
+                              if (mode != null) _selectMode(mode);
+                            },
                           ),
                         ),
                       ],
                     ),
+                    if (session.mode == NotationMode.treble)
+                      Row(
+                        children: [
+                          const Text(
+                            'Tiny lesson  ',
+                            style: TextStyle(fontSize: 13),
+                          ),
+                          Expanded(
+                            child: DropdownButtonHideUnderline(
+                              child: DropdownButton<int>(
+                                value: session.lesson,
+                                isExpanded: true,
+                                isDense: true,
+                                items: [
+                                  for (var i = 0; i < lessonIds.length; i++)
+                                    DropdownMenuItem(
+                                      value: i,
+                                      child: Text(lessonLabels[i]),
+                                    ),
+                                ],
+                                onChanged: (value) {
+                                  if (value == null) return;
+                                  setState(() {
+                                    session.selectLesson(value);
+                                    _detectedMidi = null;
+                                  });
+                                  _persistPreferences();
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      const SizedBox(height: 4),
                     Text(
                       progress.attempts == 0
                           ? 'Progress saved here · listening help welcome'
                           : 'Recent: ${progress.recentCorrect}/${progress.recent.length} on your own · ${progress.assisted} with help',
                       style: const TextStyle(fontSize: 12),
                     ),
-                    if (progress.ready && session.lesson < lessonIds.length - 1)
+                    if (session.mode == NotationMode.treble &&
+                        progress.ready &&
+                        session.lesson < lessonIds.length - 1)
                       TextButton(
                         onPressed: () {
                           setState(
@@ -553,28 +646,47 @@ class _PracticePageState extends State<PracticePage>
             ),
             const SizedBox(height: 6),
             if (_notesInput) ...[
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  for (final answer in answers)
-                    SizedBox(
-                      width: answers.length <= 3
-                          ? (MediaQuery.sizeOf(context).width - 48) / 3
-                          : null,
-                      child: FilledButton.tonal(
-                        onPressed: prompt == null || session.completed
-                            ? null
-                            : () => _answer(answer),
-                        child: Text(answer),
+              if (_pianoInput && session.mode.supportsMic)
+                PianoInput(mode: session.mode, onAnswer: _answer)
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final answer in answers)
+                      SizedBox(
+                        width: answers.length <= 3
+                            ? (MediaQuery.sizeOf(context).width - 48) / 3
+                            : null,
+                        child: FilledButton.tonal(
+                          onPressed: prompt == null || session.completed
+                              ? null
+                              : () => _answer(answer.answer),
+                          child: Text(answer.label),
+                        ),
                       ),
+                  ],
+                ),
+              if (session.mode.supportsMic)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() => _pianoInput = !_pianoInput);
+                        _persistPreferences();
+                      },
+                      child: Text(_pianoInput ? 'Note buttons' : 'Piano'),
                     ),
-                ],
-              ),
-              TextButton(
-                onPressed: () => setState(() => _notesInput = false),
-                child: const Text('Back to Sing/Play'),
-              ),
+                    TextButton(
+                      onPressed: () {
+                        setState(() => _notesInput = false);
+                        _persistPreferences();
+                      },
+                      child: const Text('Back to Sing/Play'),
+                    ),
+                  ],
+                ),
             ] else
               Card(
                 child: Padding(
@@ -615,7 +727,11 @@ class _PracticePageState extends State<PracticePage>
                             child: OutlinedButton(
                               onPressed: () {
                                 _stopMic();
-                                setState(() => _notesInput = true);
+                                setState(() {
+                                  _notesInput = true;
+                                  _pianoInput = false;
+                                });
+                                _persistPreferences();
                               },
                               child: const Text('Use note buttons'),
                             ),
@@ -653,7 +769,11 @@ class _PracticePageState extends State<PracticePage>
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(16),
-                    child: Text(lessonIntroductions[session.lesson]),
+                    child: Text(
+                      session.mode == NotationMode.treble
+                          ? lessonIntroductions[session.lesson]
+                          : modeIntroduction(session.mode),
+                    ),
                   ),
                 ],
               ),
@@ -714,7 +834,7 @@ class _PracticePageState extends State<PracticePage>
               child: ListTile(
                 title: const Text('Try a 60-second Rush'),
                 subtitle: Text(
-                  'A timed challenge on ${lessonLabels[session.lesson]}',
+                  'A timed challenge on ${session.mode == NotationMode.treble ? lessonLabels[session.lesson] : session.mode.label}',
                 ),
                 trailing: const Icon(Icons.arrow_forward),
                 onTap: _openRush,

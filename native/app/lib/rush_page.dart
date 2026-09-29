@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 
 import 'android_audio.dart';
 import 'native_core.dart';
+import 'mode_catalog.dart';
+import 'piano_input.dart';
 import 'rush_session.dart';
 import 'staff.dart';
 
@@ -15,11 +17,13 @@ class RushPage extends StatefulWidget {
     required this.core,
     required this.audio,
     required this.lesson,
+    this.mode = NotationMode.treble,
     this.nowMs,
   });
   final PracticeCore core;
   final AudioBridge audio;
   final int lesson;
+  final NotationMode mode;
   final int Function()? nowMs;
 
   @override
@@ -37,6 +41,7 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
   int _receivedSamples = 0;
   int _highScore = 0;
   bool _notesInput = false;
+  bool _pianoInput = false;
   bool _micOn = false;
   bool _micStarting = false;
   bool _permissionDenied = false;
@@ -50,8 +55,10 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
     session = RushSession(
       widget.core,
       lesson: widget.lesson,
+      mode: widget.mode,
       seed: DateTime.now().millisecondsSinceEpoch & 0xffffffff,
     );
+    _notesInput = !widget.mode.supportsMic;
     WidgetsBinding.instance.addObserver(this);
     _loadHighScore();
     _loadRushSettings();
@@ -293,17 +300,22 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final now = _now();
     final front = session.front;
-    final answers = <String>{
-      for (var i = 0; i < widget.core.lessonLength(widget.lesson); i++)
-        widget.core.lessonNote(widget.lesson, i).name,
-    }.toList();
+    final answers = widget.mode == NotationMode.treble
+        ? <ModeAnswer>[
+            for (final name in <String>{
+              for (var i = 0; i < widget.core.lessonLength(widget.lesson); i++)
+                widget.core.lessonNote(widget.lesson, i).name,
+            })
+              ModeAnswer(name, name),
+          ]
+        : modeAnswers(widget.mode);
     return CallbackShortcuts(
       bindings: {const SingleActivator(LogicalKeyboardKey.escape): _exit},
       child: Focus(
         autofocus: true,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Rush'),
+            title: Text('${widget.mode.label} Rush'),
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             leading: IconButton(
               tooltip: 'Back to Practice',
@@ -318,7 +330,7 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
                     children: [
                       Text(
-                        '60-second Rush · ${lessonLabels[widget.lesson]}',
+                        '60-second Rush · ${widget.mode == NotationMode.treble ? lessonLabels[widget.lesson] : widget.mode.label}',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
@@ -433,22 +445,35 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
                           ),
                         if (session.phase == RushPhase.running) ...[
                           if (_notesInput)
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                for (final answer in answers)
-                                  FilledButton.tonal(
-                                    onPressed: () {
+                            _pianoInput && widget.mode.supportsMic
+                                ? PianoInput(
+                                    mode: widget.mode,
+                                    onAnswer: (answer) {
                                       setState(
                                         () => session.answer(answer, _now()),
                                       );
                                       _handleResult();
                                     },
-                                    child: Text(answer),
-                                  ),
-                              ],
-                            )
+                                  )
+                                : Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: [
+                                      for (final answer in answers)
+                                        FilledButton.tonal(
+                                          onPressed: () {
+                                            setState(
+                                              () => session.answer(
+                                                answer.answer,
+                                                _now(),
+                                              ),
+                                            );
+                                            _handleResult();
+                                          },
+                                          child: Text(answer.label),
+                                        ),
+                                    ],
+                                  )
                           else
                             Card(
                               child: Padding(
@@ -507,11 +532,24 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
                                 ),
                               ),
                             ),
-                          if (_notesInput)
-                            TextButton(
-                              onPressed: () =>
-                                  setState(() => _notesInput = false),
-                              child: const Text('Back to Sing/Play'),
+                          if (_notesInput && widget.mode.supportsMic)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                TextButton(
+                                  onPressed: () => setState(
+                                    () => _pianoInput = !_pianoInput,
+                                  ),
+                                  child: Text(
+                                    _pianoInput ? 'Note buttons' : 'Piano',
+                                  ),
+                                ),
+                                TextButton(
+                                  onPressed: () =>
+                                      setState(() => _notesInput = false),
+                                  child: const Text('Back to Sing/Play'),
+                                ),
+                              ],
                             ),
                         ],
                       ],

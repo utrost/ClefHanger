@@ -22,9 +22,13 @@ class PracticeStaff extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
     label: note == null
         ? 'Empty treble staff. Start practice to see a note.'
+        : note!.isChord
+        ? revealAnswer
+              ? 'Treble staff chord ${note!.displayName}.'
+              : 'Treble staff chord with three stacked notes. Name the chord.'
         : revealAnswer
-        ? 'Treble staff note ${note!.displayName}, ${_position(note!.staffStep)}.'
-        : 'Treble staff note at ${_position(note!.staffStep)}. Sing or name it.',
+        ? '${note!.clef == 'bass' ? 'Bass' : 'Treble'} staff note ${note!.displayName}, ${_position(note!.staffStep)}.'
+        : '${note!.clef == 'bass' ? 'Bass' : 'Treble'} staff note at ${_position(note!.staffStep)}${note!.accidental == null ? '' : ' with a ${note!.accidental == '♯' ? 'sharp' : 'flat'}'}. Sing or name it.',
     child: Container(
       height: height,
       clipBehavior: Clip.antiAlias,
@@ -85,16 +89,27 @@ class _StaffPainter extends CustomPainter {
     final compact = size.height < 190;
     final clef = TextPainter(
       text: TextSpan(
-        text: '𝄞',
+        text: note?.clef == 'bass' ? '𝄢' : '𝄞',
         style: TextStyle(
           fontFamily: 'Noto Music',
-          fontSize: compact ? 78 : 91,
+          fontSize: note?.clef == 'bass'
+              ? (compact ? 70 : 82)
+              : (compact ? 78 : 91),
           color: const Color(0xFF241A28),
         ),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    clef.paint(canvas, Offset(11, bottom - (compact ? 105 : 116)));
+    clef.paint(
+      canvas,
+      Offset(
+        11,
+        bottom -
+            (note?.clef == 'bass'
+                ? (compact ? 82 : 94)
+                : (compact ? 105 : 116)),
+      ),
+    );
     if (note == null) {
       final message = TextPainter(
         text: const TextSpan(
@@ -122,9 +137,9 @@ class _StaffPainter extends CustomPainter {
           ..strokeWidth = 2,
       );
       for (var index = 0; index < previewNotes.length; index++) {
-        _drawNote(
+        _drawPrompt(
           canvas,
-          previewNotes[index].staffStep,
+          previewNotes[index],
           size.width - 48 - index * 36,
           bottom,
           gap,
@@ -137,7 +152,7 @@ class _StaffPainter extends CustomPainter {
         : 125 +
               math.max(0.0, size.width * 0.66 - 125) *
                   (1 - travelProgress!.clamp(0.0, 1.0));
-    _drawNote(canvas, note!.staffStep, x, bottom, gap, const Color(0xFF241A28));
+    _drawPrompt(canvas, note!, x, bottom, gap, const Color(0xFF241A28));
     if (revealAnswer) {
       final label = TextPainter(
         text: TextSpan(
@@ -182,14 +197,56 @@ class _StaffPainter extends CustomPainter {
     }
   }
 
+  void _drawPrompt(
+    Canvas canvas,
+    NativeNote prompt,
+    double x,
+    double bottom,
+    double gap,
+    Color color,
+  ) {
+    final steps = prompt.isChord ? prompt.chordStaffSteps : [prompt.staffStep];
+    for (final step in steps) {
+      _drawNote(canvas, step, x, bottom, gap, color, chord: prompt.isChord);
+    }
+    if (prompt.isChord) {
+      final topY = bottom - steps.last * gap / 2;
+      canvas.drawLine(
+        Offset(x + 12, topY),
+        Offset(x + 12, topY - 58),
+        Paint()
+          ..color = color
+          ..strokeWidth = 2.2,
+      );
+    }
+    if (prompt.accidental case final symbol?) {
+      final accidental = TextPainter(
+        text: TextSpan(
+          text: symbol,
+          style: TextStyle(
+            fontFamily: 'Noto Music',
+            fontSize: 30,
+            color: color,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      accidental.paint(
+        canvas,
+        Offset(x - 51, bottom - prompt.staffStep * gap / 2 - 23),
+      );
+    }
+  }
+
   void _drawNote(
     Canvas canvas,
     int staffStep,
     double x,
     double bottom,
     double gap,
-    Color color,
-  ) {
+    Color color, {
+    bool chord = false,
+  }) {
     final ink = Paint()
       ..color = color
       ..strokeWidth = 2.2
@@ -216,11 +273,17 @@ class _StaffPainter extends CustomPainter {
     canvas.translate(x, y);
     canvas.rotate(-0.3);
     canvas.drawOval(
-      Rect.fromCenter(center: Offset.zero, width: 30, height: 21),
+      Rect.fromCenter(
+        center: Offset.zero,
+        width: chord ? 25 : 30,
+        height: chord ? 14 : 21,
+      ),
       Paint()..color = color,
     );
     canvas.restore();
-    canvas.drawLine(Offset(x + 14, y), Offset(x + 14, y - 66), ink);
+    if (!chord) {
+      canvas.drawLine(Offset(x + 14, y), Offset(x + 14, y - 66), ink);
+    }
   }
 
   @override

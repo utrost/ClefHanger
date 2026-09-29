@@ -7,6 +7,7 @@ abstract class AudioBridge {
   Future<void> start();
   Future<void> stop();
   Future<void> playTone(double frequency);
+  Future<void> playChord(List<double> frequencies);
   Future<void> openSettings();
   Future<String?> readProgress(String lessonId);
   Future<void> writeProgress(String lessonId, String value);
@@ -25,6 +26,9 @@ class AndroidAudioBridge implements AudioBridge {
   @override
   Future<void> playTone(double frequency) =>
       _methods.invokeMethod<void>('playTone', {'frequency': frequency});
+  @override
+  Future<void> playChord(List<double> frequencies) =>
+      _methods.invokeMethod<void>('playChord', {'frequencies': frequencies});
   @override
   Future<void> openSettings() => _methods.invokeMethod<void>('openSettings');
   @override

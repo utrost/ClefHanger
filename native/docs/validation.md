@@ -1,11 +1,11 @@
 # Native prototype validation
 
-Observed 2026-09-29 on local Android 15 API 35 `sdk_gphone64_x86_64` emulator, 540 × 960 physical pixels (360 × 640 logical). These observations apply to the Flutter/Rust feature branch only.
+Observed 2026-09-29 to 2026-09-30 on local Android 15 API 35 `sdk_gphone64_x86_64` emulator, 540 × 960 physical pixels (360 × 640 logical). These observations apply to the Flutter/Rust feature branch only.
 
 | Check | Result |
 | --- | --- |
 | Rust unit tests and strict Clippy | Passed: lesson pools, prompt seed, any-octave matching, low B2 PCM detection, silence, and FFI pointer guard. |
-| Flutter static analysis and tests | Passed: practice outcomes, assistance, hints-off behavior, progress normalization, short portrait controls, fallback buttons, JSON mic report, and host Rust FFI integration. |
+| Flutter static analysis and tests | Passed: practice outcomes, assistance, hints-off behavior, progress normalization, mode pools and persistence, chord-only touch scoring/playback, mode-specific Rush scoring, piano black-key spellings, short portrait controls, JSON mic report, and host Rust FFI integration. |
 | APK build | Debug APK built with `libclefhanger_core.so` for ARM64 and x86_64. ARM64 loading has not been tested on a phone. |
 | First screen | [Emulator screenshot](practice-emulator.png): staff, Start, Hear, microphone guidance, Check mic, and note-button fallback visible together. |
 | Touch practice | [Note-button screenshot](note-buttons-emulator.png): Start presents a Rust-selected staff note; C/D/E fallback answers remain reachable. A correct D4 answer showed `Recent: 1/1 on your own`; the count survived force-stop and relaunch. |
@@ -14,9 +14,11 @@ Observed 2026-09-29 on local Android 15 API 35 `sdk_gphone64_x86_64` emulator, 5
 | Permission denial and recovery | Tapping Don't allow restored Check mic and showed explicit Android Settings guidance. A retry after denial did not reopen the permission prompt on this emulator. Open Android settings reached ClefHanger's App info page. After granting microphone access there and reopening Practice, Check mic resumed live detection and Android's recording indicator appeared. A widget test covers the settings action. |
 | Launcher icon | Android App info displayed the ClefHanger icon after installing branded assets at each density. |
 | Treble Rush | [Short-portrait gameplay](rush-emulator.png) keeps the moving note, timer, pause, Check mic, and note-button fallback visible together. A full 60-second emulator round reached the [result view](rush-result-emulator.png); Back to Practice returned to the saved lesson. Widget tests cover pause/resume time, expiry, replay, late-answer rejection, and mode-specific high-score storage. |
+| Additional modes | Bass, Sharps, Flats, and Chords were added to the top Practice selector and Rush. Bass-clef and three-note chord rendering were visually inspected on the short emulator; the chord staff uses separate noteheads and one stem. Chord buttons stay visible without offering single-note mic scoring. The piano's sharp/flat answer spellings and disabled natural-mode black keys have widget coverage. Sharp/flat glyphs and mixed-mode Rush still need hands-on review. |
+| GitHub artifact | Native CI run [36637081596](https://github.com/utrost/ClefHanger/actions/runs/36637081596) completed successfully and uploaded the explicitly authorized `clefhanger-android-debug` APK artifact. That run predates the additional-mode slice; the next branch run must cover it. |
 | Mic Lab | [Expanded emulator screenshot](mic-lab-emulator.png) shows live level and pitch fields. Copy mic report invoked Android's clipboard overlay with structured JSON. The report contains no raw audio. |
 | Error log | No `AndroidRuntime` or Flutter errors appeared in the checked launch/touch/permission flows. |
 
 The emulator was launched with `-no-audio`, so audible tone quality and actual microphone accuracy were **not** validated. An emulator-reported A3 confirmed the PCM path reaches Rust and returns a pitch, but it is not evidence that a real singer will be classified correctly. The unit test feeds a synthetic B2 waveform through the real Rust library. Real phone testing must cover low voices, normal rooms, reference-tone bleed, permission denial/retry, background/resume, and earphones.
 
-The native app stores progress in Android app-private preferences. Browser LocalStorage cannot move into the app automatically. No import/export migration is present. Rush, bass/accidental/chord modes, piano input, advanced Mic Lab recording, and iOS remain separate follow-up work. The PWA is unchanged and remains the available complete product.
+The native app stores progress in Android app-private preferences. Browser LocalStorage cannot move into the app automatically. No import/export migration is present. First-run teaching, advanced Mic Lab recording, real-device validation, and iOS remain separate follow-up work. The PWA is unchanged and remains the available complete product.

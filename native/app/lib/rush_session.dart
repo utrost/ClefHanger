@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'native_core.dart';
+import 'mode_catalog.dart';
 
 enum RushPhase { idle, running, paused, ended }
 
@@ -36,6 +37,7 @@ class RushSession {
   RushSession(
     this.core, {
     required this.lesson,
+    this.mode = NotationMode.treble,
     int seed = 1,
     this.speed = 5,
     this.difficulty = RushDifficulty.beginner,
@@ -43,6 +45,7 @@ class RushSession {
 
   final PracticeCore core;
   final int lesson;
+  final NotationMode mode;
   int _seed;
   int speed;
   RushDifficulty difficulty;
@@ -73,13 +76,19 @@ class RushSession {
     0.65,
   ];
   int get travelMs =>
-      (5200 * _speedFactors[speed.clamp(1, 10) - 1] * difficulty.travelFactor)
+      ((mode == NotationMode.chords
+                  ? 6200
+                  : mode == NotationMode.sharps || mode == NotationMode.flats
+                  ? 5600
+                  : 5200) *
+              _speedFactors[speed.clamp(1, 10) - 1] *
+              difficulty.travelFactor)
           .round();
   RushPrompt? get front => queue.isEmpty ? null : queue.first;
   int get attempts => correct + wrong + missed;
   int get accuracy => attempts == 0 ? 0 : (correct * 100 / attempts).round();
   String get highScoreKey =>
-      'rush.highScore.treble.speed$speed.${difficulty.name}';
+      'rush.highScore.${mode.name}.speed$speed.${difficulty.name}';
   int remainingSeconds(int nowMs) => phase == RushPhase.idle
       ? 60
       : math.max(
@@ -97,13 +106,15 @@ class RushSession {
     score = correct = wrong = missed = streak = bestStreak = 0;
     _candidateSinceMs = null;
     _playbackBlockedUntilMs = 0;
-    feedback = 'Name the front note before it reaches the edge.';
+    feedback = mode == NotationMode.chords
+        ? 'Name the front chord before it reaches the edge.'
+        : 'Name the front note before it reaches the edge.';
     _fillQueue(nowMs);
   }
 
   void _fillQueue(int nowMs) {
     while (phase == RushPhase.running && queue.length < difficulty.queueSize) {
-      final note = core.promptNote(lesson, _seed);
+      final note = promptForMode(core, mode, lesson, _seed);
       _seed = core.nextSeed(_seed);
       final spawn = nowMs + (queue.length * travelMs * 0.18).round();
       queue.add(RushPrompt(note, spawn, spawn + travelMs));
@@ -145,8 +156,9 @@ class RushSession {
         ? 20
         : 0;
     final streakBonus = math.min(80, streak * 20);
-    final points = ((100 + speedBonus + streakBonus) * difficulty.scoreFactor)
-        .round();
+    final points =
+        ((mode.basePoints + speedBonus + streakBonus) * difficulty.scoreFactor)
+            .round();
     score += points;
     correct++;
     streak++;
@@ -169,6 +181,7 @@ class RushSession {
   bool hearFrequency(double hz, int nowMs, {bool anyOctave = true}) {
     tick(nowMs);
     if (phase != RushPhase.running ||
+        !mode.supportsMic ||
         front == null ||
         nowMs < _playbackBlockedUntilMs) {
       return false;
@@ -202,6 +215,8 @@ class RushSession {
     }
     pausedAtMs = null;
     phase = RushPhase.running;
-    feedback = 'Rush resumed. Name the front note.';
+    feedback = mode == NotationMode.chords
+        ? 'Rush resumed. Name the front chord.'
+        : 'Rush resumed. Name the front note.';
   }
 }

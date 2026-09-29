@@ -55,26 +55,39 @@ class NativeNote {
     required this.id,
     required this.midi,
     required this.staffStep,
+    this.writtenName,
+    this.clef = 'treble',
+    this.accidental,
+    this.chordStaffSteps = const [],
+    this.chordMidis = const [],
   });
   final int id;
   final int midi;
   final int staffStep;
-  String get name => const [
-    'C',
-    'C♯',
-    'D',
-    'D♯',
-    'E',
-    'F',
-    'F♯',
-    'G',
-    'G♯',
-    'A',
-    'A♯',
-    'B',
-  ][midi % 12];
+  final String? writtenName;
+  final String clef;
+  final String? accidental;
+  final List<int> chordStaffSteps;
+  final List<int> chordMidis;
+  bool get isChord => chordStaffSteps.isNotEmpty;
+  String get name =>
+      writtenName ??
+      const [
+        'C',
+        'C♯',
+        'D',
+        'D♯',
+        'E',
+        'F',
+        'F♯',
+        'G',
+        'G♯',
+        'A',
+        'A♯',
+        'B',
+      ][midi % 12];
   int get octave => midi ~/ 12 - 1;
-  String get displayName => '$name$octave';
+  String get displayName => isChord ? name : '$name$octave';
 }
 
 abstract class PracticeCore {

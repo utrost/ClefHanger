@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:clefhanger/android_audio.dart';
 import 'package:clefhanger/main.dart';
+import 'package:clefhanger/mode_catalog.dart';
 import 'package:clefhanger/staff.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart' show Size, SizedBox, SwitchListTile;
@@ -13,6 +14,7 @@ class FakeAudio implements AudioBridge {
   final controller = StreamController<Uint8List>.broadcast();
   final saved = <String, String>{};
   int plays = 0;
+  int chordPlays = 0;
   int settingsOpens = 0;
   Object? startError;
   @override
@@ -30,6 +32,11 @@ class FakeAudio implements AudioBridge {
   }
 
   @override
+  Future<void> playChord(List<double> frequencies) async {
+    chordPlays++;
+  }
+
+  @override
   Future<void> openSettings() async {
     settingsOpens++;
   }
@@ -43,6 +50,38 @@ class FakeAudio implements AudioBridge {
 }
 
 void main() {
+  testWidgets('chord mode stays touch-only, plays a chord and saves progress', (
+    tester,
+  ) async {
+    final audio = FakeAudio();
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Treble').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Chords').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Check mic'), findsNothing);
+    expect(find.text('C'), findsOneWidget);
+    await tester.tap(find.text('Hear this note'));
+    await tester.pumpAndSettle();
+    expect(audio.chordPlays, 1);
+    final prompt = tester
+        .widget<PracticeStaff>(find.byType(PracticeStaff))
+        .note!;
+    final answer = modeAnswers(
+      NotationMode.chords,
+    ).firstWhere((option) => option.answer == prompt.name);
+    await tester.tap(find.text(answer.label));
+    await tester.pumpAndSettle();
+    expect(audio.saved['mode.chords'], contains('"assisted":1'));
+    expect(find.text('Next practice note'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    expect(find.text('Chords'), findsOneWidget);
+    expect(find.textContaining('with help'), findsOneWidget);
+  });
+
   testWidgets(
     'first session has a readable staff, listening action and microphone fallback',
     (tester) async {
@@ -109,6 +148,7 @@ void main() {
       await tester.scrollUntilVisible(find.text('Use note buttons'), 140);
       await tester.tap(find.text('Use note buttons'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.byType(PracticeStaff), -140);
       // The fake seed is time based, so read the displayed prompt through the staff widget.
       final staff =
           tester.widgetList(find.byType(PracticeStaff)).first as PracticeStaff;
