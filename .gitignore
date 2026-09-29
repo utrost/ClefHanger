@@ -3,5 +3,3 @@
 /native/app/android/app/src/main/jniLibs/
 /native/app/.dart_tool/
 /native/app/build/
-# Flutter regenerates stock density icons; xxxhdpi is the tracked ClefHanger icon.
-/native/app/android/app/src/main/res/mipmap-*/ic_launcher.png

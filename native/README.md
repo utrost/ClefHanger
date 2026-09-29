@@ -6,7 +6,7 @@ This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The
 
 - Flutter draws an untimed portrait Practice screen and treble staff.
 - Rust owns the six treble lesson note pools, prompt selection, note frequencies, PCM16 pitch detection, and pitch-class matching.
-- Android captures mono microphone PCM, requests `RECORD_AUDIO`, plays a reference tone, stops capture when backgrounded, and stores lesson progress in app-private preferences.
+- Android captures mono microphone PCM, requests `RECORD_AUDIO`, offers a direct app-settings route after denial, plays a reference tone, stops capture when backgrounded, and stores lesson progress in app-private preferences.
 - Practice offers Listen and imitate, visible microphone guidance, a note-button fallback, optional staff help, corrections, saved assisted/independent progress and settings, an 8-of-10 next-lesson invitation, and a copyable Mic Lab report with no audio samples.
 - Android ARM64 and emulator x64 Rust libraries are cross-compiled into the debug APK.
 

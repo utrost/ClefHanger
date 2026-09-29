@@ -70,6 +70,7 @@ class _PracticePageState extends State<PracticePage>
   int _receivedSamples = 0;
   bool _micOn = false;
   bool _micStarting = false;
+  bool _permissionDenied = false;
   bool _notesInput = false;
   bool _anyOctave = true;
   bool _hints = true;
@@ -192,6 +193,7 @@ class _PracticePageState extends State<PracticePage>
     if (_micOn || _micStarting) return;
     setState(() {
       _micStarting = true;
+      _permissionDenied = false;
       _micGuide = 'Waiting for microphone permission…';
     });
     _micSubscription ??= widget.audio.samples.listen(
@@ -211,10 +213,11 @@ class _PracticePageState extends State<PracticePage>
       }
     } on PlatformException catch (error) {
       if (mounted) {
-        setState(
-          () => _micGuide =
-              error.message ?? 'Check microphone permission and try again.',
-        );
+        setState(() {
+          _permissionDenied = error.code == 'mic_denied';
+          _micGuide =
+              error.message ?? 'Check microphone permission and try again.';
+        });
       }
       await _micSubscription?.cancel();
       _micSubscription = null;
@@ -231,6 +234,7 @@ class _PracticePageState extends State<PracticePage>
       setState(() {
         _micOn = false;
         _micStarting = false;
+        _permissionDenied = false;
         _detectedMidi = null;
         _micGuide = 'Mic off. Tap Check mic to try again.';
       });
@@ -363,6 +367,19 @@ class _PracticePageState extends State<PracticePage>
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Mic report copied.')));
+    }
+  }
+
+  Future<void> _openSettings() async {
+    try {
+      await widget.audio.openSettings();
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _micGuide =
+              'Open ClefHanger in Android Settings and allow microphone access.',
+        );
+      }
     }
   }
 
@@ -577,6 +594,12 @@ class _PracticePageState extends State<PracticePage>
                           ),
                         ],
                       ),
+                      if (_permissionDenied)
+                        TextButton.icon(
+                          onPressed: _openSettings,
+                          icon: const Icon(Icons.settings),
+                          label: const Text('Open Android settings'),
+                        ),
                     ],
                   ),
                 ),

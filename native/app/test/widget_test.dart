@@ -5,21 +5,32 @@ import 'package:clefhanger/main.dart';
 import 'package:clefhanger/staff.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart' show Size, SizedBox, SwitchListTile;
+import 'package:flutter/services.dart' show PlatformException;
 import 'practice_session_test.dart' show FakeCore;
 
 class FakeAudio implements AudioBridge {
   final controller = StreamController<Uint8List>.broadcast();
   final saved = <String, String>{};
   int plays = 0;
+  int settingsOpens = 0;
+  Object? startError;
   @override
   Stream<Uint8List> get samples => controller.stream;
   @override
-  Future<void> start() async {}
+  Future<void> start() async {
+    if (startError != null) throw startError!;
+  }
+
   @override
   Future<void> stop() async {}
   @override
   Future<void> playTone(double frequency) async {
     plays++;
+  }
+
+  @override
+  Future<void> openSettings() async {
+    settingsOpens++;
   }
 
   @override
@@ -141,5 +152,26 @@ void main() {
       matching: find.byType(SwitchListTile),
     );
     expect(tester.widget<SwitchListTile>(correction).value, isFalse);
+  });
+
+  testWidgets('denied microphone offers a direct Android settings route', (
+    tester,
+  ) async {
+    final audio = FakeAudio()
+      ..startError = PlatformException(
+        code: 'mic_denied',
+        message: 'Microphone permission denied.',
+      );
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Check mic'), 160);
+    await tester.tap(find.text('Check mic'));
+    await tester.pumpAndSettle();
+    expect(find.text('Microphone permission denied.'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Open Android settings'), 160);
+    await tester.ensureVisible(find.text('Open Android settings'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Open Android settings'));
+    expect(audio.settingsOpens, 1);
   });
 }

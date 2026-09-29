@@ -2,6 +2,9 @@ package com.simiono.clefhanger
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -42,6 +45,11 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "startMic" -> startMic(result)
+                    "openSettings" -> {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))
+                        startActivity(intent)
+                        result.success(null)
+                    }
                     "stopMic" -> {
                         pendingStart?.error("mic_cancelled", "Microphone request cancelled.", null)
                         pendingStart = null
