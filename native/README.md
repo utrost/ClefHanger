@@ -7,17 +7,16 @@ This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The
 - Flutter draws an untimed portrait Practice screen and treble staff.
 - Rust owns the six treble lesson note pools, prompt selection, note frequencies, PCM16 pitch detection, and pitch-class matching.
 - Android captures mono microphone PCM, requests `RECORD_AUDIO`, plays a reference tone, stops capture when backgrounded, and stores lesson progress in app-private preferences.
-- Practice offers Listen and imitate, visible microphone guidance, a note-button fallback, optional staff help, corrections, saved assisted/independent progress, an 8-of-10 next-lesson invitation, and a copyable Mic Lab report with no audio samples.
+- Practice offers Listen and imitate, visible microphone guidance, a note-button fallback, optional staff help, corrections, saved assisted/independent progress and settings, an 8-of-10 next-lesson invitation, and a copyable Mic Lab report with no audio samples.
 - Android ARM64 and emulator x64 Rust libraries are cross-compiled into the debug APK.
 
 Scope gaps: Rush, bass/accidental/chord modes, piano input, audio recording in Mic Lab, and migration of progress from browser LocalStorage are not ported. The existing PWA remains available. See [recorded emulator validation](docs/validation.md). Emulator startup and touch behavior do not establish physical microphone accuracy; test on Android phones before treating the native audio path as reliable. iOS has not been configured.
 
 ## Build and run
 
-Prerequisites: Flutter 3.41+, Rust with `aarch64-linux-android` and `x86_64-linux-android` targets, `cargo-ndk`, Android SDK and NDK, and an Android phone/emulator. Point `ANDROID_NDK_HOME` at the NDK. The project has no Dart dependencies beyond `ffi` and test/lint packages.
+Prerequisites: Flutter 3.41+, Rust with `aarch64-linux-android` and `x86_64-linux-android` targets, `cargo-ndk`, Android SDK and NDK, and an Android phone/emulator. Set `ANDROID_HOME` to the SDK; the preparation script finds the newest installed NDK, or you can set `ANDROID_NDK_HOME` explicitly. The project has no Dart dependencies beyond `ffi` and test/lint packages.
 
 ```bash
-export ANDROID_NDK_HOME="$ANDROID_HOME/ndk/<installed-version>"
 export PATH="<flutter-sdk>/bin:$PATH"
 native/tools/prepare_android.sh
 cd native/app

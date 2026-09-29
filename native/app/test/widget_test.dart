@@ -4,7 +4,7 @@ import 'package:clefhanger/android_audio.dart';
 import 'package:clefhanger/main.dart';
 import 'package:clefhanger/staff.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart' show Size;
+import 'package:flutter/material.dart' show Size, SizedBox, SwitchListTile;
 import 'practice_session_test.dart' show FakeCore;
 
 class FakeAudio implements AudioBridge {
@@ -107,4 +107,39 @@ void main() {
       expect(audio.saved['first-steps'], contains('"assisted":1'));
     },
   );
+
+  testWidgets('lesson and correction preference survive app restart', (
+    tester,
+  ) async {
+    final audio = FakeAudio();
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('First steps'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Line notes').last);
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Settings'), 160);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Show corrections'), 160);
+    await tester.ensureVisible(find.text('Show corrections'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Show corrections'));
+    await tester.pumpAndSettle();
+    expect(audio.saved['preferences'], contains('"lesson":1'));
+    expect(audio.saved['preferences'], contains('"hints":false'));
+
+    await tester.pumpWidget(const SizedBox());
+    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpAndSettle();
+    expect(find.text('Line notes'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Settings'), 160);
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    final correction = find.ancestor(
+      of: find.text('Show corrections'),
+      matching: find.byType(SwitchListTile),
+    );
+    expect(tester.widget<SwitchListTile>(correction).value, isFalse);
+  });
 }

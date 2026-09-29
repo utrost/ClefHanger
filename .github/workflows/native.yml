@@ -26,8 +26,6 @@ jobs:
       - name: Install Android Rust build helper
         run: cargo install cargo-ndk --locked
       - name: Prepare Android and Rust libraries
-        env:
-          ANDROID_NDK_HOME: ${{ env.ANDROID_NDK_LATEST_HOME }}
         run: native/tools/prepare_android.sh
       - name: Format, lint and test Rust
         run: |

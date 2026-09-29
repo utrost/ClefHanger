@@ -64,8 +64,11 @@ class MainActivity : FlutterActivity() {
                     "writeProgress" -> {
                         val key = call.argument<String>("key") ?: "first-steps"
                         val value = call.argument<String>("value") ?: "{}"
-                        getPreferences(0).edit().putString("progress.$key", value).apply()
-                        result.success(null)
+                        if (getPreferences(0).edit().putString("progress.$key", value).commit()) {
+                            result.success(null)
+                        } else {
+                            result.error("storage_failed", "Could not save local progress.", null)
+                        }
                     }
                     else -> result.notImplemented()
                 }

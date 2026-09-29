@@ -89,6 +89,45 @@ class _PracticePageState extends State<PracticePage>
     );
     WidgetsBinding.instance.addObserver(this);
     _loadProgress();
+    _loadPreferences();
+  }
+
+  Future<void> _loadPreferences() async {
+    try {
+      final stored = await widget.audio.readProgress('preferences');
+      if (stored == null || !mounted) return;
+      final value = jsonDecode(stored);
+      if (value is! Map) return;
+      setState(() {
+        final lesson = value['lesson'];
+        if (lesson is int && lesson >= 0 && lesson < lessonIds.length) {
+          session.selectLesson(lesson);
+        }
+        if (value['anyOctave'] is bool) _anyOctave = value['anyOctave'];
+        if (value['hints'] is bool) _hints = value['hints'];
+      });
+    } catch (_) {
+      // Corrupt preferences fall back to readable beginner defaults.
+    }
+  }
+
+  Future<void> _persistPreferences() async {
+    try {
+      await widget.audio.writeProgress(
+        'preferences',
+        jsonEncode({
+          'lesson': session.lesson,
+          'anyOctave': _anyOctave,
+          'hints': _hints,
+        }),
+      );
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _storageError = 'Settings could not be saved on this device.',
+        );
+      }
+    }
   }
 
   Future<void> _loadProgress() async {
@@ -393,6 +432,7 @@ class _PracticePageState extends State<PracticePage>
                                   session.selectLesson(value);
                                   _detectedMidi = null;
                                 });
+                                _persistPreferences();
                               },
                             ),
                           ),
@@ -407,9 +447,12 @@ class _PracticePageState extends State<PracticePage>
                     ),
                     if (progress.ready && session.lesson < lessonIds.length - 1)
                       TextButton(
-                        onPressed: () => setState(
-                          () => session.selectLesson(session.lesson + 1),
-                        ),
+                        onPressed: () {
+                          setState(
+                            () => session.selectLesson(session.lesson + 1),
+                          );
+                          _persistPreferences();
+                        },
                         child: Text(
                           'Try next lesson: ${lessonLabels[session.lesson + 1]}',
                         ),
@@ -594,12 +637,18 @@ class _PracticePageState extends State<PracticePage>
                     title: const Text('Match any octave'),
                     subtitle: const Text('A low or high C counts as C'),
                     value: _anyOctave,
-                    onChanged: (value) => setState(() => _anyOctave = value),
+                    onChanged: (value) {
+                      setState(() => _anyOctave = value);
+                      _persistPreferences();
+                    },
                   ),
                   SwitchListTile(
                     title: const Text('Show corrections'),
                     value: _hints,
-                    onChanged: (value) => setState(() => _hints = value),
+                    onChanged: (value) {
+                      setState(() => _hints = value);
+                      _persistPreferences();
+                    },
                   ),
                   const Padding(
                     padding: EdgeInsets.all(12),

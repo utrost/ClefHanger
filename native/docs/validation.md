@@ -9,6 +9,7 @@ Observed 2026-09-29 on local Android 15 API 35 `sdk_gphone64_x86_64` emulator, 5
 | APK build | Debug APK built with `libclefhanger_core.so` for ARM64 and x86_64. ARM64 loading has not been tested on a phone. |
 | First screen | [Emulator screenshot](practice-emulator.png): staff, Start, Hear, microphone guidance, Check mic, and note-button fallback visible together. |
 | Touch practice | [Note-button screenshot](note-buttons-emulator.png): Start presents a Rust-selected staff note; C/D/E fallback answers remain reachable. A correct D4 answer showed `Recent: 1/1 on your own`; the count survived force-stop and relaunch. |
+| Saved preferences | Widget test selects Line notes and disables corrections, then remounts the app and verifies both settings were restored. On the emulator, selecting Line notes and reopening the app also restored that lesson. The same app-private preference bridge stores progress and settings. |
 | Mic permission and lifecycle | Runtime permission dialog appeared. After Allow, Android showed its green microphone indicator and Flutter showed live detected-pitch guidance. Stop mic removed the indicator and restored Check mic. A permission-dialog pause bug was found and fixed during this pass. |
 | Mic Lab | [Expanded emulator screenshot](mic-lab-emulator.png) shows live level and pitch fields. Copy mic report invoked Android's clipboard overlay with structured JSON. The report contains no raw audio. |
 | Error log | No `AndroidRuntime` or Flutter errors appeared in the checked launch/touch/permission flows. |

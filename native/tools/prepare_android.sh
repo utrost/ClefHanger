@@ -2,7 +2,19 @@
 set -euo pipefail
 
 native_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-: "${ANDROID_NDK_HOME:?Set ANDROID_NDK_HOME to the installed Android NDK directory}"
+if [[ -z "${ANDROID_NDK_HOME:-}" ]]; then
+  sdk_root="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+  : "${sdk_root:?Set ANDROID_HOME or ANDROID_NDK_HOME to the installed Android SDK/NDK}"
+  shopt -s nullglob
+  ndks=("$sdk_root"/ndk/*)
+  shopt -u nullglob
+  if (( ${#ndks[@]} == 0 )); then
+    echo "No Android NDK found under $sdk_root/ndk" >&2
+    exit 1
+  fi
+  ANDROID_NDK_HOME="$(printf '%s\n' "${ndks[@]}" | sort -V | tail -n 1)"
+  export ANDROID_NDK_HOME
+fi
 
 # Flutter's generated wrapper is ignored. Recreate only missing scaffold files.
 (cd "$native_root/app" && flutter create --org com.simiono --project-name clefhanger --platforms=android --no-pub .)
