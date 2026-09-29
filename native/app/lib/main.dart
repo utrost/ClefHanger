@@ -10,6 +10,7 @@ import 'android_audio.dart';
 import 'native_core.dart';
 import 'mic_diagnostic.dart';
 import 'practice_session.dart';
+import 'rush_page.dart';
 import 'staff.dart';
 
 void main() {
@@ -30,9 +31,15 @@ void main() {
 }
 
 class ClefHangerApp extends StatelessWidget {
-  const ClefHangerApp({super.key, required this.core, required this.audio});
+  const ClefHangerApp({
+    super.key,
+    required this.core,
+    required this.audio,
+    this.rushNowMs,
+  });
   final PracticeCore core;
   final AudioBridge audio;
+  final int Function()? rushNowMs;
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'ClefHanger',
@@ -50,14 +57,20 @@ class ClefHangerApp extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     ),
-    home: PracticePage(core: core, audio: audio),
+    home: PracticePage(core: core, audio: audio, rushNowMs: rushNowMs),
   );
 }
 
 class PracticePage extends StatefulWidget {
-  const PracticePage({super.key, required this.core, required this.audio});
+  const PracticePage({
+    super.key,
+    required this.core,
+    required this.audio,
+    this.rushNowMs,
+  });
   final PracticeCore core;
   final AudioBridge audio;
+  final int Function()? rushNowMs;
   @override
   State<PracticePage> createState() => _PracticePageState();
 }
@@ -383,6 +396,21 @@ class _PracticePageState extends State<PracticePage>
     }
   }
 
+  Future<void> _openRush() async {
+    await _stopMic();
+    if (!mounted) return;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => RushPage(
+          core: widget.core,
+          audio: widget.audio,
+          lesson: session.lesson,
+          nowMs: widget.rushNowMs,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final progress = session.currentProgress;
@@ -680,6 +708,16 @@ class _PracticePageState extends State<PracticePage>
                     ),
                   ),
                 ],
+              ),
+            ),
+            Card(
+              child: ListTile(
+                title: const Text('Try a 60-second Rush'),
+                subtitle: Text(
+                  'A timed challenge on ${lessonLabels[session.lesson]}',
+                ),
+                trailing: const Icon(Icons.arrow_forward),
+                onTap: _openRush,
               ),
             ),
           ],

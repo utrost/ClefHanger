@@ -1,16 +1,16 @@
 # ClefHanger native Android prototype
 
-This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The static PWA in the repository root remains the current implementation. Nothing here is deployed or published.
+This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The static PWA in the repository root remains the current implementation. CI publishes a debug APK artifact for review; there is no production Android release or store listing.
 
 ## What runs
 
-- Flutter draws an untimed portrait Practice screen and treble staff.
+- Flutter draws portrait treble Practice and a 60-second Rush with a moving staff note, speed/difficulty controls, pause/resume, result exits, and separate high scores.
 - Rust owns the six treble lesson note pools, prompt selection, note frequencies, PCM16 pitch detection, and pitch-class matching.
 - Android captures mono microphone PCM, requests `RECORD_AUDIO`, offers a direct app-settings route after denial, plays a reference tone, stops capture when backgrounded, and stores lesson progress in app-private preferences.
 - Practice offers Listen and imitate, visible microphone guidance, a note-button fallback, optional staff help, corrections, saved assisted/independent progress and settings, an 8-of-10 next-lesson invitation, and a copyable Mic Lab report with no audio samples.
 - Android ARM64 and emulator x64 Rust libraries are cross-compiled into the debug APK.
 
-Scope gaps: Rush, bass/accidental/chord modes, piano input, audio recording in Mic Lab, and migration of progress from browser LocalStorage are not ported. The existing PWA remains available. See [recorded emulator validation](docs/validation.md). Emulator startup and touch behavior do not establish physical microphone accuracy; test on Android phones before treating the native audio path as reliable. iOS has not been configured.
+Scope gaps: bass/accidental/chord modes, piano input, audio recording in Mic Lab, and migration of progress from browser LocalStorage are not ported. See the [parity tracker](docs/parity.md) and [recorded emulator validation](docs/validation.md). The existing PWA remains available. Emulator startup and touch behavior do not establish physical microphone accuracy; test on Android phones before treating the native audio path as reliable. iOS has not been configured.
 
 ## Build and run
 

@@ -8,11 +8,15 @@ class PracticeStaff extends StatelessWidget {
     required this.note,
     this.revealAnswer = false,
     this.detectedMidi,
+    this.travelProgress,
+    this.previewNotes = const [],
     this.height = 238,
   });
   final NativeNote? note;
   final bool revealAnswer;
   final int? detectedMidi;
+  final double? travelProgress;
+  final List<NativeNote> previewNotes;
   final double height;
   @override
   Widget build(BuildContext context) => Semantics(
@@ -23,12 +27,19 @@ class PracticeStaff extends StatelessWidget {
         : 'Treble staff note at ${_position(note!.staffStep)}. Sing or name it.',
     child: Container(
       height: height,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: const Color(0xFFF6ECC8),
         borderRadius: BorderRadius.circular(24),
       ),
       child: CustomPaint(
-        painter: _StaffPainter(note: note, detectedMidi: detectedMidi),
+        painter: _StaffPainter(
+          note: note,
+          revealAnswer: revealAnswer,
+          detectedMidi: detectedMidi,
+          travelProgress: travelProgress,
+          previewNotes: previewNotes,
+        ),
         child: const SizedBox.expand(),
       ),
     ),
@@ -44,9 +55,18 @@ String _position(int step) {
 }
 
 class _StaffPainter extends CustomPainter {
-  _StaffPainter({required this.note, required this.detectedMidi});
+  _StaffPainter({
+    required this.note,
+    required this.revealAnswer,
+    required this.detectedMidi,
+    required this.travelProgress,
+    required this.previewNotes,
+  });
   final NativeNote? note;
+  final bool revealAnswer;
   final int? detectedMidi;
+  final double? travelProgress;
+  final List<NativeNote> previewNotes;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -62,18 +82,19 @@ class _StaffPainter extends CustomPainter {
       final y = bottom - line * gap;
       canvas.drawLine(Offset(left, y), Offset(right, y), ink);
     }
+    final compact = size.height < 190;
     final clef = TextPainter(
-      text: const TextSpan(
+      text: TextSpan(
         text: '𝄞',
         style: TextStyle(
           fontFamily: 'Noto Music',
-          fontSize: 91,
-          color: Color(0xFF241A28),
+          fontSize: compact ? 78 : 91,
+          color: const Color(0xFF241A28),
         ),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    clef.paint(canvas, Offset(11, bottom - 116));
+    clef.paint(canvas, Offset(11, bottom - (compact ? 105 : 116)));
     if (note == null) {
       final message = TextPainter(
         text: const TextSpan(
@@ -92,34 +113,45 @@ class _StaffPainter extends CustomPainter {
       );
       return;
     }
-    final y = bottom - note!.staffStep * gap / 2;
-    final x = math.max(125.0, size.width * 0.58);
-    if (note!.staffStep <= -2) {
-      for (var step = -2; step >= note!.staffStep; step -= 2) {
-        canvas.drawLine(
-          Offset(x - 25, bottom - step * gap / 2),
-          Offset(x + 25, bottom - step * gap / 2),
-          ink,
-        );
-      }
-    } else if (note!.staffStep >= 10) {
-      for (var step = 10; step <= note!.staffStep; step += 2) {
-        canvas.drawLine(
-          Offset(x - 25, bottom - step * gap / 2),
-          Offset(x + 25, bottom - step * gap / 2),
-          ink,
+    if (travelProgress != null) {
+      canvas.drawLine(
+        Offset(116, bottom - 4 * gap - 12),
+        Offset(116, bottom + gap + 12),
+        Paint()
+          ..color = const Color(0xFFB65C40)
+          ..strokeWidth = 2,
+      );
+      for (var index = 0; index < previewNotes.length; index++) {
+        _drawNote(
+          canvas,
+          previewNotes[index].staffStep,
+          size.width - 48 - index * 36,
+          bottom,
+          gap,
+          const Color(0x88241A28),
         );
       }
     }
-    canvas.save();
-    canvas.translate(x, y);
-    canvas.rotate(-0.3);
-    canvas.drawOval(
-      Rect.fromCenter(center: Offset.zero, width: 30, height: 21),
-      Paint()..color = const Color(0xFF241A28),
-    );
-    canvas.restore();
-    canvas.drawLine(Offset(x + 14, y), Offset(x + 14, y - 66), ink);
+    final x = travelProgress == null
+        ? math.max(125.0, size.width * 0.58)
+        : 125 +
+              math.max(0.0, size.width * 0.66 - 125) *
+                  (1 - travelProgress!.clamp(0.0, 1.0));
+    _drawNote(canvas, note!.staffStep, x, bottom, gap, const Color(0xFF241A28));
+    if (revealAnswer) {
+      final label = TextPainter(
+        text: TextSpan(
+          text: note!.displayName,
+          style: const TextStyle(
+            color: Color(0xFF241A28),
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      label.paint(canvas, Offset(x - label.width / 2, bottom + 31));
+    }
     if (detectedMidi != null) {
       final midiLabel = const [
         'C',
@@ -150,7 +182,52 @@ class _StaffPainter extends CustomPainter {
     }
   }
 
+  void _drawNote(
+    Canvas canvas,
+    int staffStep,
+    double x,
+    double bottom,
+    double gap,
+    Color color,
+  ) {
+    final ink = Paint()
+      ..color = color
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round;
+    final y = bottom - staffStep * gap / 2;
+    if (staffStep <= -2) {
+      for (var step = -2; step >= staffStep; step -= 2) {
+        canvas.drawLine(
+          Offset(x - 25, bottom - step * gap / 2),
+          Offset(x + 25, bottom - step * gap / 2),
+          ink,
+        );
+      }
+    } else if (staffStep >= 10) {
+      for (var step = 10; step <= staffStep; step += 2) {
+        canvas.drawLine(
+          Offset(x - 25, bottom - step * gap / 2),
+          Offset(x + 25, bottom - step * gap / 2),
+          ink,
+        );
+      }
+    }
+    canvas.save();
+    canvas.translate(x, y);
+    canvas.rotate(-0.3);
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset.zero, width: 30, height: 21),
+      Paint()..color = color,
+    );
+    canvas.restore();
+    canvas.drawLine(Offset(x + 14, y), Offset(x + 14, y - 66), ink);
+  }
+
   @override
   bool shouldRepaint(covariant _StaffPainter old) =>
-      old.note != note || old.detectedMidi != detectedMidi;
+      old.note != note ||
+      old.revealAnswer != revealAnswer ||
+      old.detectedMidi != detectedMidi ||
+      old.travelProgress != travelProgress ||
+      old.previewNotes != previewNotes;
 }

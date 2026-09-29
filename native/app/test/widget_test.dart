@@ -5,7 +5,8 @@ import 'package:clefhanger/main.dart';
 import 'package:clefhanger/staff.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart' show Size, SizedBox, SwitchListTile;
-import 'package:flutter/services.dart' show PlatformException;
+import 'package:flutter/services.dart'
+    show LogicalKeyboardKey, PlatformException;
 import 'practice_session_test.dart' show FakeCore;
 
 class FakeAudio implements AudioBridge {
@@ -173,5 +174,38 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Open Android settings'));
     expect(audio.settingsOpens, 1);
+  });
+
+  testWidgets('Rush pauses time, ends, and returns to Practice', (
+    tester,
+  ) async {
+    final audio = FakeAudio();
+    var nowMs = 0;
+    await tester.pumpWidget(
+      ClefHangerApp(core: FakeCore(), audio: audio, rushNowMs: () => nowMs),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Try a 60-second Rush'), 180);
+    await tester.tap(find.text('Try a 60-second Rush'));
+    await tester.pumpAndSettle();
+    expect(find.text('Start 60-second Rush'), findsOneWidget);
+    await tester.tap(find.text('Start 60-second Rush'));
+    await tester.pump();
+    await tester.ensureVisible(find.text('Pause Rush'));
+    await tester.pump();
+    await tester.tap(find.text('Pause Rush'));
+    await tester.pump();
+    expect(find.text('Resume Rush'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 60));
+    expect(find.text('Time 60s'), findsOneWidget);
+    await tester.tap(find.text('Resume Rush'));
+    await tester.pump();
+    nowMs = 60000;
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('Time! Sprint complete'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('Try a 60-second Rush'), findsOneWidget);
+    expect(find.text('Back to Practice'), findsNothing);
   });
 }
