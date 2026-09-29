@@ -1,0 +1,10 @@
+[package]
+name = "clefhanger-core"
+version = "0.1.0"
+edition = "2021"
+description = "Music, lesson and pitch rules for the native ClefHanger app"
+publish = false
+
+[lib]
+name = "clefhanger_core"
+crate-type = ["cdylib", "rlib"]

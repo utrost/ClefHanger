@@ -1,0 +1,5 @@
+# Native port build output; the PWA remains unmodified.
+/native/core/target/
+/native/app/android/app/src/main/jniLibs/
+/native/app/.dart_tool/
+/native/app/build/
