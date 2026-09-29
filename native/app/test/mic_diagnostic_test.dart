@@ -19,12 +19,14 @@ void main() {
         cents: -14,
         matchAnyOctave: true,
         lessonId: 'first-steps',
+        captureLabel: 'piano',
       );
       final data = jsonDecode(report) as Map<String, dynamic>;
       expect(data['schema'], 'clefhanger-native-mic-report-v1');
       expect(data['live']['midi'], 47);
       expect(data['live']['cents'], -14);
       expect(data['live']['inputLevel'], 0.052);
+      expect(data['captureLabel'], 'piano');
       expect(data.containsKey('samples'), false);
       expect(data.containsKey('deviceId'), false);
     },

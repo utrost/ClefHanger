@@ -91,6 +91,12 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Mic Lab'));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Play A'), 160);
+    await tester.ensureVisible(find.text('Play A'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Play A'));
+    await tester.pumpAndSettle();
+    expect(audio.plays, 1);
     await tester.scrollUntilVisible(find.text('Record 1-second mic test'), 160);
     await tester.ensureVisible(find.text('Record 1-second mic test'));
     await tester.pumpAndSettle();

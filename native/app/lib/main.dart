@@ -103,6 +103,8 @@ class _PracticePageState extends State<PracticePage>
   MicDiagnosticCapture? _recordCapture;
   MicCaptureSummary? _lastRecording;
   String _recordMessage = 'No recording test yet.';
+  String _captureLabel = 'voice';
+  String _calibrationMessage = 'Play A for an optional pitch reference.';
   final Stopwatch _clock = Stopwatch()..start();
 
   @override
@@ -442,6 +444,7 @@ class _PracticePageState extends State<PracticePage>
       lessonId: session.mode == NotationMode.treble
           ? lessonIds[session.lesson]
           : 'mode.${session.mode.name}',
+      captureLabel: _captureLabel,
       recording: _lastRecording,
     );
     await Clipboard.setData(ClipboardData(text: report));
@@ -474,6 +477,26 @@ class _PracticePageState extends State<PracticePage>
           ? 'Captured ${summary.bytes} bytes · level ${(summary.rms * 100).toStringAsFixed(1)}%. No steady pitch found.'
           : 'Captured ${summary.bytes} bytes · level ${(summary.rms * 100).toStringAsFixed(1)}% · ${summary.frequency.toStringAsFixed(1)} Hz.';
     });
+  }
+
+  Future<void> _playCalibrationTone() async {
+    session.blockPlayback(_clock.elapsedMilliseconds, playbackMs: 1100);
+    try {
+      await widget.audio.playTone(440);
+      if (mounted) {
+        setState(
+          () => _calibrationMessage =
+              'Concert A4 · 440 Hz. Sing a comfortable note; you do not need to match A.',
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(
+          () => _calibrationMessage =
+              'Reference tone could not play. Microphone practice still works.',
+        );
+      }
+    }
   }
 
   Future<void> _openSettings() async {
@@ -971,6 +994,41 @@ class _PracticePageState extends State<PracticePage>
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(_recordMessage),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: DropdownButtonFormField<String>(
+                      initialValue: _captureLabel,
+                      decoration: const InputDecoration(
+                        labelText: 'Capture label',
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                          value: 'silence',
+                          child: Text('Silence'),
+                        ),
+                        DropdownMenuItem(value: 'voice', child: Text('Voice')),
+                        DropdownMenuItem(value: 'piano', child: Text('Piano')),
+                        DropdownMenuItem(
+                          value: 'app-a-tone',
+                          child: Text('App A tone'),
+                        ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() => _captureLabel = value);
+                        }
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(_calibrationMessage),
+                  ),
+                  TextButton.icon(
+                    onPressed: _playCalibrationTone,
+                    icon: const Icon(Icons.music_note),
+                    label: const Text('Play A'),
                   ),
                   TextButton.icon(
                     onPressed: _recordingTest ? null : _recordMicTest,

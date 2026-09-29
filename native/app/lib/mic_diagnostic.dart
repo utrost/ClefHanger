@@ -54,6 +54,7 @@ String buildMicDiagnostic({
   required int? cents,
   required bool matchAnyOctave,
   required String lessonId,
+  String captureLabel = 'voice',
   MicCaptureSummary? recording,
 }) => const JsonEncoder.withIndent('  ').convert({
   'schema': 'clefhanger-native-mic-report-v1',
@@ -62,6 +63,7 @@ String buildMicDiagnostic({
   'platform': 'android',
   'sampleRate': 16000,
   'lesson': lessonId,
+  'captureLabel': captureLabel,
   'listening': listening,
   'guidance': guidance,
   'matchAnyOctave': matchAnyOctave,

@@ -147,14 +147,18 @@ class PracticeSession {
   void hear(int nowMs, {int playbackMs = 580}) {
     if (!started) start();
     helped = true;
+    blockPlayback(nowMs, playbackMs: playbackMs);
+    feedback = mode == NotationMode.chords
+        ? 'Listen to the chord, then name it. This answer will count as assisted.'
+        : 'Listen, then sing the note back. Scoring waits until the sound finishes.';
+  }
+
+  void blockPlayback(int nowMs, {int playbackMs = 580}) {
     _candidateSinceMs = null;
     _playbackBlockedUntilMs = max(
       _playbackBlockedUntilMs,
       nowMs + playbackMs + 300,
     );
-    feedback = mode == NotationMode.chords
-        ? 'Listen to the chord, then name it. This answer will count as assisted.'
-        : 'Listen, then sing the note back. Scoring waits until the sound finishes.';
   }
 
   void revealGuide() {

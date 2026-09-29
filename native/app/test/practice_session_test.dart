@@ -127,6 +127,25 @@ void main() {
     expect(session.currentProgress.recent, [true]);
   });
 
+  test('concert A playback blocks self scoring without marking help', () {
+    final core = FakeCore();
+    final session = PracticeSession(core, seed: 0)..start();
+    session.blockPlayback(1000, playbackMs: 1100);
+    expect(
+      session.hearFrequency(core.frequency(60), 2399),
+      AnswerResult.ignored,
+    );
+    expect(
+      session.hearFrequency(core.frequency(60), 2400),
+      AnswerResult.ignored,
+    );
+    expect(
+      session.hearFrequency(core.frequency(60), 2550),
+      AnswerResult.correct,
+    );
+    expect(session.currentProgress.assisted, 0);
+  });
+
   test(
     'mode progress stays separate and written flats accept sounding pitch',
     () {
