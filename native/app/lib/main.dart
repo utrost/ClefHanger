@@ -595,6 +595,7 @@ class _PracticePageState extends State<PracticePage>
   Widget build(BuildContext context) {
     final progress = session.currentProgress;
     final prompt = session.prompt;
+    final largeText = MediaQuery.textScalerOf(context).scale(16) > 21;
     final answers = session.mode == NotationMode.treble
         ? <String>{
             for (var i = 0; i < widget.core.lessonLength(session.lesson); i++)
@@ -605,21 +606,25 @@ class _PracticePageState extends State<PracticePage>
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(12, 10, 12, 28),
+          padding: EdgeInsets.fromLTRB(12, largeText ? 4 : 10, 12, 28),
           children: [
-            const Text(
+            Text(
               'ClefHanger',
               style: TextStyle(
-                fontSize: 30,
+                fontSize: largeText ? 27 : 30,
                 fontWeight: FontWeight.w800,
-                color: Color(0xFFF9E8C0),
+                color: const Color(0xFFF9E8C0),
               ),
             ),
-            const Text(
-              'Read a note. Hear it. Make it yours.',
-              style: TextStyle(color: Color(0xFFCBBBD8)),
+            Text(
+              largeText
+                  ? 'Read. Hear. Sing or play.'
+                  : 'Read a note. Hear it. Make it yours.',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Color(0xFFCBBBD8)),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: largeText ? 4 : 14),
             Card(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 9, 12, 9),
@@ -693,7 +698,9 @@ class _PracticePageState extends State<PracticePage>
                       const SizedBox(height: 4),
                     Text(
                       progress.attempts == 0
-                          ? 'Progress saved here · listening help welcome'
+                          ? largeText
+                                ? 'Progress saved here'
+                                : 'Progress saved here · listening help welcome'
                           : 'Recent: ${progress.recentCorrect}/${progress.recent.length} on your own · ${progress.assisted} with help',
                       style: const TextStyle(fontSize: 12),
                     ),
@@ -726,7 +733,11 @@ class _PracticePageState extends State<PracticePage>
               emptyClef: session.mode == NotationMode.bass ? 'bass' : 'treble',
               revealAnswer: _hints && session.correctionVisible,
               detectedMidi: _detectedMidi,
-              height: MediaQuery.sizeOf(context).height < 750 ? 185 : 238,
+              height: largeText
+                  ? 150
+                  : MediaQuery.sizeOf(context).height < 750
+                  ? 185
+                  : 238,
             ),
             const SizedBox(height: 10),
             Row(

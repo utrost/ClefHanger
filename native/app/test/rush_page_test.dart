@@ -8,6 +8,34 @@ import 'practice_session_test.dart' show FakeCore;
 import 'widget_test.dart' show FakeAudio;
 
 void main() {
+  testWidgets(
+    'Rush keeps timing but shows static notation when motion is disabled',
+    (tester) async {
+      final audio = FakeAudio();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: RushPage(
+              core: FakeCore(),
+              audio: audio,
+              lesson: 0,
+              nowMs: () => 0,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start 60-second Rush'));
+      await tester.pump();
+      expect(
+        tester.widget<PracticeStaff>(find.byType(PracticeStaff)).travelProgress,
+        isNull,
+      );
+      expect(find.text('Time 60s'), findsOneWidget);
+    },
+  );
+
   testWidgets('chord Rush presents chord buttons and never offers mic', (
     tester,
   ) async {

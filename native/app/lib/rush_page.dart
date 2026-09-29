@@ -300,6 +300,7 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final now = _now();
     final front = session.front;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
     final answers = widget.mode == NotationMode.treble
         ? <ModeAnswer>[
             for (final name in <String>{
@@ -400,7 +401,7 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
                         PracticeStaff(
                           note: front?.note,
                           detectedMidi: _detectedMidi,
-                          travelProgress: front == null
+                          travelProgress: front == null || reduceMotion
                               ? null
                               : ((session.phase == RushPhase.paused
                                             ? session.pausedAtMs!
