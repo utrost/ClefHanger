@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -35,9 +35,18 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: native/core -> target
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          cmdline-tools-version: '12266719'
+          log-accepted-android-sdk-licenses: false
       - name: Install Android Rust build helper
         run: |
-          sdkmanager "ndk;$NDK_VERSION"
+          sdkmanager "ndk;$NDK_VERSION" "build-tools;36.0.0" "platforms;android-36"
           echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
           cargo install cargo-ndk --version "$CARGO_NDK_VERSION" --locked
       - name: Prepare Android and Rust libraries
