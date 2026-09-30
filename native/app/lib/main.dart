@@ -4,6 +4,8 @@ import 'dart:math' as math;
 import 'dart:typed_data' show Endian;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'
+    show LicenseEntryWithLineBreaks, LicenseRegistry;
 import 'package:flutter/services.dart';
 
 import 'android_audio.dart';
@@ -19,6 +21,11 @@ import 'staff.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  LicenseRegistry.addLicense(() async* {
+    yield LicenseEntryWithLineBreaks([
+      'ClefHanger',
+    ], await rootBundle.loadString('assets/legal/LICENSE.txt'));
+  });
   try {
     runApp(
       ClefHangerApp(core: RustPracticeCore.open(), audio: AndroidAudioBridge()),
@@ -63,7 +70,12 @@ class ClefHangerApp extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     ),
-    home: PracticePage(core: core, audio: audio, rushNowMs: rushNowMs, nowMs: practiceNowMs),
+    home: PracticePage(
+      core: core,
+      audio: audio,
+      rushNowMs: rushNowMs,
+      nowMs: practiceNowMs,
+    ),
   );
 }
 
@@ -414,7 +426,9 @@ class _PracticePageState extends State<PracticePage>
   void _advanceAfterMicMatch(NativeNote? answered) {
     _nextNoteTimer?.cancel();
     _nextNoteTimer = Timer(const Duration(milliseconds: 650), () {
-      if (!mounted || !session.completed || !identical(session.prompt, answered)) {
+      if (!mounted ||
+          !session.completed ||
+          !identical(session.prompt, answered)) {
         return;
       }
       setState(() {
@@ -1103,6 +1117,16 @@ class _PracticePageState extends State<PracticePage>
                     title: const Text('Import browser progress'),
                     subtitle: const Text('Choose a ClefHanger JSON export'),
                     onTap: _importBrowserProgress,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.info_outline),
+                    title: const Text('Open-source licences'),
+                    subtitle: const Text('ClefHanger · AGPL-3.0-or-later'),
+                    onTap: () => showLicensePage(
+                      context: context,
+                      applicationName: 'ClefHanger',
+                      applicationLegalese: 'AGPL-3.0-or-later',
+                    ),
                   ),
                   const Padding(
                     padding: EdgeInsets.all(12),

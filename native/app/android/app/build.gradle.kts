@@ -1,49 +1,69 @@
 plugins {
     id("com.android.application")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+}
+
+// Unsigned release builds are useful to F-Droid. Never fall back to debug signing.
+val signingNames = listOf("CLEFHANGER_RELEASE_KEYSTORE", "CLEFHANGER_RELEASE_STORE_PASSWORD",
+    "CLEFHANGER_RELEASE_KEY_ALIAS", "CLEFHANGER_RELEASE_KEY_PASSWORD")
+val configuredSecrets = signingNames.count { !System.getenv(it).isNullOrBlank() }
+require(configuredSecrets == 0 || configuredSecrets == signingNames.size) {
+    "Set all four CLEFHANGER_RELEASE signing variables, or none for unsigned artifacts"
+}
+val releaseKey = System.getenv("CLEFHANGER_RELEASE_KEYSTORE")?.takeIf { it.isNotBlank() }
+fun signingSecret(name: String): String = requireNotNull(System.getenv(name)) {
+    "Missing release signing environment variable: $name"
 }
 
 android {
     namespace = "com.simiono.clefhanger"
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
-
+    compileSdk = 36
+    ndkVersion = "28.2.13676358"
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.simiono.clefhanger"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
-        // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
-        // You can force using the value of versionCode by specifying the `-P force-version-code-ignoring-abi=true`
-        // flag during build.
+        minSdk = 24
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
-
+    signingConfigs {
+        if (releaseKey != null) {
+            create("production") {
+                storeFile = file(releaseKey)
+                storePassword = signingSecret("CLEFHANGER_RELEASE_STORE_PASSWORD")
+                keyAlias = signingSecret("CLEFHANGER_RELEASE_KEY_ALIAS")
+                keyPassword = signingSecret("CLEFHANGER_RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (releaseKey != null) signingConfigs.getByName("production") else null
         }
     }
 }
-
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
+flutter { source = "../.." }
 
-flutter {
-    source = "../.."
+// Check resolved Maven dependencies before shrinking can hide SDK class names.
+val verifyFreeDependencies by tasks.registering {
+    doLast {
+        val forbidden = configurations.getByName("releaseRuntimeClasspath")
+            .incoming.resolutionResult.allComponents.filter {
+                val group = it.moduleVersion?.group.orEmpty()
+                group.startsWith("com.google.android.gms") || group.startsWith("com.google.firebase")
+            }
+        check(forbidden.isEmpty()) { "Non-free runtime dependencies: $forbidden" }
+    }
+}
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    dependsOn(verifyFreeDependencies)
 }

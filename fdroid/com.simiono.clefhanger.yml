@@ -1,0 +1,27 @@
+# Disabled submission draft; no claim of a validated F-Droid recipe.
+Disabled: Awaiting tagged source recipe and F-Droid validation
+Categories:
+  - Multimedia
+  - Science & Education
+License: AGPL-3.0-or-later
+SourceCode: https://github.com/utrost/ClefHanger
+IssueTracker: https://github.com/utrost/ClefHanger/issues
+RepoType: git
+Repo: https://github.com/utrost/ClefHanger.git
+AutoName: ClefHanger
+Summary: Learn to read music by singing and playing notes
+Description: |-
+  Practise staff notation with microphone feedback, reference tones, touch
+  answers and timed challenges. Progress is stored locally. No account needed.
+MaintainerNotes: |-
+  Flutter application in native/app with Rust libraries built from native/core.
+  Native audio and microphone use Android framework APIs, without Google Play
+  services or Firebase. Pin toolchains using native/tools/toolchain.env.
+  Release builds are unsigned by default; no upstream private key is required.
+  Before enabling, validate a tagged recipe
+  with fdroidserver, including toolchain provisioning and dependency scans.
+  Build entry point: native/tools/prepare_android.sh. Release output:
+  native/app/build/app/outputs/flutter-apk/app-release.apk.
+  See native/docs/distribution.md for signing and submission requirements.
+AutoUpdateMode: None
+UpdateCheckMode: None

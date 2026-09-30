@@ -20,19 +20,26 @@ jobs:
           CLEFHANGER_TEST_KEYSTORE: ${{ secrets.CLEFHANGER_TEST_KEYSTORE }}
         run: python3 tools/install_test_signing.py --destination "$RUNNER_TEMP/clefhanger-test.keystore"
 
+      - name: Read pinned toolchain
+        run: cat native/tools/toolchain.env >> "$GITHUB_ENV"
       - uses: subosito/flutter-action@v2
         with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
           cache: true
       - uses: dtolnay/rust-toolchain@stable
         with:
+          toolchain: ${{ env.RUST_VERSION }}
           components: clippy, rustfmt
           targets: aarch64-linux-android,x86_64-linux-android
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: native/core -> target
       - name: Install Android Rust build helper
-        run: cargo install cargo-ndk --locked
+        run: |
+          sdkmanager "ndk;$NDK_VERSION"
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+          cargo install cargo-ndk --version "$CARGO_NDK_VERSION" --locked
       - name: Prepare Android and Rust libraries
         run: native/tools/prepare_android.sh
       - name: Test Rust
@@ -47,31 +54,33 @@ jobs:
           CLEFHANGER_NATIVE_TESTS: '1'
           LD_LIBRARY_PATH: ${{ github.workspace }}/native/core/target/release
         run: |
-          flutter pub get
+          flutter pub get --enforce-lockfile
           flutter analyze
           flutter test
       - name: Build versioned APK
         working-directory: native/app
-        run: flutter build apk --debug --target-platform android-arm64,android-x64 --build-number "$((1000 + GITHUB_RUN_NUMBER))"
+        run: flutter build apk --release --target-platform android-arm64,android-x64 --build-number "$((1000 + GITHUB_RUN_NUMBER))"
       - name: Check packaged Rust ABIs
         run: |
           python3 - <<'PY'
           from zipfile import ZipFile
-          apk = 'native/app/build/app/outputs/flutter-apk/app-debug.apk'
+          apk = 'native/app/build/app/outputs/flutter-apk/app-release.apk'
           with ZipFile(apk) as package:
               names = set(package.namelist())
           for abi in ('arm64-v8a', 'x86_64'):
               assert f'lib/{abi}/libclefhanger_core.so' in names
           PY
+      - name: Verify release packaging
+        run: python3 tools/verify_store_build.py native/app/build/app/outputs/flutter-apk/app-release.apk --build-tools "$ANDROID_HOME/build-tools/36.0.0"
       - name: Sign and verify APK
-        run: python3 tools/sign_test_apk.py native/app/build/app/outputs/flutter-apk/app-debug.apk --keystore "$RUNNER_TEMP/clefhanger-test.keystore" --version "$((1000 + GITHUB_RUN_NUMBER))"
+        run: python3 tools/sign_test_apk.py native/app/build/app/outputs/flutter-apk/app-release.apk --keystore "$RUNNER_TEMP/clefhanger-test.keystore" --version "$((1000 + GITHUB_RUN_NUMBER))"
       - name: Publish GitHub prerelease
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag="native-test-${GITHUB_RUN_NUMBER}"
           asset="clefhanger-native-test-${GITHUB_RUN_NUMBER}.apk"
-          cp native/app/build/app/outputs/flutter-apk/app-debug.apk "$asset"
+          cp native/app/build/app/outputs/flutter-apk/app-release.apk "$asset"
           notes="$RUNNER_TEMP/native-test-notes.md"
           cat > "$notes" <<EOF
           ClefHanger Android test APK built from ${GITHUB_SHA}.

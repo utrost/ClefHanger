@@ -6,6 +6,8 @@ This is the single planning document for product direction, delivery priorities,
 
 The native branch now covers Practice, Rush, five notation modes, touch/piano answers, microphone guidance, teaching, diagnostic capture, local progress, and a manual PWA-to-Android progress transfer. A persistent test certificate and versioned APK prerelease workflow support in-place updates within the test series; see [Android updates](../native/docs/android-updates.md). The PWA remains the available product. Native release readiness still requires real-phone microphone and audio testing, accessibility review, and a production distribution/signing decision; see [native parity](../native/docs/parity.md) and [validation](../native/docs/validation.md).
 
+Store preparation now includes a Google-independent release build, APK/AAB packaging checks and disabled F-Droid metadata. The project is now AGPL-3.0-or-later. Production signing, F-Droid source-build validation and store submission remain open; see [distribution preparation](../native/docs/distribution.md).
+
 **Highest product priority: validate the mobile learning loop on physical phones (P1). The settings/status extraction (P2) is complete.** While device evidence is unavailable, the next bounded maintenance slice is P5: migrate the older browser suites to the existing shared, timeout-bounded harness. Do not expand microphone-dependent lessons before P1 establishes a reliable baseline.
 
 ## Product direction

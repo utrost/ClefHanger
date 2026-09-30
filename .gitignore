@@ -3,5 +3,6 @@
 /native/app/android/app/src/main/jniLibs/
 /native/app/.dart_tool/
 /native/app/build/
+/native/app/android/build/
 /.local/
 __pycache__/

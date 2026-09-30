@@ -108,3 +108,7 @@ Then open `http://localhost:4173/`.
 - [Roadmap](docs/roadmap.md) — product direction, verified capabilities, prioritized next slices, and completion criteria.
 - [Architecture notes](docs/architecture.md)
 - [Smoke checklist](docs/smoke-checklist.md)
+
+## Licence
+
+Original ClefHanger code and assets are licensed under the GNU Affero General Public License, version 3 or (at your option) any later version ([AGPL-3.0-or-later](LICENSE)). Third-party components retain their own licences.

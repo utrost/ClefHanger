@@ -14,9 +14,13 @@ Scope gaps: physical-device microphone/audio validation, accessibility review, a
 
 To move existing Practice progress and Rush best scores, open the PWA's Settings and choose **Export progress JSON**. Move the downloaded file to the Android device, then choose **Import browser progress** in the native app's Settings. Review the record count before confirming. Import keeps the record with more attempts and the higher score; it does not replace other native settings. The export contains no microphone audio or reports.
 
+## Store candidates
+
+The native runtime does not depend on Google Play services. Release builds enforce that boundary and produce an offline APK and Play App Bundle from the same source. See [distribution preparation](docs/distribution.md) for verified checks and remaining Google Play/F-Droid submission work.
+
 ## Build and run
 
-Prerequisites: Flutter 3.41+, Rust with `aarch64-linux-android` and `x86_64-linux-android` targets, `cargo-ndk`, Android SDK and NDK, and an Android phone/emulator. Set `ANDROID_HOME` to the SDK; the preparation script finds the newest installed NDK, or you can set `ANDROID_NDK_HOME` explicitly. The project has no Dart dependencies beyond `ffi` and test/lint packages.
+Prerequisites: the pinned Flutter and Rust versions in `tools/toolchain.env`, Rust with `aarch64-linux-android` and `x86_64-linux-android` targets, `cargo-ndk`, Android SDK and NDK, and an Android phone/emulator. Set `ANDROID_HOME` to the SDK; the preparation script finds the newest installed NDK, or you can set `ANDROID_NDK_HOME` explicitly. The project has no Dart dependencies beyond `ffi` and test/lint packages.
 
 ```bash
 export PATH="<flutter-sdk>/bin:$PATH"
