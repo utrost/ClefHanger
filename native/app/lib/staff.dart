@@ -8,6 +8,8 @@ class PracticeStaff extends StatelessWidget {
     required this.note,
     this.revealAnswer = false,
     this.detectedMidi,
+    this.matchProgress = 0,
+    this.completed = false,
     this.travelProgress,
     this.previewNotes = const [],
     this.height = 238,
@@ -16,21 +18,34 @@ class PracticeStaff extends StatelessWidget {
   final NativeNote? note;
   final bool revealAnswer;
   final int? detectedMidi;
+  final double matchProgress;
+  final bool completed;
   final double? travelProgress;
   final List<NativeNote> previewNotes;
   final double height;
   final String emptyClef;
+  String _semanticsLabel() {
+    final prompt = note;
+    if (prompt == null) return 'Empty $emptyClef staff. Start practice to see a note.';
+    if (prompt.isChord) {
+      return revealAnswer
+          ? 'Treble staff chord ${prompt.displayName}.'
+          : 'Treble staff chord with three stacked notes. Name the chord.';
+    }
+    final clef = prompt.clef == 'bass' ? 'Bass' : 'Treble';
+    final accidental = prompt.accidental == null
+        ? ''
+        : ' with a ${prompt.accidental == '♯' ? 'sharp' : 'flat'}';
+    final target = revealAnswer
+        ? '$clef staff note ${prompt.displayName}, ${_position(prompt.staffStep)}.'
+        : '$clef staff note at ${_position(prompt.staffStep)}$accidental. Sing or name it.';
+    if (detectedMidi == null) return target;
+    return '$target Microphone hears ${_midiName(detectedMidi!)}. The green note shows its staff position near the target octave.';
+  }
+
   @override
   Widget build(BuildContext context) => Semantics(
-    label: note == null
-        ? 'Empty $emptyClef staff. Start practice to see a note.'
-        : note!.isChord
-        ? revealAnswer
-              ? 'Treble staff chord ${note!.displayName}.'
-              : 'Treble staff chord with three stacked notes. Name the chord.'
-        : revealAnswer
-        ? '${note!.clef == 'bass' ? 'Bass' : 'Treble'} staff note ${note!.displayName}, ${_position(note!.staffStep)}.'
-        : '${note!.clef == 'bass' ? 'Bass' : 'Treble'} staff note at ${_position(note!.staffStep)}${note!.accidental == null ? '' : ' with a ${note!.accidental == '♯' ? 'sharp' : 'flat'}'}. Sing or name it.',
+    label: _semanticsLabel(),
     child: Container(
       height: height,
       clipBehavior: Clip.antiAlias,
@@ -43,6 +58,8 @@ class PracticeStaff extends StatelessWidget {
           note: note,
           revealAnswer: revealAnswer,
           detectedMidi: detectedMidi,
+          matchProgress: matchProgress,
+          completed: completed,
           travelProgress: travelProgress,
           previewNotes: previewNotes,
           emptyClef: emptyClef,
@@ -50,6 +67,30 @@ class PracticeStaff extends StatelessWidget {
         child: const SizedBox.expand(),
       ),
     ),
+  );
+}
+
+String _midiName(int midi) =>
+    '${const ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'][midi % 12]}${midi ~/ 12 - 1}';
+
+/// Keep the live note beside the target even when a singer uses another octave.
+/// The readout and semantics still report the actual detected octave.
+NativeNote ghostPitchForMidi(NativeNote target, int detectedMidi) {
+  final shownMidi = detectedMidi +
+      (((target.midi - detectedMidi) / 12).round() * 12);
+  final pitchClass = shownMidi % 12;
+  final useFlats = target.accidental == '♭';
+  const sharpLetters = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
+  const flatLetters = [0, 1, 1, 2, 2, 3, 4, 4, 5, 5, 6, 6];
+  final isBlackKey = const [1, 3, 6, 8, 10].contains(pitchClass);
+  return NativeNote(
+    id: -1,
+    midi: shownMidi,
+    staffStep: (target.clef == 'bass' ? 10 : -2) +
+        (shownMidi ~/ 12 - 5) * 7 +
+        (useFlats ? flatLetters : sharpLetters)[pitchClass],
+    clef: target.clef,
+    accidental: isBlackKey ? (useFlats ? '♭' : '♯') : null,
   );
 }
 
@@ -66,6 +107,8 @@ class _StaffPainter extends CustomPainter {
     required this.note,
     required this.revealAnswer,
     required this.detectedMidi,
+    required this.matchProgress,
+    required this.completed,
     required this.travelProgress,
     required this.previewNotes,
     required this.emptyClef,
@@ -73,6 +116,8 @@ class _StaffPainter extends CustomPainter {
   final NativeNote? note;
   final bool revealAnswer;
   final int? detectedMidi;
+  final double matchProgress;
+  final bool completed;
   final double? travelProgress;
   final List<NativeNote> previewNotes;
   final String emptyClef;
@@ -85,13 +130,13 @@ class _StaffPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
     const left = 48.0;
     final right = size.width - 24;
-    final bottom = size.height * 0.69;
-    const gap = 22.0;
+    final compact = size.height < 190;
+    final bottom = size.height * (compact ? 0.65 : 0.69);
+    final gap = compact ? 16.0 : 22.0;
     for (var line = 0; line < 5; line++) {
       final y = bottom - line * gap;
       canvas.drawLine(Offset(left, y), Offset(right, y), ink);
     }
-    final compact = size.height < 190;
     final clef = TextPainter(
       text: TextSpan(
         text: (note?.clef ?? emptyClef) == 'bass' ? '𝄢' : '𝄞',
@@ -157,7 +202,37 @@ class _StaffPainter extends CustomPainter {
         : 125 +
               math.max(0.0, size.width * 0.66 - 125) *
                   (1 - travelProgress!.clamp(0.0, 1.0));
-    _drawPrompt(canvas, note!, x, bottom, gap, const Color(0xFF241A28));
+    if (detectedMidi != null && !note!.isChord && !completed) {
+      _drawPrompt(
+        canvas,
+        ghostPitchForMidi(note!, detectedMidi!),
+        math.max(112.0, x - 76),
+        bottom,
+        gap,
+        const Color(0xB360BFA2),
+      );
+    }
+    _drawPrompt(
+      canvas,
+      note!,
+      x,
+      bottom,
+      gap,
+      completed ? const Color(0xFF2F9A72) : const Color(0xFF241A28),
+    );
+    if (matchProgress > 0 && !note!.isChord) {
+      final center = Offset(x, bottom - note!.staffStep * gap / 2);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: 25),
+        -math.pi / 2,
+        2 * math.pi * matchProgress.clamp(0.0, 1.0),
+        false,
+        Paint()
+          ..color = const Color(0xFF2F9A72)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3.5,
+      );
+    }
     if (revealAnswer) {
       final label = TextPainter(
         text: TextSpan(
@@ -173,23 +248,9 @@ class _StaffPainter extends CustomPainter {
       label.paint(canvas, Offset(x - label.width / 2, bottom + 31));
     }
     if (detectedMidi != null) {
-      final midiLabel = const [
-        'C',
-        'C♯',
-        'D',
-        'D♯',
-        'E',
-        'F',
-        'F♯',
-        'G',
-        'G♯',
-        'A',
-        'A♯',
-        'B',
-      ][detectedMidi! % 12];
       final readout = TextPainter(
         text: TextSpan(
-          text: 'Mic: $midiLabel${detectedMidi! ~/ 12 - 1}',
+          text: 'Mic: ${_midiName(detectedMidi!)}',
           style: const TextStyle(
             color: Color(0xFF266F60),
             fontSize: 15,
@@ -296,6 +357,8 @@ class _StaffPainter extends CustomPainter {
       old.note != note ||
       old.revealAnswer != revealAnswer ||
       old.detectedMidi != detectedMidi ||
+      old.matchProgress != matchProgress ||
+      old.completed != completed ||
       old.travelProgress != travelProgress ||
       old.previewNotes != previewNotes ||
       old.emptyClef != emptyClef;

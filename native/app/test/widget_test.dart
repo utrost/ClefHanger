@@ -53,7 +53,56 @@ class FakeAudio implements AudioBridge {
   }
 }
 
+class SingingCore extends FakeCore {
+  double heardHz = 0;
+  @override
+  double detect(Uint8List data, int sampleRate) => heardHz;
+}
+
 void main() {
+  testWidgets('live pitch draws a ghost and advances after a full second', (
+    tester,
+  ) async {
+    final audio = FakeAudio();
+    final core = SingingCore();
+    var now = 1000;
+    await tester.pumpWidget(ClefHangerApp(
+      core: core,
+      audio: audio,
+      practiceNowMs: () => now,
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start practice'));
+    await tester.scrollUntilVisible(find.text('Check mic'), 140);
+    await tester.tap(find.text('Check mic'));
+    await tester.pump();
+    await tester.scrollUntilVisible(find.byType(PracticeStaff), -140);
+    final first = tester.widget<PracticeStaff>(find.byType(PracticeStaff));
+    core.heardHz = core.frequency(first.note!.midi);
+
+    audio.controller.add(Uint8List(8192));
+    await tester.pump();
+    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).detectedMidi,
+        first.note!.midi);
+    now = 1999;
+    audio.controller.add(Uint8List(8192));
+    await tester.pump();
+    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
+        false);
+    now = 2000;
+    audio.controller.add(Uint8List(8192));
+    await tester.pump();
+    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
+        true);
+    expect(audio.saved['first-steps'], contains('"correct":1'));
+    await tester.pump(const Duration(milliseconds: 650));
+    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
+        false);
+    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).note,
+        isNot(same(first.note)));
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('browser import previews and persists newer progress', (
     tester,
   ) async {

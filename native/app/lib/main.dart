@@ -40,10 +40,12 @@ class ClefHangerApp extends StatelessWidget {
     required this.core,
     required this.audio,
     this.rushNowMs,
+    this.practiceNowMs,
   });
   final PracticeCore core;
   final AudioBridge audio;
   final int Function()? rushNowMs;
+  final int Function()? practiceNowMs;
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'ClefHanger',
@@ -61,7 +63,7 @@ class ClefHangerApp extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     ),
-    home: PracticePage(core: core, audio: audio, rushNowMs: rushNowMs),
+    home: PracticePage(core: core, audio: audio, rushNowMs: rushNowMs, nowMs: practiceNowMs),
   );
 }
 
@@ -71,10 +73,12 @@ class PracticePage extends StatefulWidget {
     required this.core,
     required this.audio,
     this.rushNowMs,
+    this.nowMs,
   });
   final PracticeCore core;
   final AudioBridge audio;
   final int Function()? rushNowMs;
+  final int Function()? nowMs;
   @override
   State<PracticePage> createState() => _PracticePageState();
 }
@@ -102,10 +106,12 @@ class _PracticePageState extends State<PracticePage>
   bool _recordingTest = false;
   MicDiagnosticCapture? _recordCapture;
   MicCaptureSummary? _lastRecording;
+  Timer? _nextNoteTimer;
   String _recordMessage = 'No recording test yet.';
   String _captureLabel = 'voice';
   String _calibrationMessage = 'Play A for an optional pitch reference.';
   final Stopwatch _clock = Stopwatch()..start();
+  int _now() => widget.nowMs?.call() ?? _clock.elapsedMilliseconds;
 
   @override
   void initState() {
@@ -250,6 +256,7 @@ class _PracticePageState extends State<PracticePage>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _nextNoteTimer?.cancel();
     _micSubscription?.cancel();
     widget.audio.stop();
     widget.core.dispose();
@@ -258,6 +265,9 @@ class _PracticePageState extends State<PracticePage>
 
   Future<void> _startMic() async {
     if (_micOn || _micStarting) return;
+    session.resetMicMatch();
+    _window = Uint8List(8192);
+    _receivedSamples = 0;
     setState(() {
       _micStarting = true;
       _permissionDenied = false;
@@ -294,6 +304,7 @@ class _PracticePageState extends State<PracticePage>
   }
 
   Future<void> _stopMic() async {
+    session.resetMicMatch();
     _recordingTest = false;
     _recordCapture = null;
     await _micSubscription?.cancel();
@@ -339,9 +350,10 @@ class _PracticePageState extends State<PracticePage>
     _receivedSamples += packet.length ~/ 2;
     if (_receivedSamples < 4096) return;
     final hz = widget.core.detect(_window, 16000);
-    final now = _clock.elapsedMilliseconds;
+    final now = _now();
     final midi = widget.core.nearestMidi(hz);
     _lastFrequency = hz;
+    if (session.completed) return;
     if (!session.canScore(now)) {
       setState(() {
         _detectedMidi = midi < 0 ? null : midi;
@@ -359,6 +371,7 @@ class _PracticePageState extends State<PracticePage>
       return;
     }
     if (hz <= 0 || midi < 0) {
+      session.resetMicMatch();
       setState(() {
         _detectedMidi = null;
         _micGuide = 'Listening… hold one steady note near the phone.';
@@ -368,6 +381,7 @@ class _PracticePageState extends State<PracticePage>
     final prompt = session.prompt;
     final result = session.hearFrequency(hz, now, anyOctave: _anyOctave);
     if (result != AnswerResult.ignored) _persist(session.mode, session.lesson);
+    if (result == AnswerResult.correct) _advanceAfterMicMatch(prompt);
     final status = prompt == null
         ? 0
         : widget.core.classify(hz, prompt.midi, anyOctave: _anyOctave);
@@ -388,12 +402,26 @@ class _PracticePageState extends State<PracticePage>
     setState(() {
       _detectedMidi = midi;
       _micGuide = result == AnswerResult.correct
-          ? 'Matched ${prompt!.name}! Choose the next note.'
+          ? 'Matched ${prompt!.name}! Next note coming…'
           : status == 4
-          ? 'Hold $noteName steady…'
+          ? 'Hold $noteName steady for one second…'
           : status == 3
           ? 'I hear $noteName${midi ~/ 12 - 1}. Try the written octave, or turn Match any octave on.'
           : 'I hear $noteName${midi ~/ 12 - 1}. Aim for ${prompt?.name ?? 'the staff note'}.';
+    });
+  }
+
+  void _advanceAfterMicMatch(NativeNote? answered) {
+    _nextNoteTimer?.cancel();
+    _nextNoteTimer = Timer(const Duration(milliseconds: 650), () {
+      if (!mounted || !session.completed || !identical(session.prompt, answered)) {
+        return;
+      }
+      setState(() {
+        session.next();
+        _detectedMidi = null;
+        _micGuide = 'Next note. Sing the black note and hold it steady.';
+      });
     });
   }
 
@@ -407,7 +435,7 @@ class _PracticePageState extends State<PracticePage>
   }
 
   Future<void> _hear() async {
-    final now = _clock.elapsedMilliseconds;
+    final now = _now();
     setState(() => session.hear(now));
     try {
       final prompt = session.prompt!;
@@ -480,7 +508,7 @@ class _PracticePageState extends State<PracticePage>
   }
 
   Future<void> _playCalibrationTone() async {
-    session.blockPlayback(_clock.elapsedMilliseconds, playbackMs: 1100);
+    session.blockPlayback(_now(), playbackMs: 1100);
     try {
       await widget.audio.playTone(440);
       if (mounted) {
@@ -756,6 +784,8 @@ class _PracticePageState extends State<PracticePage>
               emptyClef: session.mode == NotationMode.bass ? 'bass' : 'treble',
               revealAnswer: _hints && session.correctionVisible,
               detectedMidi: _detectedMidi,
+              matchProgress: session.micMatchProgress(_now()),
+              completed: session.completed,
               height: largeText
                   ? 150
                   : MediaQuery.sizeOf(context).height < 750

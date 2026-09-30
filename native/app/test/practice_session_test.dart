@@ -89,12 +89,12 @@ void main() {
       final core = FakeCore();
       final session = PracticeSession(core, seed: 0)..hear(1000);
       expect(session.prompt!.name, 'C');
-      expect(session.canScore(1879), false);
-      expect(session.canScore(1880), true);
+      expect(session.canScore(2019), false);
+      expect(session.canScore(2020), true);
       final hz = core.frequency(60);
-      expect(session.hearFrequency(hz, 1880), AnswerResult.ignored);
-      expect(session.hearFrequency(hz, 2029), AnswerResult.ignored);
-      expect(session.hearFrequency(hz, 2030), AnswerResult.correct);
+      expect(session.hearFrequency(hz, 2020), AnswerResult.ignored);
+      expect(session.hearFrequency(hz, 3019), AnswerResult.ignored);
+      expect(session.hearFrequency(hz, 3020), AnswerResult.correct);
       expect(session.currentProgress.assisted, 1);
       expect(session.currentProgress.recent, isEmpty);
     },
@@ -120,11 +120,23 @@ void main() {
       session.hearFrequency(core.frequency(60), 1300),
       AnswerResult.ignored,
     );
-    expect(
-      session.hearFrequency(core.frequency(60), 1450),
-      AnswerResult.correct,
-    );
+    expect(session.micMatchProgress(1800), closeTo(0.5, 0.001));
+    expect(session.hearFrequency(core.frequency(60), 2299), AnswerResult.ignored);
+    expect(session.hearFrequency(core.frequency(60), 2300), AnswerResult.correct);
     expect(session.currentProgress.recent, [true]);
+  });
+
+  test('silence resets the one-second microphone hold', () {
+    final core = FakeCore();
+    final session = PracticeSession(core, seed: 0)..start();
+    final hz = core.frequency(60);
+    expect(session.hearFrequency(hz, 1000), AnswerResult.ignored);
+    expect(session.micMatchProgress(1500), 0.5);
+    session.resetMicMatch();
+    expect(session.micMatchProgress(1500), 0);
+    expect(session.hearFrequency(hz, 1900), AnswerResult.ignored);
+    expect(session.hearFrequency(hz, 2899), AnswerResult.ignored);
+    expect(session.hearFrequency(hz, 2900), AnswerResult.correct);
   });
 
   test('concert A playback blocks self scoring without marking help', () {
@@ -140,7 +152,7 @@ void main() {
       AnswerResult.ignored,
     );
     expect(
-      session.hearFrequency(core.frequency(60), 2550),
+      session.hearFrequency(core.frequency(60), 3400),
       AnswerResult.correct,
     );
     expect(session.currentProgress.assisted, 0);
@@ -160,7 +172,7 @@ void main() {
         AnswerResult.ignored,
       );
       expect(
-        session.hearFrequency(core.frequency(61), 250),
+        session.hearFrequency(core.frequency(61), 1100),
         AnswerResult.correct,
       );
       expect(session.currentProgress.correct, 1);

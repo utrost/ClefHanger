@@ -56,6 +56,7 @@ enum AnswerResult { ignored, correct, wrong }
 
 /// The untimed learning loop. Audio callbacks supply monotonic timestamps.
 class PracticeSession {
+  static const micHoldMs = 1000;
   PracticeSession(this.core, {int seed = 1}) : _seed = seed;
   final PracticeCore core;
   int _seed;
@@ -144,7 +145,7 @@ class PracticeSession {
     feedback = 'Skipped. Here is another practice note.';
   }
 
-  void hear(int nowMs, {int playbackMs = 580}) {
+  void hear(int nowMs, {int playbackMs = 720}) {
     if (!started) start();
     helped = true;
     blockPlayback(nowMs, playbackMs: playbackMs);
@@ -153,7 +154,7 @@ class PracticeSession {
         : 'Listen, then sing the note back. Scoring waits until the sound finishes.';
   }
 
-  void blockPlayback(int nowMs, {int playbackMs = 580}) {
+  void blockPlayback(int nowMs, {int playbackMs = 720}) {
     _candidateSinceMs = null;
     _playbackBlockedUntilMs = max(
       _playbackBlockedUntilMs,
@@ -164,6 +165,14 @@ class PracticeSession {
   void revealGuide() {
     helped = true;
   }
+
+  void resetMicMatch() => _candidateSinceMs = null;
+
+  double micMatchProgress(int nowMs) => completed
+      ? 1
+      : _candidateSinceMs == null
+      ? 0
+      : ((nowMs - _candidateSinceMs!) / micHoldMs).clamp(0.0, 1.0).toDouble();
 
   AnswerResult answer(String name, {bool showCorrection = true}) {
     if (prompt == null || completed) return AnswerResult.ignored;
@@ -217,7 +226,7 @@ class PracticeSession {
       return AnswerResult.ignored;
     }
     _candidateSinceMs ??= nowMs;
-    if (nowMs - _candidateSinceMs! < 150) return AnswerResult.ignored;
+    if (nowMs - _candidateSinceMs! < micHoldMs) return AnswerResult.ignored;
     return answer(prompt!.name);
   }
 }

@@ -209,14 +209,17 @@ class MainActivity : FlutterActivity() {
     /** Short piano-like reference tone. Dart blocks scoring until sound + acoustic tail ends. */
     private fun playNotes(frequencies: List<Double>) {
         Thread {
-            val length = (sampleRate * 0.58).toInt()
+            val duration = 0.72
+            val length = (sampleRate * duration).toInt()
             val pcm = ShortArray(length) { index ->
                 val t = index.toDouble() / sampleRate
-                val envelope = (1.0 - index.toDouble() / length).let { it * it }
+                val envelope = minOf(1.0, t / 0.015, (duration - t) / 0.16)
                 val wave = frequencies.sumOf { frequency ->
-                    sin(2 * PI * frequency * t) + 0.25 * sin(4 * PI * frequency * t)
+                    // Extra harmonics keep low notes audible on small phone speakers.
+                    (sin(2 * PI * frequency * t) + 0.55 * sin(4 * PI * frequency * t) +
+                        0.25 * sin(6 * PI * frequency * t)) / 1.8
                 } / frequencies.size
-                (wave * envelope * 9000).toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
+                (wave * envelope * 27000).toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
             }
             var output: AudioTrack? = null
             try {
@@ -228,7 +231,7 @@ class MainActivity : FlutterActivity() {
                     .build()
                 output.write(pcm, 0, pcm.size)
                 output.play()
-                Thread.sleep(700)
+                Thread.sleep(820)
             } catch (_: Exception) {
                 // Audio output can disappear while this short tone is playing.
             } finally {
