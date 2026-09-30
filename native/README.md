@@ -1,6 +1,6 @@
 # ClefHanger native Android port
 
-This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The static PWA in the repository root remains the current implementation. CI publishes a debug APK artifact for review; there is no production Android release or store listing.
+This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The static PWA in the repository root remains the current implementation. CI publishes a debug APK artifact and an updateable, test-signed [GitHub prerelease](https://github.com/utrost/ClefHanger/releases) for review; there is no production Android release or store listing. See [Android test APK updates](docs/android-updates.md) before installing or replacing a test build.
 
 ## What runs
 
@@ -10,7 +10,7 @@ This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The
 - Practice offers Listen and imitate, visible microphone guidance, note-button and one-octave piano fallbacks, a first-run three-tip tutorial, an illustrated swipe-through note guide, session restart, corrections, saved assisted/independent progress and settings, an 8-of-10 next-lesson invitation, and a Mic Lab one-second PCM test with a copyable measurements-only report. Mic Lab also has an optional concert A reference and capture labels. Chords use touch answers because single-pitch detection cannot identify a chord.
 - Android ARM64 and emulator x64 Rust libraries are cross-compiled into the debug APK.
 
-Scope gaps: physical-device microphone/audio validation, accessibility review, and a release signing/distribution decision remain. See the [parity tracker](docs/parity.md) and [recorded emulator validation](docs/validation.md). The existing PWA remains available. Emulator startup and touch behavior do not establish physical microphone accuracy; test on Android phones before treating the native audio path as reliable. iOS has not been configured.
+Scope gaps: physical-device microphone/audio validation, accessibility review, and a production signing/distribution decision remain. See the [parity tracker](docs/parity.md) and [recorded emulator validation](docs/validation.md). The existing PWA remains available. Emulator startup and touch behavior do not establish physical microphone accuracy; test on Android phones before treating the native audio path as reliable. iOS has not been configured.
 
 To move existing Practice progress and Rush best scores, open the PWA's Settings and choose **Export progress JSON**. Move the downloaded file to the Android device, then choose **Import browser progress** in the native app's Settings. Review the record count before confirming. Import keeps the record with more attempts and the higher score; it does not replace other native settings. The export contains no microphone audio or reports.
 

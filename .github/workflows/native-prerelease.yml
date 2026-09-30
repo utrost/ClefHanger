@@ -1,0 +1,93 @@
+name: Native Android prerelease
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [feat/flutter-rust-port]
+    paths: [native/**, tools/**, .github/workflows/native-prerelease.yml]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pinned test signing key
+        env:
+          CLEFHANGER_TEST_KEYSTORE: ${{ secrets.CLEFHANGER_TEST_KEYSTORE }}
+        run: python3 tools/install_test_signing.py --destination "$RUNNER_TEMP/clefhanger-test.keystore"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+          targets: aarch64-linux-android,x86_64-linux-android
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: native/core -> target
+      - name: Install Android Rust build helper
+        run: cargo install cargo-ndk --locked
+      - name: Prepare Android and Rust libraries
+        run: native/tools/prepare_android.sh
+      - name: Test Rust
+        run: |
+          cargo fmt --manifest-path native/core/Cargo.toml --check
+          cargo clippy --manifest-path native/core/Cargo.toml --all-targets -- -D warnings
+          cargo test --manifest-path native/core/Cargo.toml
+          cargo build --manifest-path native/core/Cargo.toml --release
+      - name: Test Flutter and real host FFI
+        working-directory: native/app
+        env:
+          CLEFHANGER_NATIVE_TESTS: '1'
+          LD_LIBRARY_PATH: ${{ github.workspace }}/native/core/target/release
+        run: |
+          flutter pub get
+          flutter analyze
+          flutter test
+      - name: Build versioned APK
+        working-directory: native/app
+        run: flutter build apk --debug --target-platform android-arm64,android-x64 --build-number "$((1000 + GITHUB_RUN_NUMBER))"
+      - name: Check packaged Rust ABIs
+        run: |
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          apk = 'native/app/build/app/outputs/flutter-apk/app-debug.apk'
+          with ZipFile(apk) as package:
+              names = set(package.namelist())
+          for abi in ('arm64-v8a', 'x86_64'):
+              assert f'lib/{abi}/libclefhanger_core.so' in names
+          PY
+      - name: Sign and verify APK
+        run: python3 tools/sign_test_apk.py native/app/build/app/outputs/flutter-apk/app-debug.apk --keystore "$RUNNER_TEMP/clefhanger-test.keystore" --version "$((1000 + GITHUB_RUN_NUMBER))"
+      - name: Publish GitHub prerelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="native-test-${GITHUB_RUN_NUMBER}"
+          asset="clefhanger-native-test-${GITHUB_RUN_NUMBER}.apk"
+          cp native/app/build/app/outputs/flutter-apk/app-debug.apk "$asset"
+          notes="$RUNNER_TEMP/native-test-notes.md"
+          cat > "$notes" <<EOF
+          ClefHanger Android test APK built from ${GITHUB_SHA}.
+
+          Download the APK asset directly on your Android phone. Android build number: $((1000 + GITHUB_RUN_NUMBER)).
+          This prerelease uses the persistent ClefHanger test signing certificate. Later prereleases using the same certificate and a higher build number install over it while retaining app data.
+          The earlier Actions debug APK used an ephemeral certificate and needs one uninstall before installing this series.
+          Physical-device microphone and audio validation remains in progress.
+          EOF
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$asset" --clobber
+          else
+            gh release create "$tag" "$asset" --target "$GITHUB_SHA" --title "ClefHanger Android test ${GITHUB_RUN_NUMBER}" --notes-file "$notes" --prerelease
+          fi
+          release_url="$(gh release view "$tag" --json url --jq .url)"
+          echo "Download the Android APK from [$tag]($release_url)." >> "$GITHUB_STEP_SUMMARY"
+      - name: Remove runner signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/clefhanger-test.keystore"
