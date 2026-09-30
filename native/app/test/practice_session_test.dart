@@ -93,6 +93,9 @@ void main() {
       expect(session.canScore(2020), true);
       final hz = core.frequency(60);
       expect(session.hearFrequency(hz, 2020), AnswerResult.ignored);
+      for (var t = 2120; t <= 2920; t += 100) {
+        session.hearFrequency(hz, t);
+      }
       expect(session.hearFrequency(hz, 3019), AnswerResult.ignored);
       expect(session.hearFrequency(hz, 3020), AnswerResult.correct);
       expect(session.currentProgress.assisted, 1);
@@ -121,8 +124,17 @@ void main() {
       AnswerResult.ignored,
     );
     expect(session.micMatchProgress(1800), closeTo(0.5, 0.001));
-    expect(session.hearFrequency(core.frequency(60), 2299), AnswerResult.ignored);
-    expect(session.hearFrequency(core.frequency(60), 2300), AnswerResult.correct);
+    for (var t = 1400; t <= 2200; t += 100) {
+      session.hearFrequency(core.frequency(60), t);
+    }
+    expect(
+      session.hearFrequency(core.frequency(60), 2299),
+      AnswerResult.ignored,
+    );
+    expect(
+      session.hearFrequency(core.frequency(60), 2300),
+      AnswerResult.correct,
+    );
     expect(session.currentProgress.recent, [true]);
   });
 
@@ -135,6 +147,9 @@ void main() {
     session.resetMicMatch();
     expect(session.micMatchProgress(1500), 0);
     expect(session.hearFrequency(hz, 1900), AnswerResult.ignored);
+    for (var t = 2000; t <= 2800; t += 100) {
+      session.hearFrequency(hz, t);
+    }
     expect(session.hearFrequency(hz, 2899), AnswerResult.ignored);
     expect(session.hearFrequency(hz, 2900), AnswerResult.correct);
   });
@@ -151,6 +166,9 @@ void main() {
       session.hearFrequency(core.frequency(60), 2400),
       AnswerResult.ignored,
     );
+    for (var t = 2500; t <= 3300; t += 100) {
+      session.hearFrequency(core.frequency(60), t);
+    }
     expect(
       session.hearFrequency(core.frequency(60), 3400),
       AnswerResult.correct,
@@ -171,6 +189,9 @@ void main() {
         session.hearFrequency(core.frequency(61), 100),
         AnswerResult.ignored,
       );
+      for (var t = 200; t <= 1000; t += 100) {
+        session.hearFrequency(core.frequency(61), t);
+      }
       expect(
         session.hearFrequency(core.frequency(61), 1100),
         AnswerResult.correct,

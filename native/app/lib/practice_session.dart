@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'native_core.dart';
 import 'mode_catalog.dart';
+import 'practice_round.dart';
 
 class LessonProgress {
   const LessonProgress({
@@ -66,9 +67,14 @@ class PracticeSession {
   bool completed = false;
   bool helped = false;
   bool correctionVisible = false;
+  bool _promptMistake = false;
+  PracticeRound? round;
+  bool get roundFinished => round?.finished ?? false;
   String feedback = 'Tap Start practice or Hear this note.';
   int _playbackBlockedUntilMs = 0;
   int? _candidateSinceMs;
+  int? _lastMatchingSampleMs;
+  List<int> _checkOrder = [0, 1, 2];
   NativeNote? _previousAnswered;
   final List<LessonProgress> progress = List.filled(6, const LessonProgress());
   final Map<NotationMode, LessonProgress> modeProgress = {};
@@ -95,6 +101,7 @@ class PracticeSession {
   void selectLesson(int index) {
     if (index < 0 || index >= lessonIds.length) return;
     lesson = index;
+    round = null;
     prompt = null;
     completed = false;
     helped = false;
@@ -106,6 +113,7 @@ class PracticeSession {
 
   void selectMode(NotationMode value) {
     mode = value;
+    round = null;
     prompt = null;
     completed = false;
     helped = false;
@@ -115,7 +123,9 @@ class PracticeSession {
     feedback = 'Ready for ${mode.label}. Tap Start practice.';
   }
 
-  void start() {
+  void start({bool shortRound = true}) {
+    round = shortRound ? PracticeRound() : null;
+    _checkOrder = [0, 1, 2]..shuffle(Random(_seed));
     prompt = null;
     completed = false;
     _previousAnswered = null;
@@ -123,22 +133,44 @@ class PracticeSession {
   }
 
   void next() {
+    if (roundFinished) return;
     if (completed && mode == NotationMode.treble && lesson == 4) {
       _previousAnswered = prompt;
     }
-    prompt = promptForMode(core, mode, lesson, _seed);
+    if (round != null && mode == NotationMode.treble && lesson == 0) {
+      final position = round!.resolved;
+      prompt = core.lessonNote(
+        0,
+        position < 3 ? position : _checkOrder[position - 3],
+      );
+    } else {
+      prompt = promptForMode(core, mode, lesson, _seed);
+    }
     _seed = core.nextSeed(_seed);
     completed = false;
     helped = false;
     correctionVisible = false;
+    _promptMistake = false;
     _candidateSinceMs = null;
     feedback = mode == NotationMode.chords
         ? 'Read the stack. Hear the chord if you need help, then name it.'
+        : round?.checking == true
+        ? 'Try this note without listening first. Help is still available whenever you need it.'
         : 'Read the note. Hear it if you need help, then sing or play it back.';
   }
 
   void skip() {
-    if (!started) return;
+    if (!started || roundFinished) return;
+    if (!completed) {
+      round?.record(
+        prompt!.name,
+        correct: false,
+        helped: helped,
+        mistake: _promptMistake,
+      );
+    }
+    completed = roundFinished;
+    if (roundFinished) return;
     completed = false;
     _previousAnswered = null;
     next();
@@ -146,6 +178,7 @@ class PracticeSession {
   }
 
   void hear(int nowMs, {int playbackMs = 720}) {
+    if (roundFinished) return;
     if (!started) start();
     helped = true;
     blockPlayback(nowMs, playbackMs: playbackMs);
@@ -166,7 +199,10 @@ class PracticeSession {
     helped = true;
   }
 
-  void resetMicMatch() => _candidateSinceMs = null;
+  void resetMicMatch() {
+    _candidateSinceMs = null;
+    _lastMatchingSampleMs = null;
+  }
 
   double micMatchProgress(int nowMs) => completed
       ? 1
@@ -183,12 +219,19 @@ class PracticeSession {
       currentProgress.record(correct: right, helped: helped),
     );
     if (right) {
+      round?.record(
+        prompt!.name,
+        correct: true,
+        helped: helped,
+        mistake: _promptMistake,
+      );
       completed = true;
       correctionVisible = false;
       feedback =
           '$name — correct. ${writtenNoteHint(prompt!)}${_intervalHint(prompt!)} Ready for the next note.';
       return AnswerResult.correct;
     }
+    _promptMistake = true;
     feedback = showCorrection
         ? '$name is not it. The note is ${prompt!.name}. ${writtenNoteHint(prompt!)} Try again.'
         : '$name is not it. Try again.';
@@ -225,6 +268,10 @@ class PracticeSession {
       _candidateSinceMs = null;
       return AnswerResult.ignored;
     }
+    if (_lastMatchingSampleMs != null && nowMs - _lastMatchingSampleMs! > 400) {
+      _candidateSinceMs = null;
+    }
+    _lastMatchingSampleMs = nowMs;
     _candidateSinceMs ??= nowMs;
     if (nowMs - _candidateSinceMs! < micHoldMs) return AnswerResult.ignored;
     return answer(prompt!.name);

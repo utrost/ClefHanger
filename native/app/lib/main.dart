@@ -15,6 +15,7 @@ import 'lesson_guide.dart';
 import 'piano_input.dart';
 import 'mic_diagnostic.dart';
 import 'practice_session.dart';
+import 'pitch_guidance.dart';
 import 'progress_transfer.dart';
 import 'rush_page.dart';
 import 'staff.dart';
@@ -98,6 +99,7 @@ class PracticePage extends StatefulWidget {
 class _PracticePageState extends State<PracticePage>
     with WidgetsBindingObserver {
   late final PracticeSession session;
+  final _practiceScroll = ScrollController();
   StreamSubscription<Uint8List>? _micSubscription;
   Uint8List _window = Uint8List(8192);
   int _receivedSamples = 0;
@@ -272,6 +274,7 @@ class _PracticePageState extends State<PracticePage>
     _micSubscription?.cancel();
     widget.audio.stop();
     widget.core.dispose();
+    _practiceScroll.dispose();
     super.dispose();
   }
 
@@ -315,13 +318,19 @@ class _PracticePageState extends State<PracticePage>
     }
   }
 
+  void _finishRound() {
+    _stopMic();
+    if (_practiceScroll.hasClients) _practiceScroll.jumpTo(0);
+  }
+
   Future<void> _stopMic() async {
+    _nextNoteTimer?.cancel();
     session.resetMicMatch();
     _recordingTest = false;
     _recordCapture = null;
-    await _micSubscription?.cancel();
+    final subscription = _micSubscription;
     _micSubscription = null;
-    await widget.audio.stop();
+    final stopped = widget.audio.stop();
     if (mounted) {
       setState(() {
         _micOn = false;
@@ -331,6 +340,8 @@ class _PracticePageState extends State<PracticePage>
         _micGuide = 'Mic off. Tap Check mic to try again.';
       });
     }
+    await subscription?.cancel();
+    await stopped;
   }
 
   void _onSamples(Uint8List packet) {
@@ -368,7 +379,7 @@ class _PracticePageState extends State<PracticePage>
     if (session.completed) return;
     if (!session.canScore(now)) {
       setState(() {
-        _detectedMidi = midi < 0 ? null : midi;
+        _detectedMidi = null;
         _micGuide = 'Listen… scoring waits until the sound finishes.';
       });
       return;
@@ -393,33 +404,26 @@ class _PracticePageState extends State<PracticePage>
     final prompt = session.prompt;
     final result = session.hearFrequency(hz, now, anyOctave: _anyOctave);
     if (result != AnswerResult.ignored) _persist(session.mode, session.lesson);
-    if (result == AnswerResult.correct) _advanceAfterMicMatch(prompt);
-    final status = prompt == null
-        ? 0
-        : widget.core.classify(hz, prompt.midi, anyOctave: _anyOctave);
-    final noteName = const [
-      'C',
-      'C♯',
-      'D',
-      'D♯',
-      'E',
-      'F',
-      'F♯',
-      'G',
-      'G♯',
-      'A',
-      'A♯',
-      'B',
-    ][midi % 12];
+    if (result == AnswerResult.correct) {
+      if (session.roundFinished) {
+        _finishRound();
+      } else {
+        _advanceAfterMicMatch(prompt);
+      }
+    }
+    final guidance = PitchGuidance.from(
+      widget.core,
+      hz,
+      prompt,
+      anyOctave: _anyOctave,
+    );
     setState(() {
       _detectedMidi = midi;
       _micGuide = result == AnswerResult.correct
-          ? 'Matched ${prompt!.name}! Next note coming…'
-          : status == 4
-          ? 'Hold $noteName steady for one second…'
-          : status == 3
-          ? 'I hear $noteName${midi ~/ 12 - 1}. Try the written octave, or turn Match any octave on.'
-          : 'I hear $noteName${midi ~/ 12 - 1}. Aim for ${prompt?.name ?? 'the staff note'}.';
+          ? session.roundFinished
+                ? 'Round complete. See how you did below.'
+                : 'Matched ${prompt!.name}! Next note coming…'
+          : guidance?.message ?? 'Listening… hold one steady note.';
     });
   }
 
@@ -428,6 +432,7 @@ class _PracticePageState extends State<PracticePage>
     _nextNoteTimer = Timer(const Duration(milliseconds: 650), () {
       if (!mounted ||
           !session.completed ||
+          session.roundFinished ||
           !identical(session.prompt, answered)) {
         return;
       }
@@ -446,9 +451,11 @@ class _PracticePageState extends State<PracticePage>
     if (result == AnswerResult.ignored) return;
     setState(() {});
     _persist(mode, lesson);
+    if (session.roundFinished) _finishRound();
   }
 
   Future<void> _hear() async {
+    if (session.roundFinished) return;
     final now = _now();
     setState(() => session.hear(now));
     try {
@@ -656,8 +663,76 @@ class _PracticePageState extends State<PracticePage>
     _persistPreferences();
   }
 
+  Widget _roundSummary() {
+    final round = session.round!;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                'Round complete',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Matched ${round.matched} of 6 notes${round.skipped == 0 ? '.' : ' · ${round.skipped} skipped.'}',
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Check: ${round.independentChecks}/3 without answer help',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const Text(
+              'Buttons: first correct answer. Voice: a held match without replaying the note.',
+            ),
+            if (round.helpedChecks > 0)
+              Text(
+                '${round.helpedChecks} check notes used listening or visual help. That is useful practice too.',
+              ),
+            const SizedBox(height: 12),
+            Text(round.recommendation),
+            const SizedBox(height: 16),
+            FilledButton(
+              onPressed: () => setState(() {
+                session.start();
+                _practiceScroll.jumpTo(0);
+                _detectedMidi = null;
+              }),
+              child: const Text('Repeat this lesson'),
+            ),
+            TextButton(
+              onPressed: () => setState(() {
+                session.start(shortRound: false);
+                _practiceScroll.jumpTo(0);
+                _detectedMidi = null;
+              }),
+              child: const Text('Continue freely'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final pitch =
+        _micOn &&
+            _detectedMidi != null &&
+            !session.completed &&
+            session.canScore(_now())
+        ? PitchGuidance.from(
+            widget.core,
+            _lastFrequency,
+            session.prompt,
+            anyOctave: _anyOctave,
+          )
+        : null;
     final progress = session.currentProgress;
     final prompt = session.prompt;
     final largeText = MediaQuery.textScalerOf(context).scale(16) > 21;
@@ -671,6 +746,7 @@ class _PracticePageState extends State<PracticePage>
     return Scaffold(
       body: SafeArea(
         child: ListView(
+          controller: _practiceScroll,
           padding: EdgeInsets.fromLTRB(12, largeText ? 4 : 10, 12, 28),
           children: [
             Text(
@@ -762,10 +838,12 @@ class _PracticePageState extends State<PracticePage>
                     else
                       const SizedBox(height: 4),
                     Text(
-                      progress.attempts == 0
+                      session.round != null && !session.roundFinished
+                          ? session.round!.status
+                          : progress.attempts == 0
                           ? largeText
                                 ? 'Progress saved here'
-                                : 'Progress saved here · listening help welcome'
+                                : '6 notes · listen, then try on your own'
                           : 'Recent: ${progress.recentCorrect}/${progress.recent.length} on your own · ${progress.assisted} with help',
                       style: const TextStyle(fontSize: 12),
                     ),
@@ -792,168 +870,181 @@ class _PracticePageState extends State<PracticePage>
                 ),
               ),
             ),
-            const SizedBox(height: 8),
-            PracticeStaff(
-              note: prompt,
-              emptyClef: session.mode == NotationMode.bass ? 'bass' : 'treble',
-              revealAnswer: _hints && session.correctionVisible,
-              detectedMidi: _detectedMidi,
-              matchProgress: session.micMatchProgress(_now()),
-              completed: session.completed,
-              height: largeText
-                  ? 150
-                  : MediaQuery.sizeOf(context).height < 750
-                  ? 185
-                  : 238,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: FilledButton(
-                    onPressed: () => setState(() {
-                      if (!session.started) {
-                        session.start();
-                      } else if (session.completed) {
-                        session.next();
-                      } else {
-                        session.skip();
-                      }
-                      _detectedMidi = null;
-                    }),
-                    child: Text(
-                      !session.started
-                          ? 'Start practice'
-                          : session.completed
-                          ? 'Next practice note'
-                          : 'Skip note',
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: _hear,
-                    child: const Text('Hear this note'),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            if (_notesInput) ...[
-              if (_pianoInput && session.mode.supportsMic)
-                PianoInput(mode: session.mode, onAnswer: _answer)
-              else
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final answer in answers)
-                      SizedBox(
-                        width: answers.length <= 3
-                            ? (MediaQuery.sizeOf(context).width - 48) / 3
-                            : null,
-                        child: FilledButton.tonal(
-                          onPressed: prompt == null || session.completed
-                              ? null
-                              : () => _answer(answer.answer),
-                          child: Text(answer.label),
-                        ),
+            if (session.roundFinished)
+              _roundSummary()
+            else ...[
+              const SizedBox(height: 8),
+              PracticeStaff(
+                note: prompt,
+                emptyClef: session.mode == NotationMode.bass
+                    ? 'bass'
+                    : 'treble',
+                revealAnswer: _hints && session.correctionVisible,
+                detectedMidi: _detectedMidi,
+                matchProgress: session.micMatchProgress(_now()),
+                completed: session.completed,
+                height:
+                    (largeText
+                        ? 150.0
+                        : MediaQuery.sizeOf(context).height < 750
+                        ? 185.0
+                        : 238.0) -
+                    (_micOn ? 18 : 0),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => setState(() {
+                        if (!session.started) {
+                          session.start();
+                        } else if (session.completed) {
+                          session.next();
+                        } else {
+                          session.skip();
+                        }
+                        _detectedMidi = null;
+                        if (session.roundFinished) _finishRound();
+                      }),
+                      child: Text(
+                        !session.started
+                            ? 'Start practice'
+                            : session.completed
+                            ? 'Next practice note'
+                            : 'Skip note',
                       ),
-                  ],
-                ),
-              if (session.mode.supportsMic)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        setState(() => _pianoInput = !_pianoInput);
-                        _persistPreferences();
-                      },
-                      child: Text(_pianoInput ? 'Note buttons' : 'Piano'),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        setState(() => _notesInput = false);
-                        _persistPreferences();
-                      },
-                      child: const Text('Back to Sing/Play'),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _hear,
+                      child: const Text('Hear this note'),
                     ),
-                  ],
-                ),
-            ] else
-              Card(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              if (_notesInput) ...[
+                if (_pianoInput && session.mode.supportsMic)
+                  PianoInput(mode: session.mode, onAnswer: _answer)
+                else
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      Semantics(
-                        liveRegion: false,
-                        child: Text(
-                          _micGuide,
-                          key: const Key('micGuidance'),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FilledButton(
-                              onPressed: _micStarting
-                                  ? null
-                                  : _micOn
-                                  ? _stopMic
-                                  : _startMic,
-                              child: Text(
-                                _micStarting
-                                    ? 'Waiting…'
-                                    : _micOn
-                                    ? 'Stop mic'
-                                    : 'Check mic',
-                              ),
-                            ),
+                      for (final answer in answers)
+                        SizedBox(
+                          width: answers.length <= 3
+                              ? (MediaQuery.sizeOf(context).width - 48) / 3
+                              : null,
+                          child: FilledButton.tonal(
+                            onPressed: prompt == null || session.completed
+                                ? null
+                                : () => _answer(answer.answer),
+                            child: Text(answer.label),
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () {
-                                _stopMic();
-                                setState(() {
-                                  _notesInput = true;
-                                  _pianoInput = false;
-                                });
-                                _persistPreferences();
-                              },
-                              child: const Text('Use note buttons'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (_permissionDenied)
-                        TextButton.icon(
-                          onPressed: _openSettings,
-                          icon: const Icon(Icons.settings),
-                          label: const Text('Open Android settings'),
                         ),
                     ],
                   ),
+                if (session.mode.supportsMic)
+                  Wrap(
+                    alignment: WrapAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _pianoInput = !_pianoInput);
+                          _persistPreferences();
+                        },
+                        child: Text(_pianoInput ? 'Note buttons' : 'Piano'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          setState(() => _notesInput = false);
+                          _persistPreferences();
+                        },
+                        child: const Text('Back to Sing/Play'),
+                      ),
+                    ],
+                  ),
+              ] else
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 7, 10, 7),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Semantics(
+                          liveRegion: false,
+                          child: Text(
+                            _micGuide,
+                            key: const Key('micGuidance'),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ),
+                        if (_micOn)
+                          pitch != null
+                              ? PitchMeter(guidance: pitch)
+                              : const SizedBox(height: 18),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FilledButton(
+                                onPressed: _micStarting
+                                    ? null
+                                    : _micOn
+                                    ? _stopMic
+                                    : _startMic,
+                                child: Text(
+                                  _micStarting
+                                      ? 'Waiting…'
+                                      : _micOn
+                                      ? 'Stop mic'
+                                      : 'Check mic',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  _stopMic();
+                                  setState(() {
+                                    _notesInput = true;
+                                    _pianoInput = false;
+                                  });
+                                  _persistPreferences();
+                                },
+                                child: const Text('Use note buttons'),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_permissionDenied)
+                          TextButton.icon(
+                            onPressed: _openSettings,
+                            icon: const Icon(Icons.settings),
+                            label: const Text('Open Android settings'),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              Semantics(
+                liveRegion: true,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(
+                    session.feedback,
+                    key: const Key('practiceFeedback'),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            Semantics(
-              liveRegion: true,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(
-                  session.feedback,
-                  key: const Key('practiceFeedback'),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ),
+            ],
             if (!_tutorialDismissed)
               Card(
                 child: Padding(
@@ -971,9 +1062,9 @@ class _PracticePageState extends State<PracticePage>
                                 session.mode != NotationMode.treble
                             ? modeIntroduction(session.mode)
                             : const [
-                                'Sing or hum the note you see. Notes climb upward through A B C D E F G, then repeat.',
+                                'Black is your target; green is your voice. With Match any octave on, the green note is shown near the target octave. The Mic label keeps your actual octave.',
                                 'On the treble staff, the clef curls around the G line. Nearby notes step up or down from there.',
-                                'Practice has no timer. Hear the note if you need help, then sing, hum, or play it back steadily.',
+                                'Start with three notes using Hear this note. Then try three without listening first. Hold a match for one second; the next note appears automatically.',
                               ][_tutorialStep],
                       ),
                       Row(

@@ -14,6 +14,7 @@ class FakeAudio implements AudioBridge {
   final controller = StreamController<Uint8List>.broadcast();
   final saved = <String, String>{};
   int plays = 0;
+  int stops = 0;
   int chordPlays = 0;
   int settingsOpens = 0;
   Object? startError;
@@ -26,7 +27,10 @@ class FakeAudio implements AudioBridge {
   }
 
   @override
-  Future<void> stop() async {}
+  Future<void> stop() async {
+    stops++;
+  }
+
   @override
   Future<void> playTone(double frequency) async {
     plays++;
@@ -60,17 +64,60 @@ class SingingCore extends FakeCore {
 }
 
 void main() {
+  testWidgets(
+    'six touch answers show an honest check result and allow free practice',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(360, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final audio = FakeAudio();
+      await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Use note buttons'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start practice'));
+      await tester.pumpAndSettle();
+      for (var i = 0; i < 6; i++) {
+        await tester.scrollUntilVisible(find.byType(PracticeStaff), -100);
+        final note = tester
+            .widget<PracticeStaff>(find.byType(PracticeStaff))
+            .note!;
+        await tester.scrollUntilVisible(find.text(note.name), 100);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(note.name));
+        await tester.pumpAndSettle();
+        if (i < 5) {
+          await tester.scrollUntilVisible(
+            find.text('Next practice note'),
+            -100,
+          );
+          await tester.pumpAndSettle();
+          await tester.tap(find.text('Next practice note'));
+          await tester.pumpAndSettle();
+        }
+      }
+      await tester.scrollUntilVisible(find.text('Round complete'), -100);
+      expect(find.text('Round complete'), findsOneWidget);
+      expect(find.text('Check: 3/3 without answer help'), findsOneWidget);
+      expect(find.byType(PracticeStaff), findsNothing);
+      await tester.ensureVisible(find.text('Continue freely'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Continue freely'));
+      await tester.pumpAndSettle();
+      expect(find.text('Round complete'), findsNothing);
+      expect(find.byType(PracticeStaff), findsOneWidget);
+      expect(audio.saved['first-steps'], contains('"correct":6'));
+    },
+  );
+
   testWidgets('live pitch draws a ghost and advances after a full second', (
     tester,
   ) async {
     final audio = FakeAudio();
     final core = SingingCore();
     var now = 1000;
-    await tester.pumpWidget(ClefHangerApp(
-      core: core,
-      audio: audio,
-      practiceNowMs: () => now,
-    ));
+    await tester.pumpWidget(
+      ClefHangerApp(core: core, audio: audio, practiceNowMs: () => now),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Start practice'));
     await tester.scrollUntilVisible(find.text('Check mic'), 140);
@@ -82,25 +129,79 @@ void main() {
 
     audio.controller.add(Uint8List(8192));
     await tester.pump();
-    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).detectedMidi,
-        first.note!.midi);
+    expect(
+      tester.widget<PracticeStaff>(find.byType(PracticeStaff)).detectedMidi,
+      first.note!.midi,
+    );
+    for (now = 1100; now <= 1900; now += 100) {
+      audio.controller.add(Uint8List(8192));
+      await tester.pump();
+    }
     now = 1999;
     audio.controller.add(Uint8List(8192));
     await tester.pump();
-    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
-        false);
+    expect(
+      tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
+      false,
+    );
     now = 2000;
     audio.controller.add(Uint8List(8192));
     await tester.pump();
-    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
-        true);
+    expect(
+      tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
+      true,
+    );
     expect(audio.saved['first-steps'], contains('"correct":1'));
     await tester.pump(const Duration(milliseconds: 650));
-    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
-        false);
-    expect(tester.widget<PracticeStaff>(find.byType(PracticeStaff)).note,
-        isNot(same(first.note)));
+    expect(
+      tester.widget<PracticeStaff>(find.byType(PracticeStaff)).completed,
+      false,
+    );
+    expect(
+      tester.widget<PracticeStaff>(find.byType(PracticeStaff)).note,
+      isNot(same(first.note)),
+    );
     await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('six held microphone matches stop recording and end the round', (
+    tester,
+  ) async {
+    final audio = FakeAudio();
+    final core = SingingCore();
+    var now = 1000;
+    await tester.pumpWidget(
+      ClefHangerApp(core: core, audio: audio, practiceNowMs: () => now),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start practice'));
+    await tester.scrollUntilVisible(find.text('Check mic'), 140);
+    await tester.tap(find.text('Check mic'));
+    await tester.pump();
+    await tester.scrollUntilVisible(find.byType(PracticeStaff), -140);
+    final stopsBefore = audio.stops;
+    for (var i = 0; i < 6; i++) {
+      core.heardHz = core.frequency(
+        tester.widget<PracticeStaff>(find.byType(PracticeStaff)).note!.midi,
+      );
+      for (var sample = 0; sample <= 10; sample++) {
+        audio.controller.add(Uint8List(8192));
+        await tester.pump();
+        now += 100;
+      }
+      await tester.pump(const Duration(milliseconds: 700));
+      now += 700;
+    }
+    await tester.pumpAndSettle();
+    expect(find.text('Round complete'), findsOneWidget);
+    expect(audio.stops, greaterThan(stopsBefore));
+    expect(audio.saved['first-steps'], contains('"correct":6'));
+    audio.controller.add(Uint8List(8192));
+    await tester.pump(const Duration(seconds: 2));
+    expect(find.byType(PracticeStaff), findsNothing);
+    expect(audio.saved['first-steps'], contains('"correct":6'));
+    await tester.pumpWidget(const SizedBox());
+    await audio.controller.close();
   });
 
   testWidgets('browser import previews and persists newer progress', (
@@ -221,8 +322,12 @@ void main() {
       expect(find.text('Hear this note'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Check mic'), 180);
       expect(find.text('Check mic'), findsOneWidget);
+      await tester.ensureVisible(find.text('Hear this note'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Hear this note'));
-      await tester.pump();
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.byType(PracticeStaff), -140);
+      await tester.pumpAndSettle();
       expect(audio.plays, 1);
       expect(find.text('Skip note'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('Use note buttons'), 140);
@@ -299,6 +404,8 @@ void main() {
     await tester.tap(find.text('Line notes').last);
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Settings'), 160);
+    await tester.ensureVisible(find.text('Settings'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Show corrections'), 160);
@@ -314,6 +421,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Line notes'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Settings'), 160);
+    await tester.ensureVisible(find.text('Settings'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
     final correction = find.ancestor(

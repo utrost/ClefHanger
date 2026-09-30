@@ -8,6 +8,8 @@ The native branch now covers Practice, Rush, five notation modes, touch/piano an
 
 Store preparation now includes a Google-independent release build, APK/AAB packaging checks and disabled F-Droid metadata. The project is now AGPL-3.0-or-later. Production signing, F-Droid source-build validation and store submission remain open; see [distribution preparation](../native/docs/distribution.md).
 
+The native beginner slice now provides six-note rounds, a three-note unaided check invitation, outcome/review guidance and directional pitch feedback. The [five-person beginner protocol](beginner-study.md) is ready; no participant results are recorded yet.
+
 **Highest product priority: validate the mobile learning loop on physical phones (P1). The settings/status extraction (P2) is complete.** While device evidence is unavailable, the next bounded maintenance slice is P5: migrate the older browser suites to the existing shared, timeout-bounded harness. Do not expand microphone-dependent lessons before P1 establishes a reliable baseline.
 
 ## Product direction
