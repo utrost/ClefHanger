@@ -15,6 +15,7 @@ import 'lesson_guide.dart';
 import 'piano_input.dart';
 import 'mic_diagnostic.dart';
 import 'practice_session.dart';
+import 'reading_lesson_page.dart';
 import 'pitch_guidance.dart';
 import 'progress_transfer.dart';
 import 'rush_page.dart';
@@ -1045,6 +1046,23 @@ class _PracticePageState extends State<PracticePage>
                 ),
               ),
             ],
+            OutlinedButton.icon(
+              icon: const Icon(Icons.school_outlined),
+              label: const Text('Guided reading lesson'),
+              onPressed: () async {
+                await _stopMic();
+                if (!context.mounted) return;
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (_) => ReadingLessonPage(
+                      core: widget.core,
+                      storage: widget.audio,
+                    ),
+                  ),
+                );
+              },
+            ),
             if (!_tutorialDismissed)
               Card(
                 child: Padding(

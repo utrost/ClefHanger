@@ -1,6 +1,6 @@
 # ClefHanger roadmap
 
-Last reviewed: **2026-09-30**, against the Slice 73 progress export and the isolated Flutter/Rust Android port on `feat/flutter-rust-port`.
+Last reviewed: **2026-10-15**, against the Slice 73 progress export and the isolated Flutter/Rust Android port on `feat/flutter-rust-port`.
 
 This is the single planning document for product direction, delivery priorities, and architecture work. It replaces the separate MVP roadmap, product specification, and refactoring plan. Historical implementation details remain in Git; completed work below is a baseline, not an open backlog.
 
@@ -10,9 +10,28 @@ Store preparation now includes a Google-independent release build, APK/AAB packa
 
 The native beginner slice now provides six-note rounds, a three-note unaided check invitation, outcome/review guidance and directional pitch feedback. The [five-person beginner protocol](beginner-study.md) is ready; no participant results are recorded yet.
 
-**Highest product priority: validate the mobile learning loop on physical phones (P1). The settings/status extraction (P2) is complete.** While device evidence is unavailable, the next bounded maintenance slice is P5: migrate the older browser suites to the existing shared, timeout-bounded harness. Do not expand microphone-dependent lessons before P1 establishes a reliable baseline.
+## Native learning redesign — active project plan
 
-## Product direction
+Approved direction: evolve the Flutter/Rust app in place on `feat/flutter-rust-port`. Keep the PWA stable, offline operation, AGPL licensing and update-compatible prereleases. This section supersedes the sequencing of the older P1–P6 browser backlog below. No full rewrite or new backend is planned.
+
+**Outcome:** a beginner completes a short, understandable lesson and knows what to practise next. Recognition, imitation and performance must have distinct evidence; old mixed-input totals must never be relabelled as skill mastery.
+
+| Slice | Deliverable and acceptance criteria | Dependencies / status |
+| --- | --- | --- |
+| N1 — Guided recognition | C/D/E introduction → unlabeled recognition check → actionable result. Corrections and revealed hints do not count as independent first answers. Persist a versioned reading result separately from legacy progress; handle malformed data and save failure. Compact-screen and end-to-end tests. | Implemented 2026-10-15; entry is “Guided reading lesson” in Practice during rollout. Automated tests cover scoring, corrupt/legacy records, save failure/retry, reload and compact layout. Human evaluation remains open. |
+| N2 — Journey home and skill boundaries | A focused home with Read, Listen and match, and Read and perform; one recommended next action. Move mode selection/diagnostics into secondary navigation. Choose voice, instrument or quiet touch; changing input cannot silently change the skill being measured. Existing Practice and Rush remain reachable. | After N1; next implementation slice. |
+| N3 — Reliable audio setup | Explicit permission/listening/signal/playback/holding/recovery states; comfortable voice range setup; playback in that range; direction shown only for usable detection. Keep acoustic-tail suppression, octave explanation and manual recovery. | Requires audio-state extraction and physical phone evidence before declaring reliable. |
+| N4 — Imitation and performance lessons | Separate listen-and-match from read-and-perform; demonstrate each, explain reference/pitch relationships without requiring absolute pitch, then check its specific objective. Keep voice/instrument evidence distinct from touch recognition. | N2–N3; do not reuse a recognition score as singing progress. |
+| N5 — Useful return session | Bounded per-skill/per-note history, review suggestions and checks across days; explain why a note is recommended. Versioned migration preserves old totals as legacy practice. No mastery claim from a single round. | N1/N4 evidence and repeated-session user feedback. |
+| N6 — Curriculum and release readiness | One concept per lesson, then short phrases; Rush is optional fluency practice. TalkBack, large text, interruption/recovery and offline update testing; production signing and Play/F-Droid source-build validation. | Expand curriculum after the five-person study identifies blockers. Store work can proceed independently. |
+
+**Architecture:** pure lesson state owns exercise transitions and evidence; Flutter owns UI/navigation; the audio adapter owns device I/O; Rust owns pitch/music calculations. Introduce boundaries as working slices, not a speculative rewrite. Test state transitions and stored-data compatibility before broadening the UI.
+
+**Evaluation:** run the [beginner study](beginner-study.md), recording input method, first independent success, misunderstandings, completion and next-session choice. Five sessions identify usability issues; they do not establish learning efficacy. Test retention on a later day. Phone microphone accuracy, usable vocal range and audible playback remain unverified until observed on devices.
+
+**Delivery gate for each native slice:** focused regression tests plus the full Flutter suite with real host FFI, static analysis, release packaging where applicable, compact-screen review and documented limitations. Update this plan and publish on the native branch after checks pass. Browser runtime/cache changes follow the separate legacy gate below. No human study, store submission or physical-device result may be marked complete from emulator evidence.
+
+## Existing product and browser baseline
 
 ClefHanger helps singers, choir members, music-reading beginners, and monophonic instrumentalists connect written notes with sound through short, approachable sessions. The primary experience is portrait mobile Practice: see a note, listen if needed, sing or play it, receive useful guidance, and try the next note. Absolute pitch and keyboard hardware are not prerequisites.
 
@@ -38,13 +57,13 @@ The app remains a static, dependency-free PWA using native JavaScript modules, S
 | Offline and upgrades | Service-worker app shell and subpath support. Upgrade regression preserves progress and unrelated applications’ caches, then verifies offline startup with the server stopped and HTTP cache disabled. |
 | Diagnostics | Mic Lab exports `.txt` JSON reports; recorded Android Firefox B2/C3 input is a regression fixture. This is limited device evidence, not a browser compatibility guarantee. |
 | Architecture | Staff renderer, music theory, content, scoring, learning, lessons, progress, storage, microphone session/controller, diagnostics, semantic presentation, settings presentation, microphone status presentation, and summary focus already have dedicated modules. |
-| Test gate | Automatic unit/browser test discovery, browser concurrency limit, bounded browser-command diagnostics, syntax/manifest/version checks, and GitHub CI. Slice 73 passes 210 unit and 17 browser tests locally; the native suite passes 38 tests. |
+| Test gate | Automatic unit/browser test discovery, browser concurrency limit, bounded browser-command diagnostics, syntax/manifest/version checks, and GitHub CI. Slice 73 passes 210 unit and 17 browser tests locally; the native suite passed 51 tests at the September 30 baseline. |
 
 Recent milestones: Slice 70 simplified mobile Practice, added listen-and-imitate assistance and persisted lesson progress, and repaired Rush flow. Slice 71 clarified lesson notation, aligned accessible descriptions, and strengthened PWA upgrade coverage. Slice 72 extracted settings/status presentation and added direct decision tests plus browser coverage for control transitions. Slice 73 added manual progress export for the Android port. These are completed features; follow-up work below addresses remaining evidence and limitations.
 
 Exact behavior and constants belong in [Current state reference](current-state-reference.md), module ownership in [Architecture](architecture.md), and interaction expectations in [User journey](user-journey.md). The recorded baseline CI run is [Slice 71 checks](https://github.com/utrost/ClefHanger/actions/runs/36230469202). Repository publication and production deployment are separate; confirm the live version using the [developer handoff](developer-handoff.md) before claiming a release is deployed.
 
-## Prioritized delivery plan
+## Retained browser backlog (secondary to the native plan)
 
 Statuses describe evidence and readiness, not dates or promises. Each item should ship as a small reviewable slice. Product priority is UI/UX first, followed by learning content, maintainability, and supporting documentation/testing.
 

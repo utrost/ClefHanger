@@ -28,3 +28,9 @@ Observed 2026-09-29 to 2026-09-30 on local Android 15 API 35 `sdk_gphone64_x86_6
 The emulator was launched with `-no-audio`, so audible tone quality and actual microphone accuracy were **not** validated. An emulator-reported A3 confirmed the PCM path reaches Rust and returns a pitch, but it is not evidence that a real singer will be classified correctly. The unit test feeds a synthetic B2 waveform through the real Rust library. Real phone testing must cover low voices, normal rooms, reference-tone bleed, permission denial/retry, background/resume, and earphones.
 
 The native app stores progress in Android app-private preferences. Browser LocalStorage cannot move into the app automatically, but a manual JSON export/import is available on this branch. Real-device validation and iOS remain separate follow-up work. The PWA on the main branch remains the available complete product; the Slice 73 export is currently on the isolated native branch.
+
+## Guided reading slice — 2026-10-15
+
+Static analysis is clean and all 55 native tests pass with host Rust FFI enabled. The Read lesson introduces C/D/E staff positions and then checks them without labels. The 360×640 widget flow covers introduction, shuffled check, result, failed-save warning/retry and reload. Recognition is stored under `learning.v1.read.cde.latest`; existing mixed-input totals are preserved. Unit tests cover hints, corrections, duplicate answers, invalid records and completed-state guards. Navigation coverage checks that entering the lesson stops the microphone and returning preserves the Practice route.
+
+This slice has automated layout coverage, not a new physical-phone observation or human learning result. The first rollout is reached through “Guided reading lesson” in Practice. Journey-home navigation, comfortable-range setup, separate imitation/performance lessons and retained-learning checks remain scheduled in the [roadmap](../../docs/roadmap.md).
