@@ -54,3 +54,13 @@ Android playback now responds after output completes and reports failures, inclu
 The release APK compiled locally, passed native-code/16 KB/no-Google-SDK packaging checks, and installed as build 1009 over the existing signed emulator app. On the 360×640 logical Android 15 emulator, the [input chooser](sound-setup-emulator.png), instrument [live guidance](sound-guidance-emulator.png), reference playback transition and six-skipped-note result were inspected. The result correctly displayed zero matches and six skips and saved to the instrument/imitation record. No AndroidRuntime or Flutter errors were found in these checked flows. Emulator-reported pitch is not evidence of real-instrument or voice accuracy.
 
 Interrupted or failed reference requests count conservatively as reference-assisted for performance; imitation still requires successful playback before scoring. A regression test covers interruption before the playback completion callback. Final automated gate: 67 native tests with host FFI enabled, static analysis clean.
+
+## Comfortable voice reference level — 2026-10-15
+
+Static analysis is clean; all 72 Flutter tests pass with the real host Rust library. Voice sessions now offer lower (C3–E3), middle (C4–E4) and higher (C5–E5) reference levels. This is a manual comfort choice, not automatic range estimation. Written notes stay in the original octave; instrument playback is unchanged. The green ghost note remains octave-normalized and the microphone label reports the detected octave.
+
+Focused tests cover low/high reference frequencies and synthetic held matches, unchanged written notation, no microphone start during setup, persistence/reload, corrupt preferences, backward-compatible sound results, explicit setup-preview context, background interruption preventing the next preview tone, and failed-save recovery through “Use once without saving.” Widget flows include 360×640 and 150% text. Results distinguish in-session reference requests from a preview requested before the session; neither is described as mastery.
+
+Audible tone quality, comfort for real singers, room noise and physical-phone accuracy remain unverified.
+
+The release APK compiled and passed the no-Google-SDK/native-code/16 KB alignment checks. Build 1011 was signed with the existing test certificate and installed over the previous emulator version. On the compact Android 15 emulator, the lower C/E preview completed, the scrollable setup continued into practice, and “Reference C3 · written C4” appeared with the microphone still off. No AndroidRuntime or Flutter errors appeared in these checked flows. This verifies playback completion and UI behavior, not audible quality.

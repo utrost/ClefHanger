@@ -6,6 +6,8 @@ import 'reading_lesson_page.dart';
 import 'sound_evidence.dart';
 import 'sound_session.dart';
 import 'staff.dart';
+import 'voice_range.dart';
+import 'voice_range_page.dart';
 
 class SoundSetupPage extends StatefulWidget {
   const SoundSetupPage({
@@ -49,6 +51,16 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
   }
 
   Future<void> _practice(SoundInput input) async {
+    VoiceSetupSelection? selection;
+    if (input == SoundInput.voice) {
+      selection = await Navigator.of(context).push<VoiceSetupSelection>(
+        MaterialPageRoute(
+          builder: (_) =>
+              VoiceRangePage(core: widget.core, audio: widget.audio),
+        ),
+      );
+      if (!mounted || selection == null) return;
+    }
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => SoundPracticePage(
@@ -56,6 +68,8 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
           audio: widget.audio,
           skill: widget.skill,
           input: input,
+          voiceRange: selection?.range ?? VoiceRange.middle,
+          setupPreviewRequested: selection?.previewRequested ?? false,
         ),
       ),
     );
@@ -103,6 +117,12 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
                   'Last ${input.label.toLowerCase()} session: ${previous[input]!.matched}/6 matched · ${previous[input]!.withReference} with reference requested · ${previous[input]!.skipped} skipped.',
                 ),
               ),
+            if (previous[input]?.referenceRange != null)
+              Text(
+                'Reference level: ${previous[input]!.referenceRange!.label}',
+              ),
+            if (previous[input]?.setupPreviewRequested == true)
+              const Text('A pitch preview was requested before that session.'),
             if (failed.contains(input))
               Text(
                 'Previous ${input.label.toLowerCase()} result could not be loaded.',
@@ -138,12 +158,16 @@ class SoundPracticePage extends StatefulWidget {
     required this.skill,
     required this.input,
     this.nowMs,
+    this.voiceRange = VoiceRange.middle,
+    this.setupPreviewRequested = false,
   });
   final PracticeCore core;
   final AudioBridge audio;
   final SoundSkill skill;
   final SoundInput input;
   final int Function()? nowMs;
+  final VoiceRange voiceRange;
+  final bool setupPreviewRequested;
   @override
   State<SoundPracticePage> createState() => _SoundPracticePageState();
 }
@@ -162,6 +186,8 @@ class _SoundPracticePageState extends State<SoundPracticePage>
       skill: widget.skill,
       input: widget.input,
       nowMs: widget.nowMs,
+      voiceRange: widget.voiceRange,
+      setupPreviewRequested: widget.setupPreviewRequested,
     )..addListener(_changed);
     WidgetsBinding.instance.addObserver(this);
   }
@@ -230,7 +256,11 @@ class _SoundPracticePageState extends State<SoundPracticePage>
               '${sound.evidence.matched}/6 matched · ${sound.evidence.skipped} skipped',
             ),
             Text('${sound.withReference} with reference requested'),
-            Text('${sound.withoutReference} without requesting a reference'),
+            Text(
+              '${sound.withoutReference} without an in-session reference request',
+            ),
+            if (sound.evidence.setupPreviewRequested)
+              const Text('A pitch preview was requested before this session.'),
             const SizedBox(height: 16),
             const Text(
               'A match means one held pitch with feedback. It is not a test of note-name recognition or retained learning.',
@@ -256,6 +286,10 @@ class _SoundPracticePageState extends State<SoundPracticePage>
               'Note ${sound.practice.round!.resolved + (sound.practice.completed ? 0 : 1)}/6',
             ),
             const SizedBox(height: 8),
+            if (widget.input == SoundInput.voice)
+              Text(
+                'Reference ${sound.referenceName} · written ${sound.practice.prompt!.displayName}',
+              ),
             PracticeStaff(
               note: sound.practice.prompt,
               instruction: widget.input == SoundInput.instrument
@@ -264,7 +298,9 @@ class _SoundPracticePageState extends State<SoundPracticePage>
               detectedMidi: sound.detectedMidi,
               matchProgress: sound.hold,
               completed: sound.practice.completed,
-              height: MediaQuery.sizeOf(context).height < 750 ? 170 : 220,
+              height: MediaQuery.sizeOf(context).height < 750
+                  ? (widget.input == SoundInput.voice ? 150 : 170)
+                  : 220,
             ),
             const SizedBox(height: 12),
             Semantics(

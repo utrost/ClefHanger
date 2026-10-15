@@ -5,6 +5,7 @@ import 'native_core.dart';
 import 'pitch_guidance.dart';
 import 'practice_session.dart';
 import 'sound_evidence.dart';
+import 'voice_range.dart';
 
 enum SoundPhase {
   off,
@@ -27,6 +28,8 @@ class SoundSession extends ChangeNotifier {
     required this.audio,
     required this.skill,
     required this.input,
+    this.voiceRange = VoiceRange.middle,
+    this.setupPreviewRequested = false,
     int Function()? nowMs,
   }) : _nowOverride = nowMs,
        practice = PracticeSession(core) {
@@ -36,6 +39,13 @@ class SoundSession extends ChangeNotifier {
   final AudioBridge audio;
   final SoundSkill skill;
   final SoundInput input;
+  final VoiceRange voiceRange;
+  final bool setupPreviewRequested;
+  int get referenceMidi =>
+      practice.prompt!.midi +
+      (input == SoundInput.voice ? voiceRange.semitones : 0);
+  String get referenceName =>
+      '${practice.prompt!.name}${referenceMidi ~/ 12 - 1}';
   final PracticeSession practice;
   final int Function()? _nowOverride;
   final _clock = Stopwatch()..start();
@@ -61,6 +71,8 @@ class SoundSession extends ChangeNotifier {
     withReference: withReference,
     withoutReference: withoutReference,
     skipped: practice.round!.skipped,
+    referenceRange: input == SoundInput.voice ? voiceRange : null,
+    setupPreviewRequested: input == SoundInput.voice && setupPreviewRequested,
   );
 
   void _notify() {
@@ -161,7 +173,7 @@ class SoundSession extends ChangeNotifier {
     practice.hear(now);
     _notify();
     try {
-      await audio.playTone(core.frequency(practice.prompt!.midi));
+      await audio.playTone(core.frequency(referenceMidi));
       if (_disposed || generation != _generation) return;
       _heardReference = true;
       // Android completes the playback call after the tone. Retain a tail even

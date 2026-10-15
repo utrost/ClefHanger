@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'voice_range.dart';
 
 enum SoundSkill { imitate, perform }
 
@@ -22,10 +23,14 @@ class SoundEvidence {
     required this.withReference,
     required this.withoutReference,
     required this.skipped,
+    this.referenceRange,
+    this.setupPreviewRequested = false,
   });
   final SoundSkill skill;
   final SoundInput input;
   final int withReference, withoutReference, skipped;
+  final VoiceRange? referenceRange;
+  final bool setupPreviewRequested;
   int get matched => withReference + withoutReference;
   static String key(SoundSkill skill, SoundInput input) =>
       'learning.v1.sound.${skill.name}.${input.name}.cde.latest';
@@ -38,6 +43,8 @@ class SoundEvidence {
     'withReference': withReference,
     'withoutReference': withoutReference,
     'skipped': skipped,
+    if (referenceRange != null) 'referenceRange': referenceRange!.name,
+    'setupPreviewRequested': setupPreviewRequested,
   });
   static SoundEvidence? decode(
     String? raw,
@@ -52,6 +59,13 @@ class SoundEvidence {
           value['input'] != input.name ||
           value['lesson'] != 'cde' ||
           value['total'] != 6) {
+        return null;
+      }
+      final range = voiceRangeFromName(value['referenceRange']);
+      final preview = value['setupPreviewRequested'] ?? false;
+      if ((value.containsKey('referenceRange') && range == null) ||
+          preview is! bool ||
+          (input == SoundInput.instrument && (range != null || preview))) {
         return null;
       }
       final withRef = value['withReference'];
@@ -73,6 +87,8 @@ class SoundEvidence {
         withReference: withRef,
         withoutReference: withoutRef,
         skipped: skipped,
+        referenceRange: range,
+        setupPreviewRequested: preview,
       );
     } catch (_) {
       return null;
