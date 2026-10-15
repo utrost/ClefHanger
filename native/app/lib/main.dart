@@ -17,6 +17,7 @@ import 'mic_diagnostic.dart';
 import 'practice_session.dart';
 import 'reading_lesson_page.dart';
 import 'journey_home.dart';
+import 'sound_practice_page.dart';
 import 'pitch_guidance.dart';
 import 'progress_transfer.dart';
 import 'rush_page.dart';
@@ -108,6 +109,15 @@ class _ClefHangerAppState extends State<ClefHangerApp> {
         : Builder(
             builder: (context) => JourneyHome(
               storage: widget.audio,
+              openSound: (skill) => Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => SoundSetupPage(
+                    core: widget.core,
+                    audio: widget.audio,
+                    skill: skill,
+                  ),
+                ),
+              ),
               openReading: () => Navigator.of(context).push<void>(
                 MaterialPageRoute(
                   builder: (_) => ReadingLessonPage(

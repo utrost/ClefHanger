@@ -14,6 +14,7 @@ class PracticeStaff extends StatelessWidget {
     this.previewNotes = const [],
     this.height = 238,
     this.emptyClef = 'treble',
+    this.instruction,
   });
   final NativeNote? note;
   final bool revealAnswer;
@@ -24,9 +25,12 @@ class PracticeStaff extends StatelessWidget {
   final List<NativeNote> previewNotes;
   final double height;
   final String emptyClef;
+  final String? instruction;
   String _semanticsLabel() {
     final prompt = note;
-    if (prompt == null) return 'Empty $emptyClef staff. Start practice to see a note.';
+    if (prompt == null) {
+      return 'Empty $emptyClef staff. Start practice to see a note.';
+    }
     if (prompt.isChord) {
       return revealAnswer
           ? 'Treble staff chord ${prompt.displayName}.'
@@ -38,7 +42,7 @@ class PracticeStaff extends StatelessWidget {
         : ' with a ${prompt.accidental == '♯' ? 'sharp' : 'flat'}';
     final target = revealAnswer
         ? '$clef staff note ${prompt.displayName}, ${_position(prompt.staffStep)}.'
-        : '$clef staff note at ${_position(prompt.staffStep)}$accidental. Sing or name it.';
+        : '$clef staff note at ${_position(prompt.staffStep)}$accidental. ${instruction ?? 'Sing or name it.'}';
     if (detectedMidi == null) return target;
     return '$target Microphone hears ${_midiName(detectedMidi!)}. The green note shows its staff position near the target octave.';
   }
@@ -76,8 +80,8 @@ String _midiName(int midi) =>
 /// Keep the live note beside the target even when a singer uses another octave.
 /// The readout and semantics still report the actual detected octave.
 NativeNote ghostPitchForMidi(NativeNote target, int detectedMidi) {
-  final shownMidi = detectedMidi +
-      (((target.midi - detectedMidi) / 12).round() * 12);
+  final shownMidi =
+      detectedMidi + (((target.midi - detectedMidi) / 12).round() * 12);
   final pitchClass = shownMidi % 12;
   final useFlats = target.accidental == '♭';
   const sharpLetters = [0, 0, 1, 1, 2, 3, 3, 4, 4, 5, 5, 6];
@@ -86,7 +90,8 @@ NativeNote ghostPitchForMidi(NativeNote target, int detectedMidi) {
   return NativeNote(
     id: -1,
     midi: shownMidi,
-    staffStep: (target.clef == 'bass' ? 10 : -2) +
+    staffStep:
+        (target.clef == 'bass' ? 10 : -2) +
         (shownMidi ~/ 12 - 5) * 7 +
         (useFlats ? flatLetters : sharpLetters)[pitchClass],
     clef: target.clef,

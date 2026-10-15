@@ -4,6 +4,9 @@ This directory is an isolated Flutter/Rust port on `feat/flutter-rust-port`. The
 
 ## What runs
 
+- The journey home recommends a guided C/D/E reading lesson and keeps free Practice, settings and Rush secondary. Reading results are separate from legacy mixed-input totals.
+- Listen and match and Read and perform have dedicated six-note sound sessions. Choose voice or a monophonic instrument before starting; quiet touch opens the reading lesson. Imitation requires successful reference playback for each note. Results distinguish matches after playback, matches without playback and skips, and are stored separately by skill/input. The chooser shows the latest completed result; incomplete sessions are not saved.
+- A dedicated sound controller exposes microphone permission, listening, no-signal, pitch/hold, playback, pause, finish and recovery states. Capture starts only on explicit Enable microphone. Android reports playback completion/failure; playback and acoustic-tail audio cannot score. Comfortable-range calibration and physical-phone reliability remain open.
 - Flutter draws portrait Practice and 60-second Rush in Treble, Bass, Sharps, Flats, and Chords modes. Rush has a moving staff prompt, speed/difficulty controls, pause/resume, result exits, and mode-specific high scores.
 - Rust owns the six treble lesson note pools, prompt selection, note frequencies, PCM16 pitch detection, and pitch-class matching.
 - Android captures mono microphone PCM, requests `RECORD_AUDIO`, offers a direct app-settings route after denial, plays reference notes and chords, stops capture when backgrounded, and stores lesson/mode progress in app-private preferences.

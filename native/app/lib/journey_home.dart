@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'android_audio.dart';
 import 'reading_lesson.dart';
+import 'sound_evidence.dart';
 
 /// Navigation and recommendation only; lesson state remains in each lesson.
 class JourneyHome extends StatefulWidget {
@@ -10,11 +11,13 @@ class JourneyHome extends StatefulWidget {
     required this.openReading,
     required this.openPractice,
     required this.openRush,
+    required this.openSound,
   });
   final AudioBridge storage;
   final Future<void> Function() openReading;
   final Future<void> Function() openPractice;
   final Future<void> Function() openRush;
+  final Future<void> Function(SoundSkill skill) openSound;
   @override
   State<JourneyHome> createState() => _JourneyHomeState();
 }
@@ -60,54 +63,6 @@ class _JourneyHomeState extends State<JourneyHome> {
     } finally {
       if (mounted) setState(() => busy = false);
     }
-  }
-
-  Future<void> _sound(bool imitate) async {
-    await Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text(imitate ? 'Listen and match' : 'Read and perform'),
-          ),
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.all(20),
-              children: [
-                Text(
-                  imitate
-                      ? 'Connect a sound with your voice or instrument.'
-                      : 'Connect the written note with a sound.',
-                  style: Theme.of(context).textTheme.headlineSmall,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  imitate
-                      ? 'In Practice, tap Hear this note. Wait for playback to finish, then sing, hum or play it. The green note shows what the microphone hears. Hold a match for one second.'
-                      : 'In Practice, read the black note, then sing or play it. Use Hear this note whenever you need a reference. You do not need absolute pitch; listening is useful practice.',
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Use a comfortable range. Octave matching is available in Settings. If you need a quiet exercise, use the reading lesson instead.',
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Free Practice totals combine sound and note-button answers. They are not separate reading or singing scores.',
-                ),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: widget.openPractice,
-                  child: const Text('Open free Practice'),
-                ),
-                TextButton(
-                  onPressed: widget.openReading,
-                  child: const Text('Read with quiet touch instead'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -176,7 +131,9 @@ class _JourneyHomeState extends State<JourneyHome> {
               title: const Text('Listen and match'),
               subtitle: const Text('Hear a reference, then sing or play it.'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: busy ? null : () => _open(() => _sound(true)),
+              onTap: busy
+                  ? null
+                  : () => _open(() => widget.openSound(SoundSkill.imitate)),
             ),
           ),
           Card(
@@ -184,7 +141,9 @@ class _JourneyHomeState extends State<JourneyHome> {
               title: const Text('Read and perform'),
               subtitle: const Text('Read the staff, then make the sound.'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: busy ? null : () => _open(() => _sound(false)),
+              onTap: busy
+                  ? null
+                  : () => _open(() => widget.openSound(SoundSkill.perform)),
             ),
           ),
           const SizedBox(height: 20),

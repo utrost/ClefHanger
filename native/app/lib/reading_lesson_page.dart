@@ -176,6 +176,7 @@ class _ReadingLessonPageState extends State<ReadingLessonPage> {
             const SizedBox(height: 12),
             PracticeStaff(
               note: widget.core.lessonNote(0, lesson.noteIndex),
+              instruction: 'Name this note.',
               revealAnswer:
                   lesson.teaching || lesson.revealed || lesson.answered,
               height: 185,

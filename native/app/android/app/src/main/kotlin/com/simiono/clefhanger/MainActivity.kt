@@ -77,8 +77,7 @@ class MainActivity : FlutterActivity() {
                         if (frequency == null || frequency !in 80.0..1000.0) {
                             result.error("bad_frequency", "Expected an audible note", null)
                         } else {
-                            playNotes(listOf(frequency))
-                            result.success(null)
+                            playNotes(listOf(frequency), result)
                         }
                     }
                     "playChord" -> {
@@ -86,8 +85,7 @@ class MainActivity : FlutterActivity() {
                         if (frequencies == null || frequencies.size != 3 || frequencies.any { it !in 80.0..1000.0 }) {
                             result.error("bad_frequency", "Expected three audible chord notes", null)
                         } else {
-                            playNotes(frequencies)
-                            result.success(null)
+                            playNotes(frequencies, result)
                         }
                     }
                     "readProgress" -> {
@@ -207,7 +205,7 @@ class MainActivity : FlutterActivity() {
     }
 
     /** Short piano-like reference tone. Dart blocks scoring until sound + acoustic tail ends. */
-    private fun playNotes(frequencies: List<Double>) {
+    private fun playNotes(frequencies: List<Double>, result: MethodChannel.Result) {
         Thread {
             val duration = 0.72
             val length = (sampleRate * duration).toInt()
@@ -222,6 +220,7 @@ class MainActivity : FlutterActivity() {
                 (wave * envelope * 27000).toInt().coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
             }
             var output: AudioTrack? = null
+            var failed = false
             try {
                 output = AudioTrack.Builder()
                     .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
@@ -229,14 +228,18 @@ class MainActivity : FlutterActivity() {
                     .setTransferMode(AudioTrack.MODE_STATIC)
                     .setBufferSizeInBytes(pcm.size * 2)
                     .build()
-                output.write(pcm, 0, pcm.size)
+                check(output.write(pcm, 0, pcm.size) == pcm.size) { "Incomplete audio output" }
                 output.play()
                 Thread.sleep(820)
             } catch (_: Exception) {
-                // Audio output can disappear while this short tone is playing.
+                failed = true
             } finally {
                 try { output?.stop() } catch (_: IllegalStateException) { }
-                output?.release()
+                try { output?.release() } catch (_: Exception) { failed = true }
+            }
+            runOnUiThread {
+                if (failed) result.error("playback_failed", "Reference sound could not play.", null)
+                else result.success(null)
             }
         }.apply { name = "ClefHanger reference note"; start() }
     }

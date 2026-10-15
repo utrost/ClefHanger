@@ -97,30 +97,26 @@ void main() {
     expect(core.disposals, 1);
     expect(tester.takeException(), isNull);
   });
-  testWidgets(
-    'sound skill introductions explain current score limits and allow quiet reading',
-    (tester) async {
-      await tester.pumpWidget(
-        ClefHangerApp(core: FakeCore(), audio: FakeAudio()),
-      );
-      await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('Listen and match'), 100);
-      await tester.tap(find.text('Listen and match'));
-      await tester.pumpAndSettle();
-      expect(
-        find.textContaining('not separate reading or singing scores'),
-        findsOneWidget,
-      );
-      await tester.scrollUntilVisible(
-        find.text('Read with quiet touch instead'),
-        100,
-      );
-      await tester.tap(find.text('Read with quiet touch instead'));
-      await tester.pumpAndSettle();
-      expect(find.text('Recognise C, D and E'), findsOneWidget);
-      await tester.pageBack();
-      await tester.pumpAndSettle();
-      expect(find.text('Open free Practice'), findsOneWidget);
-    },
-  );
+  testWidgets('sound setup offers fixed input choices and quiet reading', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ClefHangerApp(core: FakeCore(), audio: FakeAudio()),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('Listen and match'), 100);
+    await tester.tap(find.text('Listen and match'));
+    await tester.pumpAndSettle();
+    expect(find.text('Use my voice'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Read with quiet touch instead'),
+      100,
+    );
+    await tester.tap(find.text('Read with quiet touch instead'));
+    await tester.pumpAndSettle();
+    expect(find.text('Recognise C, D and E'), findsOneWidget);
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    expect(find.text('Use an instrument'), findsOneWidget);
+  });
 }
