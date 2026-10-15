@@ -158,7 +158,7 @@ class SoundSession extends ChangeNotifier {
     phase = SoundPhase.playback;
     _clearPitch();
     _silence?.cancel();
-    practice.blockPlayback(now);
+    practice.hear(now);
     _notify();
     try {
       await audio.playTone(core.frequency(practice.prompt!.midi));
@@ -228,7 +228,7 @@ class SoundSession extends ChangeNotifier {
     }
     final result = practice.hearFrequency(hz, now);
     if (result == AnswerResult.correct) {
-      if (_heardReference) {
+      if (practice.helped) {
         withReference++;
       } else {
         withoutReference++;

@@ -77,7 +77,7 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
           Text(
             widget.skill == SoundSkill.imitate
                 ? 'Hear each note, then match it. Six notes, with one steady second for each match.'
-                : 'Read the staff and make the sound. Hear a reference whenever you need it; the result distinguishes matches with and without playback.',
+                : 'Read the staff and make the sound. Hear a reference whenever you need it; the result distinguishes matches with and without requesting a reference.',
           ),
           const SizedBox(height: 12),
           const Text(
@@ -100,7 +100,7 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  'Last ${input.label.toLowerCase()} session: ${previous[input]!.matched}/6 matched · ${previous[input]!.withReference} after playback · ${previous[input]!.skipped} skipped.',
+                  'Last ${input.label.toLowerCase()} session: ${previous[input]!.matched}/6 matched · ${previous[input]!.withReference} with reference requested · ${previous[input]!.skipped} skipped.',
                 ),
               ),
             if (failed.contains(input))
@@ -229,8 +229,8 @@ class _SoundPracticePageState extends State<SoundPracticePage>
             Text(
               '${sound.evidence.matched}/6 matched · ${sound.evidence.skipped} skipped',
             ),
-            Text('${sound.withReference} after reference playback'),
-            Text('${sound.withoutReference} without reference playback'),
+            Text('${sound.withReference} with reference requested'),
+            Text('${sound.withoutReference} without requesting a reference'),
             const SizedBox(height: 16),
             const Text(
               'A match means one held pitch with feedback. It is not a test of note-name recognition or retained learning.',

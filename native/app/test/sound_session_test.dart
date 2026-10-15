@@ -7,6 +7,7 @@ import 'widget_test.dart' show FakeAudio, SingingCore;
 
 class ControlledAudio extends FakeAudio {
   Completer<void>? permission;
+  Completer<void>? playback;
   bool failSave = false;
   bool failPlayback = false;
   @override
@@ -15,6 +16,7 @@ class ControlledAudio extends FakeAudio {
   Future<void> playTone(double hz) async {
     if (failPlayback) throw StateError('No output');
     await super.playTone(hz);
+    await playback?.future;
   }
 
   @override
@@ -25,6 +27,38 @@ class ControlledAudio extends FakeAudio {
 }
 
 void main() {
+  testWidgets(
+    'interrupted reference cannot become an unassisted performance match',
+    (tester) async {
+      final core = SingingCore();
+      final audio = ControlledAudio()..playback = Completer<void>();
+      var now = 0;
+      final sound = SoundSession(
+        core: core,
+        audio: audio,
+        skill: SoundSkill.perform,
+        input: SoundInput.voice,
+        nowMs: () => now,
+      );
+      final playing = sound.hear();
+      unawaited(sound.stop(SoundPhase.paused));
+      audio.playback!.complete();
+      await playing;
+      now = 2000;
+      await sound.startMic();
+      core.heardHz = core.frequency(sound.practice.prompt!.midi);
+      for (var i = 0; i <= 10; i++) {
+        now += 100;
+        audio.controller.add(Uint8List(8192));
+        await tester.pump();
+      }
+      expect(sound.withReference, 1);
+      expect(sound.withoutReference, 0);
+      sound.dispose();
+      await tester.pump();
+    },
+  );
+
   testWidgets(
     'microphone start failure is recoverable without restarting the lesson',
     (tester) async {

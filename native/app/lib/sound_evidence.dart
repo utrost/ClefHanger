@@ -14,6 +14,7 @@ extension SoundInputLabel on SoundInput {
 }
 
 /// Latest completed six-note session, never migrated from mixed-input totals.
+/// Reference requests count conservatively even when output is interrupted.
 class SoundEvidence {
   const SoundEvidence({
     required this.skill,
