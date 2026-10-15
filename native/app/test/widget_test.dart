@@ -70,7 +70,9 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(360, 800));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       final audio = FakeAudio();
-      await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+      await tester.pumpWidget(
+        ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Use note buttons'));
       await tester.pumpAndSettle();
@@ -116,7 +118,12 @@ void main() {
     final core = SingingCore();
     var now = 1000;
     await tester.pumpWidget(
-      ClefHangerApp(core: core, audio: audio, practiceNowMs: () => now),
+      ClefHangerApp(
+        startInPractice: true,
+        core: core,
+        audio: audio,
+        practiceNowMs: () => now,
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Start practice'));
@@ -171,7 +178,12 @@ void main() {
     final core = SingingCore();
     var now = 1000;
     await tester.pumpWidget(
-      ClefHangerApp(core: core, audio: audio, practiceNowMs: () => now),
+      ClefHangerApp(
+        startInPractice: true,
+        core: core,
+        audio: audio,
+        practiceNowMs: () => now,
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Start practice'));
@@ -210,7 +222,9 @@ void main() {
     final audio = FakeAudio()
       ..progressFile =
           '{"schema":"clefhanger-progress-transfer-v1","progress":{"first-steps":{"attempts":3,"correct":2,"assisted":1,"recent":[true,false]}},"highScores":{"rush.highScore.treble.speed5.beginner":340}}';
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Settings'), 160);
     await tester.ensureVisible(find.text('Settings'));
@@ -234,7 +248,9 @@ void main() {
     tester,
   ) async {
     final audio = FakeAudio();
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Mic Lab'), 160);
     await tester.ensureVisible(find.text('Mic Lab'));
@@ -262,7 +278,9 @@ void main() {
     tester,
   ) async {
     final audio = FakeAudio();
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Next tip'), 160);
     await tester.ensureVisible(find.text('Next tip'));
@@ -274,7 +292,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(audio.saved['preferences'], contains('"tutorialDismissed":true'));
     await tester.pumpWidget(const SizedBox());
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Start with a lesson'), findsNothing);
   });
@@ -283,7 +303,9 @@ void main() {
     tester,
   ) async {
     final audio = FakeAudio();
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Treble').first);
     await tester.pumpAndSettle();
@@ -305,7 +327,9 @@ void main() {
     expect(audio.saved['mode.chords'], contains('"assisted":1'));
     expect(find.text('Next practice note'), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Chords'), findsOneWidget);
     expect(find.textContaining('with help'), findsOneWidget);
@@ -315,7 +339,9 @@ void main() {
     'first session has a readable staff, listening action and microphone fallback',
     (tester) async {
       final audio = FakeAudio();
-      await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+      await tester.pumpWidget(
+        ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+      );
       await tester.pumpAndSettle();
       expect(find.text('First steps'), findsOneWidget);
       expect(find.text('Start practice'), findsOneWidget);
@@ -345,7 +371,11 @@ void main() {
       await tester.binding.setSurfaceSize(const Size(360, 640));
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.pumpWidget(
-        ClefHangerApp(core: FakeCore(), audio: FakeAudio()),
+        ClefHangerApp(
+          startInPractice: true,
+          core: FakeCore(),
+          audio: FakeAudio(),
+        ),
       );
       await tester.pumpAndSettle();
       for (final label in [
@@ -374,7 +404,9 @@ void main() {
     'a correct touch answer advances only on Next and writes assisted progress',
     (tester) async {
       final audio = FakeAudio();
-      await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+      await tester.pumpWidget(
+        ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Hear this note'));
       await tester.pump();
@@ -397,7 +429,9 @@ void main() {
     tester,
   ) async {
     final audio = FakeAudio();
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('First steps'));
     await tester.pumpAndSettle();
@@ -417,7 +451,9 @@ void main() {
     expect(audio.saved['preferences'], contains('"hints":false'));
 
     await tester.pumpWidget(const SizedBox());
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     expect(find.text('Line notes'), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Settings'), 160);
@@ -440,7 +476,9 @@ void main() {
         code: 'mic_denied',
         message: 'Microphone permission denied.',
       );
-    await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+    await tester.pumpWidget(
+      ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+    );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Check mic'), 160);
     await tester.tap(find.text('Check mic'));
@@ -459,7 +497,12 @@ void main() {
     final audio = FakeAudio();
     var nowMs = 0;
     await tester.pumpWidget(
-      ClefHangerApp(core: FakeCore(), audio: audio, rushNowMs: () => nowMs),
+      ClefHangerApp(
+        startInPractice: true,
+        core: FakeCore(),
+        audio: audio,
+        rushNowMs: () => nowMs,
+      ),
     );
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Try a 60-second Rush'), 180);

@@ -34,3 +34,11 @@ The native app stores progress in Android app-private preferences. Browser Local
 Static analysis is clean and all 55 native tests pass with host Rust FFI enabled. The Read lesson introduces C/D/E staff positions and then checks them without labels. The 360×640 widget flow covers introduction, shuffled check, result, failed-save warning/retry and reload. Recognition is stored under `learning.v1.read.cde.latest`; existing mixed-input totals are preserved. Unit tests cover hints, corrections, duplicate answers, invalid records and completed-state guards. Navigation coverage checks that entering the lesson stops the microphone and returning preserves the Practice route.
 
 This slice has automated layout coverage, not a new physical-phone observation or human learning result. The first rollout is reached through “Guided reading lesson” in Practice. Journey-home navigation, comfortable-range setup, separate imitation/performance lessons and retained-learning checks remain scheduled in the [roadmap](../../docs/roadmap.md).
+
+## Journey home navigation — 2026-10-15
+
+The default launch now recommends guided reading, refreshes its distinct result after returning, and explains Listen and match versus Read and perform before opening existing free Practice. Sound totals are explicitly described as mixed-input practice rather than independent skill scores. Quiet reading is offered as a separate route. Rush and settings remain secondary actions.
+
+Navigation tests cover 360×640 layouts, 150% system text, reading-result refresh without interpreting legacy totals, sound-to-quiet-reading navigation, repeated Practice visits without disposing the shared Rust core, and Rush return to home. Large-text testing exposed and fixed a Rush time/score row overflow. The app now owns the core; individual routes release only their own subscriptions/controllers. Practice omits its duplicate heading when a back bar is present so microphone controls remain in the compact viewport.
+
+These are automated observations, not new physical-phone or participant evidence. Input-specific sound progress and audio setup remain open in N2–N4.

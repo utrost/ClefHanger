@@ -14,12 +14,14 @@ import 'staff.dart';
 class RushPage extends StatefulWidget {
   const RushPage({
     super.key,
+    this.returnLabel = 'Back to Practice',
     required this.core,
     required this.audio,
     required this.lesson,
     this.mode = NotationMode.treble,
     this.nowMs,
   });
+  final String returnLabel;
   final PracticeCore core;
   final AudioBridge audio;
   final int lesson;
@@ -319,7 +321,7 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
             title: Text('${widget.mode.label} Rush'),
             backgroundColor: Theme.of(context).scaffoldBackgroundColor,
             leading: IconButton(
-              tooltip: 'Back to Practice',
+              tooltip: widget.returnLabel,
               onPressed: _exit,
               icon: const Icon(Icons.arrow_back),
             ),
@@ -335,13 +337,13 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
-                      Row(
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 4,
                         children: [
-                          Expanded(
-                            child: Text(
-                              'Time ${session.remainingSeconds(now)}s',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
+                          Text(
+                            'Time ${session.remainingSeconds(now)}s',
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                           Text('Score ${session.score} · Best $_highScore'),
                         ],
@@ -603,10 +605,7 @@ class _RushPageState extends State<RushPage> with WidgetsBindingObserver {
                 onPressed: _start,
                 child: const Text('Play another 60s Rush'),
               ),
-              TextButton(
-                onPressed: _exit,
-                child: const Text('Back to Practice'),
-              ),
+              TextButton(onPressed: _exit, child: Text(widget.returnLabel)),
             ],
           ),
         ),

@@ -16,6 +16,7 @@ import 'piano_input.dart';
 import 'mic_diagnostic.dart';
 import 'practice_session.dart';
 import 'reading_lesson_page.dart';
+import 'journey_home.dart';
 import 'pitch_guidance.dart';
 import 'progress_transfer.dart';
 import 'rush_page.dart';
@@ -43,18 +44,43 @@ void main() {
   }
 }
 
-class ClefHangerApp extends StatelessWidget {
+class ClefHangerApp extends StatefulWidget {
   const ClefHangerApp({
     super.key,
     required this.core,
     required this.audio,
     this.rushNowMs,
     this.practiceNowMs,
+    this.startInPractice = false,
   });
   final PracticeCore core;
   final AudioBridge audio;
   final int Function()? rushNowMs;
   final int Function()? practiceNowMs;
+  final bool startInPractice;
+  @override
+  State<ClefHangerApp> createState() => _ClefHangerAppState();
+}
+
+class _ClefHangerAppState extends State<ClefHangerApp> {
+  @override
+  void dispose() {
+    widget.audio.stop();
+    widget.core.dispose();
+    super.dispose();
+  }
+
+  Future<void> _practice(BuildContext context) =>
+      Navigator.of(context).push<void>(
+        MaterialPageRoute(
+          builder: (_) => PracticePage(
+            core: widget.core,
+            audio: widget.audio,
+            rushNowMs: widget.rushNowMs,
+            nowMs: widget.practiceNowMs,
+          ),
+        ),
+      );
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'ClefHanger',
@@ -72,12 +98,39 @@ class ClefHangerApp extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     ),
-    home: PracticePage(
-      core: core,
-      audio: audio,
-      rushNowMs: rushNowMs,
-      nowMs: practiceNowMs,
-    ),
+    home: widget.startInPractice
+        ? PracticePage(
+            core: widget.core,
+            audio: widget.audio,
+            rushNowMs: widget.rushNowMs,
+            nowMs: widget.practiceNowMs,
+          )
+        : Builder(
+            builder: (context) => JourneyHome(
+              storage: widget.audio,
+              openReading: () => Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => ReadingLessonPage(
+                    core: widget.core,
+                    storage: widget.audio,
+                    returnLabel: 'Back',
+                  ),
+                ),
+              ),
+              openPractice: () => _practice(context),
+              openRush: () => Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => RushPage(
+                    lesson: 0,
+                    returnLabel: 'Back to home',
+                    core: widget.core,
+                    audio: widget.audio,
+                    nowMs: widget.rushNowMs,
+                  ),
+                ),
+              ),
+            ),
+          ),
   );
 }
 
@@ -274,7 +327,6 @@ class _PracticePageState extends State<PracticePage>
     _nextNoteTimer?.cancel();
     _micSubscription?.cancel();
     widget.audio.stop();
-    widget.core.dispose();
     _practiceScroll.dispose();
     super.dispose();
   }
@@ -745,28 +797,33 @@ class _PracticePageState extends State<PracticePage>
         : modeAnswers(session.mode);
     const amber = Color(0xFFF6C84A);
     return Scaffold(
+      appBar: Navigator.canPop(context)
+          ? AppBar(title: const Text('Free Practice'))
+          : null,
       body: SafeArea(
         child: ListView(
           controller: _practiceScroll,
           padding: EdgeInsets.fromLTRB(12, largeText ? 4 : 10, 12, 28),
           children: [
-            Text(
-              'ClefHanger',
-              style: TextStyle(
-                fontSize: largeText ? 27 : 30,
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFFF9E8C0),
+            if (!Navigator.canPop(context)) ...[
+              Text(
+                'ClefHanger',
+                style: TextStyle(
+                  fontSize: largeText ? 27 : 30,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFFF9E8C0),
+                ),
               ),
-            ),
-            Text(
-              largeText
-                  ? 'Read. Hear. Sing or play.'
-                  : 'Read a note. Hear it. Make it yours.',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(color: Color(0xFFCBBBD8)),
-            ),
-            SizedBox(height: largeText ? 4 : 14),
+              Text(
+                largeText
+                    ? 'Read. Hear. Sing or play.'
+                    : 'Read a note. Hear it. Make it yours.',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Color(0xFFCBBBD8)),
+              ),
+              SizedBox(height: largeText ? 4 : 14),
+            ],
             Card(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(12, 9, 12, 9),

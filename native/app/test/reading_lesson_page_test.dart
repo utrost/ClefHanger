@@ -23,7 +23,9 @@ void main() {
     'guided route stops microphone and returns to existing practice',
     (tester) async {
       final audio = FakeAudio();
-      await tester.pumpWidget(ClefHangerApp(core: FakeCore(), audio: audio));
+      await tester.pumpWidget(
+        ClefHangerApp(startInPractice: true, core: FakeCore(), audio: audio),
+      );
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.text('Check mic'), 100);
       await tester.tap(find.text('Check mic'));

@@ -7,9 +7,11 @@ import 'staff.dart';
 class ReadingLessonPage extends StatefulWidget {
   const ReadingLessonPage({
     super.key,
+    this.returnLabel = 'Back to Practice',
     required this.core,
     required this.storage,
   });
+  final String returnLabel;
   final PracticeCore core;
   final AudioBridge storage;
   @override
@@ -162,7 +164,7 @@ class _ReadingLessonPageState extends State<ReadingLessonPage> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Back to Practice'),
+              child: Text(widget.returnLabel),
             ),
           ] else ...[
             Text(
