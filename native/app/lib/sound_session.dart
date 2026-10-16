@@ -30,6 +30,7 @@ class SoundSession extends ChangeNotifier {
     required this.input,
     this.voiceRange = VoiceRange.middle,
     this.setupPreviewRequested = false,
+    this.demonstrationRequested = false,
     int Function()? nowMs,
   }) : _nowOverride = nowMs,
        practice = PracticeSession(core) {
@@ -41,6 +42,7 @@ class SoundSession extends ChangeNotifier {
   final SoundInput input;
   final VoiceRange voiceRange;
   final bool setupPreviewRequested;
+  final bool demonstrationRequested;
   int get referenceMidi =>
       practice.prompt!.midi +
       (input == SoundInput.voice ? voiceRange.semitones : 0);
@@ -72,6 +74,7 @@ class SoundSession extends ChangeNotifier {
     withoutReference: withoutReference,
     skipped: practice.round!.skipped,
     referenceRange: input == SoundInput.voice ? voiceRange : null,
+    demonstrationRequested: demonstrationRequested,
     setupPreviewRequested: input == SoundInput.voice && setupPreviewRequested,
   );
 

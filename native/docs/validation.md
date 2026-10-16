@@ -64,3 +64,13 @@ Focused tests cover low/high reference frequencies and synthetic held matches, u
 Audible tone quality, comfort for real singers, room noise and physical-phone accuracy remain unverified.
 
 The release APK compiled and passed the no-Google-SDK/native-code/16 KB alignment checks. Build 1011 was signed with the existing test certificate and installed over the previous emulator version. On the compact Android 15 emulator, the lower C/E preview completed, the scrollable setup continued into practice, and “Reference C3 · written C4” appeared with the microphone still off. No AndroidRuntime or Flutter errors appeared in these checked flows. This verifies playback completion and UI behavior, not audible quality.
+
+## Sound teaching demonstration — 2026-10-16
+
+Static analysis is clean and all 75 Flutter tests pass with host Rust FFI enabled. A separate introduction before voice/instrument sound practice shows C, D and E on the staff as their tones play. Each staff update renders before playback starts. The copy distinguishes imitation from performance, explains adjacent staff steps/whole tones in this example, and explicitly permits a reference instead of assuming absolute pitch. Voice tones follow the selected register; written notation remains C4/D4/E4. No capture starts in this introduction.
+
+Tests cover synchronized C/D/E staff steps and transposed frequencies, interruption preventing the next queued tone, replay, failed playback followed by continuation, 360×640 at 150% text, persisted assistance in results and the refreshed chooser, and old/malformed evidence. Existing navigation tests also cover continuing without requesting the demonstration. A demonstration request is retained even on failure; it does not unlock imitation scoring or count as a match. Older result records remain readable with no demonstration request recorded.
+
+Physical-phone sound quality, real-singer accuracy and beginner understanding remain open. This demonstration does not establish learning efficacy or retained skill.
+
+Release build 1012 passed native-code, 16 KB alignment and no-Google-SDK packaging checks, was signed with the persistent test certificate, and installed over the previous Android emulator build. The [compact teaching screen](sound-demo-emulator.png) keeps the staff and playback button visible together. Emulator playback completed at E; scrolling to Start sound practice opened the six-note session with its microphone off. No AndroidRuntime or Flutter errors were found in this flow. Playback completion is not evidence of audible tone quality.

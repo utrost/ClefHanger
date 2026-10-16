@@ -170,6 +170,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Use this pitch level'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Start sound practice'), 100);
+      await tester.ensureVisible(find.text('Start sound practice'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start sound practice'));
+      await tester.pumpAndSettle();
       expect(find.text('Reference C3 · written C4'), findsOneWidget);
       expect(
         tester
@@ -267,6 +272,11 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Use once without saving'));
+      await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Start sound practice'), 100);
+      await tester.ensureVisible(find.text('Start sound practice'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start sound practice'));
       await tester.pumpAndSettle();
       expect(find.text('Reference C5 · written C4'), findsOneWidget);
       expect(audio.saved.containsKey(voiceRangeKey), false);

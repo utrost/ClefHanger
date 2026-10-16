@@ -5,6 +5,7 @@ import 'pitch_guidance.dart';
 import 'reading_lesson_page.dart';
 import 'sound_evidence.dart';
 import 'sound_session.dart';
+import 'sound_demo_page.dart';
 import 'staff.dart';
 import 'voice_range.dart';
 import 'voice_range_page.dart';
@@ -61,6 +62,18 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
       );
       if (!mounted || selection == null) return;
     }
+    final demonstrationRequested = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => SoundDemoPage(
+          core: widget.core,
+          audio: widget.audio,
+          skill: widget.skill,
+          input: input,
+          range: selection?.range ?? VoiceRange.middle,
+        ),
+      ),
+    );
+    if (!mounted || demonstrationRequested == null) return;
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => SoundPracticePage(
@@ -68,6 +81,7 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
           audio: widget.audio,
           skill: widget.skill,
           input: input,
+          demonstrationRequested: demonstrationRequested,
           voiceRange: selection?.range ?? VoiceRange.middle,
           setupPreviewRequested: selection?.previewRequested ?? false,
         ),
@@ -123,6 +137,10 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
               ),
             if (previous[input]?.setupPreviewRequested == true)
               const Text('A pitch preview was requested before that session.'),
+            if (previous[input]?.demonstrationRequested == true)
+              const Text(
+                'A C → D → E demonstration was requested before that session.',
+              ),
             if (failed.contains(input))
               Text(
                 'Previous ${input.label.toLowerCase()} result could not be loaded.',
@@ -160,6 +178,7 @@ class SoundPracticePage extends StatefulWidget {
     this.nowMs,
     this.voiceRange = VoiceRange.middle,
     this.setupPreviewRequested = false,
+    this.demonstrationRequested = false,
   });
   final PracticeCore core;
   final AudioBridge audio;
@@ -168,6 +187,7 @@ class SoundPracticePage extends StatefulWidget {
   final int Function()? nowMs;
   final VoiceRange voiceRange;
   final bool setupPreviewRequested;
+  final bool demonstrationRequested;
   @override
   State<SoundPracticePage> createState() => _SoundPracticePageState();
 }
@@ -188,6 +208,7 @@ class _SoundPracticePageState extends State<SoundPracticePage>
       nowMs: widget.nowMs,
       voiceRange: widget.voiceRange,
       setupPreviewRequested: widget.setupPreviewRequested,
+      demonstrationRequested: widget.demonstrationRequested,
     )..addListener(_changed);
     WidgetsBinding.instance.addObserver(this);
   }
@@ -261,6 +282,10 @@ class _SoundPracticePageState extends State<SoundPracticePage>
             ),
             if (sound.evidence.setupPreviewRequested)
               const Text('A pitch preview was requested before this session.'),
+            if (sound.evidence.demonstrationRequested)
+              const Text(
+                'A C → D → E demonstration was requested before this session.',
+              ),
             const SizedBox(height: 16),
             const Text(
               'A match means one held pitch with feedback. It is not a test of note-name recognition or retained learning.',

@@ -25,12 +25,14 @@ class SoundEvidence {
     required this.skipped,
     this.referenceRange,
     this.setupPreviewRequested = false,
+    this.demonstrationRequested = false,
   });
   final SoundSkill skill;
   final SoundInput input;
   final int withReference, withoutReference, skipped;
   final VoiceRange? referenceRange;
   final bool setupPreviewRequested;
+  final bool demonstrationRequested;
   int get matched => withReference + withoutReference;
   static String key(SoundSkill skill, SoundInput input) =>
       'learning.v1.sound.${skill.name}.${input.name}.cde.latest';
@@ -45,6 +47,7 @@ class SoundEvidence {
     'skipped': skipped,
     if (referenceRange != null) 'referenceRange': referenceRange!.name,
     'setupPreviewRequested': setupPreviewRequested,
+    'demonstrationRequested': demonstrationRequested,
   });
   static SoundEvidence? decode(
     String? raw,
@@ -63,8 +66,10 @@ class SoundEvidence {
       }
       final range = voiceRangeFromName(value['referenceRange']);
       final preview = value['setupPreviewRequested'] ?? false;
+      final demo = value['demonstrationRequested'] ?? false;
       if ((value.containsKey('referenceRange') && range == null) ||
           preview is! bool ||
+          demo is! bool ||
           (input == SoundInput.instrument && (range != null || preview))) {
         return null;
       }
@@ -89,6 +94,7 @@ class SoundEvidence {
         skipped: skipped,
         referenceRange: range,
         setupPreviewRequested: preview,
+        demonstrationRequested: demo,
       );
     } catch (_) {
       return null;

@@ -33,6 +33,11 @@ void main() {
       await tester.scrollUntilVisible(find.text('Use an instrument'), 100);
       await tester.tap(find.text('Use an instrument'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Start sound practice'), 100);
+      await tester.ensureVisible(find.text('Start sound practice'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start sound practice'));
+      await tester.pumpAndSettle();
       expect(find.text('Instrument · same note in any octave'), findsOneWidget);
       final semantics = tester.ensureSemantics();
       expect(
