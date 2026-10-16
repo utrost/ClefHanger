@@ -31,8 +31,10 @@ class SoundSession extends ChangeNotifier {
     this.voiceRange = VoiceRange.middle,
     this.setupPreviewRequested = false,
     this.demonstrationRequested = false,
+    bool automaticAdvance = true,
     int Function()? nowMs,
-  }) : _nowOverride = nowMs,
+  }) : _automaticAdvance = automaticAdvance,
+       _nowOverride = nowMs,
        practice = PracticeSession(core) {
     practice.start();
   }
@@ -48,6 +50,16 @@ class SoundSession extends ChangeNotifier {
       (input == SoundInput.voice ? voiceRange.semitones : 0);
   String get referenceName =>
       '${practice.prompt!.name}${referenceMidi ~/ 12 - 1}';
+  bool _automaticAdvance;
+  bool get automaticAdvance => _automaticAdvance;
+  void setAutomaticAdvance(bool enabled) {
+    if (_automaticAdvance == enabled) return;
+    _automaticAdvance = enabled;
+    if (!enabled && practice.completed && !finished) {
+      stop(SoundPhase.matched);
+    }
+  }
+
   final PracticeSession practice;
   final int Function()? _nowOverride;
   final _clock = Stopwatch()..start();
@@ -91,7 +103,14 @@ class SoundSession extends ChangeNotifier {
   }
 
   Future<void> startMic() async {
-    if (_disposed || active || starting || finished || playing) return;
+    if (_disposed ||
+        active ||
+        starting ||
+        finished ||
+        playing ||
+        practice.completed) {
+      return;
+    }
     final generation = ++_generation;
     starting = true;
     phase = SoundPhase.requesting;
@@ -257,6 +276,8 @@ class SoundSession extends ChangeNotifier {
       if (finished) {
         stop(SoundPhase.finished);
         save();
+      } else if (!_automaticAdvance) {
+        stop(SoundPhase.matched);
       } else {
         phase = SoundPhase.matched;
         _advance = Timer(const Duration(milliseconds: 650), next);
@@ -330,6 +351,9 @@ class SoundSession extends ChangeNotifier {
       return 'Microphone paused. Enable it when you are ready.';
     }
     if (phase == SoundPhase.finished) return 'Sound session complete.';
+    if (practice.completed && !finished && !active) {
+      return 'Matched. Microphone stopped. Choose Next sound note when ready.';
+    }
     if (phase == SoundPhase.matched) return 'Matched. Next note coming…';
     if (!active) return 'Microphone off. Enable it when you are ready.';
     if (needsReference) return 'Hear this note first, then imitate it.';

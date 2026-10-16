@@ -247,6 +247,11 @@ class _SoundPracticePageState extends State<SoundPracticePage>
       voiceRange: widget.voiceRange,
       setupPreviewRequested: widget.setupPreviewRequested,
       demonstrationRequested: widget.demonstrationRequested,
+      automaticAdvance: !WidgetsBinding
+          .instance
+          .platformDispatcher
+          .accessibilityFeatures
+          .accessibleNavigation,
     )..addListener(_changed);
     WidgetsBinding.instance.addObserver(this);
   }
@@ -258,6 +263,18 @@ class _SoundPracticePageState extends State<SoundPracticePage>
       _finished = true;
       if (scroll.hasClients) scroll.jumpTo(0);
     }
+  }
+
+  @override
+  void didChangeAccessibilityFeatures() {
+    sound.setAutomaticAdvance(
+      !WidgetsBinding
+          .instance
+          .platformDispatcher
+          .accessibilityFeatures
+          .accessibleNavigation,
+    );
+    if (mounted) setState(() {});
   }
 
   @override
@@ -376,6 +393,7 @@ class _SoundPracticePageState extends State<SoundPracticePage>
                   ? 'Play one note.'
                   : 'Sing or hum one note.',
               detectedMidi: sound.detectedMidi,
+              describeDetectedPitch: !sound.active,
               matchProgress: sound.hold,
               completed: sound.practice.completed,
               height: MediaQuery.sizeOf(context).height < 750
@@ -384,7 +402,7 @@ class _SoundPracticePageState extends State<SoundPracticePage>
             ),
             const SizedBox(height: 12),
             Semantics(
-              liveRegion: true,
+              liveRegion: !sound.active && !sound.playing,
               child: Text(sound.message, key: const Key('soundStatus')),
             ),
             SizedBox(
@@ -393,9 +411,14 @@ class _SoundPracticePageState extends State<SoundPracticePage>
                   ? null
                   : PitchMeter(guidance: sound.guidance!),
             ),
+            if (!sound.automaticAdvance)
+              const Text(
+                'Screen-reader pacing: the microphone stops after each match. Choose Next sound note, then enable it again. Use earphones to keep spoken feedback out of the microphone.',
+              ),
             const SizedBox(height: 8),
             FilledButton(
-              onPressed: sound.starting || sound.playing
+              onPressed:
+                  sound.starting || sound.playing || sound.practice.completed
                   ? null
                   : sound.active
                   ? () => sound.stop()

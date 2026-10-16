@@ -15,6 +15,7 @@ class PracticeStaff extends StatelessWidget {
     this.height = 238,
     this.emptyClef = 'treble',
     this.instruction,
+    this.describeDetectedPitch = true,
   });
   final NativeNote? note;
   final bool revealAnswer;
@@ -26,6 +27,7 @@ class PracticeStaff extends StatelessWidget {
   final double height;
   final String emptyClef;
   final String? instruction;
+  final bool describeDetectedPitch;
   String _semanticsLabel() {
     final prompt = note;
     if (prompt == null) {
@@ -34,7 +36,7 @@ class PracticeStaff extends StatelessWidget {
     if (prompt.isChord) {
       return revealAnswer
           ? 'Treble staff chord ${prompt.displayName}.'
-          : 'Treble staff chord with three stacked notes. Name the chord.';
+          : '${prompt.clef == 'bass' ? 'Bass' : 'Treble'} staff chord with notes at ${prompt.chordStaffSteps.map(_position).join(', ')}. Name the chord.';
     }
     final clef = prompt.clef == 'bass' ? 'Bass' : 'Treble';
     final accidental = prompt.accidental == null
@@ -43,7 +45,7 @@ class PracticeStaff extends StatelessWidget {
     final target = revealAnswer
         ? '$clef staff note ${prompt.displayName}, ${_position(prompt.staffStep)}.'
         : '$clef staff note at ${_position(prompt.staffStep)}$accidental. ${instruction ?? 'Sing or name it.'}';
-    if (detectedMidi == null) return target;
+    if (detectedMidi == null || !describeDetectedPitch) return target;
     return '$target Microphone hears ${_midiName(detectedMidi!)}. The green note shows its staff position near the target octave.';
   }
 
@@ -102,8 +104,18 @@ NativeNote ghostPitchForMidi(NativeNote target, int detectedMidi) {
 String _position(int step) {
   if (step == -2) return 'the ledger line below the staff';
   if (step == 10) return 'the first ledger line above the staff';
-  if (step < 0) return 'below the staff';
-  if (step > 8) return 'above the staff';
+  if (step == -1) return 'the space just below the staff';
+  if (step == 9) return 'the space just above the staff';
+  if (step < -2) {
+    return step.isEven
+        ? 'ledger line ${-step ~/ 2} below the staff'
+        : 'space ${(-step + 1) ~/ 2} below the staff';
+  }
+  if (step > 10) {
+    return step.isEven
+        ? 'ledger line ${(step - 8) ~/ 2} above the staff'
+        : 'space ${(step - 7) ~/ 2} above the staff';
+  }
   return '${step.isEven ? 'line' : 'space'} ${(step ~/ 2) + 1} from the bottom';
 }
 

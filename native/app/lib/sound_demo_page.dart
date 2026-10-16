@@ -145,7 +145,7 @@ class _SoundDemoPageState extends State<SoundDemoPage>
               height: 150,
               instruction: positions[index],
             ),
-            Semantics(liveRegion: true, child: Text(positions[index])),
+            Semantics(liveRegion: !playing, child: Text(positions[index])),
             const SizedBox(height: 12),
             OutlinedButton(
               onPressed: playing ? null : _play,
