@@ -192,8 +192,8 @@ void main() {
       expect(saved.skipped, 6);
       await tapVisible(tester, 'Choose another session');
       expect(
-        find.text(
-          'A C → D → E demonstration was requested before that session.',
+        find.textContaining(
+          'A C → D → E demonstration was requested before the session.',
         ),
         findsOneWidget,
       );

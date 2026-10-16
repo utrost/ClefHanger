@@ -6,6 +6,7 @@ import 'reading_lesson_page.dart';
 import 'sound_evidence.dart';
 import 'sound_session.dart';
 import 'sound_demo_page.dart';
+import 'session_guidance.dart';
 import 'staff.dart';
 import 'voice_range.dart';
 import 'voice_range_page.dart';
@@ -46,12 +47,18 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
           });
         }
       } catch (_) {
-        if (mounted) setState(() => failed.add(input));
+        if (mounted) {
+          setState(() {
+            previous.remove(input);
+            failed.add(input);
+          });
+        }
       }
     }
   }
 
-  Future<void> _practice(SoundInput input) async {
+  Future<void> _practice(SoundInput input, {SoundSkill? nextSkill}) async {
+    final skill = nextSkill ?? widget.skill;
     VoiceSetupSelection? selection;
     if (input == SoundInput.voice) {
       selection = await Navigator.of(context).push<VoiceSetupSelection>(
@@ -67,7 +74,7 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
         builder: (_) => SoundDemoPage(
           core: widget.core,
           audio: widget.audio,
-          skill: widget.skill,
+          skill: skill,
           input: input,
           range: selection?.range ?? VoiceRange.middle,
         ),
@@ -79,7 +86,7 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
         builder: (_) => SoundPracticePage(
           core: widget.core,
           audio: widget.audio,
-          skill: widget.skill,
+          skill: skill,
           input: input,
           demonstrationRequested: demonstrationRequested,
           voiceRange: selection?.range ?? VoiceRange.middle,
@@ -131,15 +138,46 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
                   'Last ${input.label.toLowerCase()} session: ${previous[input]!.matched}/6 matched · ${previous[input]!.withReference} with reference requested · ${previous[input]!.skipped} skipped.',
                 ),
               ),
+            if (previous[input] != null) ...[
+              Text(
+                SessionGuidance.sound(
+                  widget.skill,
+                  input,
+                  previous[input],
+                ).title,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              Text(
+                SessionGuidance.sound(
+                  widget.skill,
+                  input,
+                  previous[input],
+                ).reason,
+              ),
+              if (SessionGuidance.sound(
+                    widget.skill,
+                    input,
+                    previous[input],
+                  ).soundSkill !=
+                  widget.skill)
+                TextButton(
+                  onPressed: () => _practice(
+                    input,
+                    nextSkill: SessionGuidance.sound(
+                      widget.skill,
+                      input,
+                      previous[input],
+                    ).soundSkill,
+                  ),
+                  child: Text(
+                    'Try read and perform with ${input.label.toLowerCase()}',
+                  ),
+                ),
+              const SizedBox(height: 12),
+            ],
             if (previous[input]?.referenceRange != null)
               Text(
                 'Reference level: ${previous[input]!.referenceRange!.label}',
-              ),
-            if (previous[input]?.setupPreviewRequested == true)
-              const Text('A pitch preview was requested before that session.'),
-            if (previous[input]?.demonstrationRequested == true)
-              const Text(
-                'A C → D → E demonstration was requested before that session.',
               ),
             if (failed.contains(input))
               Text(
@@ -289,6 +327,23 @@ class _SoundPracticePageState extends State<SoundPracticePage>
             const SizedBox(height: 16),
             const Text(
               'A match means one held pitch with feedback. It is not a test of note-name recognition or retained learning.',
+            ),
+            const SizedBox(height: 12),
+            Text(
+              SessionGuidance.sound(
+                widget.skill,
+                widget.input,
+                sound.evidence,
+              ).title,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            Text(
+              SessionGuidance.sound(
+                widget.skill,
+                widget.input,
+                sound.evidence,
+                includeContext: false,
+              ).reason,
             ),
             const SizedBox(height: 12),
             if (sound.saving)

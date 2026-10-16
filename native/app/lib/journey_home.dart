@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'android_audio.dart';
 import 'reading_lesson.dart';
 import 'sound_evidence.dart';
+import 'session_guidance.dart';
 
 /// Navigation and recommendation only; lesson state remains in each lesson.
 class JourneyHome extends StatefulWidget {
@@ -44,10 +45,10 @@ class _JourneyHomeState extends State<JourneyHome> {
       }
     } catch (_) {
       if (mounted) {
-        setState(
-          () => error =
-              'Saved reading result unavailable. You can still practise.',
-        );
+        setState(() {
+          last = null;
+          error = 'Saved reading result unavailable. You can still practise.';
+        });
       }
     } finally {
       if (mounted) setState(() => loading = false);
@@ -82,19 +83,11 @@ class _JourneyHomeState extends State<JourneyHome> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    last == null
-                        ? 'Start with reading'
-                        : 'Your next reading session',
+                    SessionGuidance.reading(last).title,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    last == null
-                        ? 'Learn to recognise C, D and E on the staff. No microphone needed.'
-                        : last!.review.isNotEmpty
-                        ? 'Revisit ${last!.review.join(', ')} and check the three positions again.'
-                        : 'Try C, D and E again to see what you remember. One successful round is a beginning.',
-                  ),
+                  Text(SessionGuidance.reading(last).reason),
                   if (last != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
@@ -107,19 +100,28 @@ class _JourneyHomeState extends State<JourneyHome> {
                   FilledButton(
                     onPressed: busy || loading
                         ? null
-                        : () => _open(widget.openReading),
+                        : () => _open(
+                            SessionGuidance.reading(last).soundSkill == null
+                                ? widget.openReading
+                                : () => widget.openSound(
+                                    SessionGuidance.reading(last).soundSkill!,
+                                  ),
+                          ),
                     child: Text(
                       loading
                           ? 'Loading…'
-                          : last == null
-                          ? 'Start reading lesson'
-                          : 'Practise reading again',
+                          : SessionGuidance.reading(last).action,
                     ),
                   ),
                 ],
               ),
             ),
           ),
+          if (SessionGuidance.reading(last).soundSkill != null)
+            TextButton(
+              onPressed: busy ? null : () => _open(widget.openReading),
+              child: const Text('Practise reading again'),
+            ),
           const SizedBox(height: 20),
           Text(
             'Connect notes with sound',

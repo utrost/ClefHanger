@@ -74,3 +74,13 @@ Tests cover synchronized C/D/E staff steps and transposed frequencies, interrupt
 Physical-phone sound quality, real-singer accuracy and beginner understanding remain open. This demonstration does not establish learning efficacy or retained skill.
 
 Release build 1012 passed native-code, 16 KB alignment and no-Google-SDK packaging checks, was signed with the persistent test certificate, and installed over the previous Android emulator build. The [compact teaching screen](sound-demo-emulator.png) keeps the staff and playback button visible together. Emulator playback completed at E; scrolling to Start sound practice opened the six-note session with its microphone off. No AndroidRuntime or Flutter errors were found in this flow. Playback completion is not evidence of audible tone quality.
+
+## Return-session guidance — 2026-10-16
+
+All 79 Flutter tests pass with host Rust FFI enabled; static analysis is clean. Home suggests imitation after a reading check with three independent first answers and no review flags, while preserving a reading-repeat route. Otherwise it recommends reading/review. Sound results and input choosers recommend repetition after skips; six imitation matches offer Read and perform using the same voice/instrument input. Performance completion suggests revisiting on another occasion without inferring retained learning.
+
+Guidance is a pure projection of existing latest-session records. No new storage schema, historical timestamps, mastery score or per-note mistake history is introduced. Reference requests, setup previews and demonstrations remain explicit; skip totals never become claims about particular difficult notes. Evidence for another skill or input is rejected by the guidance helper. Storage refresh failures now clear stale results.
+
+New tests cover reading thresholds/review flags, missing evidence, skill/input isolation, assistance explanations, skips versus completion, home refresh and read failure, corrupt input records, and instrument-specific onward navigation at 360×640 with 150% text. Existing session completion tests exercise refreshed result guidance. Physical-phone audio reliability, TalkBack and participant learning evidence remain open.
+
+Release build 1013 passed native-code, 16 KB alignment and no-Google-SDK checks, then installed over the previous emulator build with the persistent test certificate. The existing instrument/imitation record survived the update; its [compact recommendation](session-guidance-emulator.png) correctly suggested repetition after six skips without creating a voice recommendation. Controls remained reachable by scrolling. No AndroidRuntime or Flutter errors appeared in this inspected flow.
