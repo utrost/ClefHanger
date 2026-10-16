@@ -100,6 +100,12 @@ class SoundSession extends ChangeNotifier {
     _notify();
     _subscription = audio.samples.listen(
       _samples,
+      onDone: () {
+        if (_disposed || (!active && !starting)) return;
+        stop(SoundPhase.error);
+        error = 'Microphone stream ended. Try enabling it again.';
+        _notify();
+      },
       onError: (Object error) {
         stop(SoundPhase.error);
         this.error = 'Microphone interrupted. Try enabling it again.';
@@ -138,14 +144,14 @@ class SoundSession extends ChangeNotifier {
     phase = finished ? SoundPhase.finished : next;
     final subscription = _subscription;
     _subscription = null;
-    final stopping = audio.stop();
+    final stopping = Future.wait([audio.stop(), audio.stopPlayback()]);
     _notify();
     await subscription?.cancel();
     try {
       await stopping;
     } catch (_) {
       if (!_disposed) {
-        error = 'Could not confirm microphone shutdown.';
+        error = 'Could not confirm audio shutdown.';
         _notify();
       }
     }

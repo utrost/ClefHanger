@@ -43,13 +43,28 @@ class _VoiceRangePageState extends State<VoiceRangePage>
     }
   }
 
+  Future<void> _stopPlayback() async {
+    generation++;
+    setState(() {
+      playing = false;
+      message = 'Playback stopped. Replay when ready.';
+    });
+    try {
+      await widget.audio.stopPlayback();
+    } catch (_) {
+      if (mounted) {
+        setState(() => message = 'Could not stop playback. Try again.');
+      }
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
-      generation++;
       if (playing) {
+        _stopPlayback();
         setState(() => message = 'Preview interrupted. Try again when ready.');
       }
     }
@@ -85,7 +100,7 @@ class _VoiceRangePageState extends State<VoiceRangePage>
         );
       }
     } finally {
-      if (mounted) setState(() => playing = false);
+      if (mounted && token == generation) setState(() => playing = false);
     }
   }
 
@@ -119,13 +134,14 @@ class _VoiceRangePageState extends State<VoiceRangePage>
   @override
   void dispose() {
     generation++;
+    if (playing) widget.audio.stopPlayback().catchError((Object _) {});
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => PopScope(
-    canPop: !playing && !saving,
+    canPop: !saving,
     child: Scaffold(
       appBar: AppBar(title: const Text('Comfortable pitch')),
       body: SafeArea(
@@ -161,6 +177,11 @@ class _VoiceRangePageState extends State<VoiceRangePage>
               onPressed: loading || playing || saving ? null : _preview,
               child: Text(playing ? 'Playing C and E…' : 'Preview C and E'),
             ),
+            if (playing)
+              TextButton(
+                onPressed: _stopPlayback,
+                child: const Text('Stop playback'),
+              ),
             if (message != null)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),

@@ -6,6 +6,7 @@ abstract class AudioBridge {
   Stream<Uint8List> get samples;
   Future<void> start();
   Future<void> stop();
+  Future<void> stopPlayback();
   Future<void> playTone(double frequency);
   Future<void> playChord(List<double> frequencies);
   Future<void> openSettings();
@@ -24,6 +25,8 @@ class AndroidAudioBridge implements AudioBridge {
   Future<void> start() => _methods.invokeMethod<void>('startMic');
   @override
   Future<void> stop() => _methods.invokeMethod<void>('stopMic');
+  @override
+  Future<void> stopPlayback() => _methods.invokeMethod<void>('stopPlayback');
   @override
   Future<void> playTone(double frequency) =>
       _methods.invokeMethod<void>('playTone', {'frequency': frequency});

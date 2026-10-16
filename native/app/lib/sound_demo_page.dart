@@ -45,13 +45,28 @@ class _SoundDemoPageState extends State<SoundDemoPage>
     WidgetsBinding.instance.addObserver(this);
   }
 
+  Future<void> _stopPlayback() async {
+    generation++;
+    setState(() {
+      playing = false;
+      message = 'Playback stopped. Replay when ready.';
+    });
+    try {
+      await widget.audio.stopPlayback();
+    } catch (_) {
+      if (mounted) {
+        setState(() => message = 'Could not stop playback. Try again.');
+      }
+    }
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden ||
         state == AppLifecycleState.detached) {
-      generation++;
       if (playing) {
+        _stopPlayback();
         setState(
           () => message = 'Demonstration interrupted. Replay when ready.',
         );
@@ -94,20 +109,21 @@ class _SoundDemoPageState extends State<SoundDemoPage>
         );
       }
     } finally {
-      if (mounted) setState(() => playing = false);
+      if (mounted && token == generation) setState(() => playing = false);
     }
   }
 
   @override
   void dispose() {
     generation++;
+    if (playing) widget.audio.stopPlayback().catchError((Object _) {});
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => PopScope(
-    canPop: !playing,
+    canPop: true,
     child: Scaffold(
       appBar: AppBar(title: const Text('See and hear the steps')),
       body: SafeArea(
@@ -135,6 +151,11 @@ class _SoundDemoPageState extends State<SoundDemoPage>
               onPressed: playing ? null : _play,
               child: Text(playing ? 'Playing C → D → E…' : 'Hear C → D → E'),
             ),
+            if (playing)
+              TextButton(
+                onPressed: _stopPlayback,
+                child: const Text('Stop playback'),
+              ),
             if (message != null)
               Semantics(liveRegion: true, child: Text(message!)),
             const SizedBox(height: 12),

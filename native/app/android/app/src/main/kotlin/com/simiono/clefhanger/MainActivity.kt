@@ -31,6 +31,7 @@ class MainActivity : FlutterActivity() {
     private val recording = AtomicBoolean(false)
     private var recorder: AudioRecord? = null
     private var captureThread: Thread? = null
+    private var playbackThread: Thread? = null
     private var sink: EventChannel.EventSink? = null
     private var pendingStart: MethodChannel.Result? = null
     private var pendingProgressImport: MethodChannel.Result? = null
@@ -70,6 +71,10 @@ class MainActivity : FlutterActivity() {
                         pendingStart?.error("mic_cancelled", "Microphone request cancelled.", null)
                         pendingStart = null
                         stopCapture()
+                        result.success(null)
+                    }
+                    "stopPlayback" -> {
+                        stopPlayback()
                         result.success(null)
                     }
                     "playTone" -> {
@@ -204,9 +209,15 @@ class MainActivity : FlutterActivity() {
         captureThread = null
     }
 
+    private fun stopPlayback() {
+        playbackThread?.interrupt()
+        playbackThread = null
+    }
+
     /** Short piano-like reference tone. Dart blocks scoring until sound + acoustic tail ends. */
     private fun playNotes(frequencies: List<Double>, result: MethodChannel.Result) {
-        Thread {
+        stopPlayback()
+        playbackThread = Thread {
             val duration = 0.72
             val length = (sampleRate * duration).toInt()
             val pcm = ShortArray(length) { index ->
@@ -229,6 +240,7 @@ class MainActivity : FlutterActivity() {
                     .setBufferSizeInBytes(pcm.size * 2)
                     .build()
                 check(output.write(pcm, 0, pcm.size) == pcm.size) { "Incomplete audio output" }
+                if (Thread.currentThread().isInterrupted) throw InterruptedException()
                 output.play()
                 Thread.sleep(820)
             } catch (_: Exception) {
@@ -245,6 +257,7 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onPause() {
+        stopPlayback()
         // The runtime permission dialog also pauses this activity. Keep a pending
         // permission request alive; Flutter cancels it if the app truly hides.
         if (pendingStart == null) stopCapture()
@@ -252,6 +265,7 @@ class MainActivity : FlutterActivity() {
     }
 
     override fun onDestroy() {
+        stopPlayback()
         stopCapture()
         super.onDestroy()
     }

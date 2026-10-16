@@ -384,7 +384,7 @@ class _SoundPracticePageState extends State<SoundPracticePage>
             ),
             const SizedBox(height: 12),
             Semantics(
-              liveRegion: false,
+              liveRegion: true,
               child: Text(sound.message, key: const Key('soundStatus')),
             ),
             SizedBox(

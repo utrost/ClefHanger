@@ -15,6 +15,7 @@ class FakeAudio implements AudioBridge {
   final saved = <String, String>{};
   int plays = 0;
   int stops = 0;
+  int playbackStops = 0;
   int chordPlays = 0;
   int settingsOpens = 0;
   Object? startError;
@@ -29,6 +30,11 @@ class FakeAudio implements AudioBridge {
   @override
   Future<void> stop() async {
     stops++;
+  }
+
+  @override
+  Future<void> stopPlayback() async {
+    playbackStops++;
   }
 
   @override
