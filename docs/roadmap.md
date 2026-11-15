@@ -10,6 +10,8 @@ Store preparation now includes a Google-independent release build, APK/AAB packa
 
 The native beginner slice now provides six-note rounds, a three-note unaided check invitation, outcome/review guidance and directional pitch feedback. The [five-person beginner protocol](beginner-study.md) is ready; no participant results are recorded yet.
 
+The [learning concept](learning-concept.md) defines the proposed curriculum, lesson loop and evidence rules. Its Relate/anchor-based exercises are proposed, not implemented; the current Read and perform matches alone do not establish relative-pitch skill. Delivery status remains in this roadmap.
+
 ## Native learning redesign — active project plan
 
 Approved direction: evolve the Flutter/Rust app in place on `feat/flutter-rust-port`. Keep the PWA stable, offline operation, AGPL licensing and update-compatible prereleases. This section supersedes the sequencing of the older P1–P6 browser backlog below. No full rewrite or new backend is planned.

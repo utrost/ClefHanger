@@ -1,6 +1,6 @@
 # Five-person beginner check
 
-Status: protocol prepared; no participant sessions have been run. Use the native prerelease that includes the six-note Practice round. This study should guide the next product decision, not produce a claim that six matches prove sight-reading improvement.
+Status: protocol prepared; no participant sessions have been run. Use a native prerelease with the journey home, guided reading and separate sound sessions. Record its exact build. This protocol follows the [learning concept](learning-concept.md); proposed anchor-based lessons are not part of this current-app study. This study should guide the next product decision, not produce a claim that six matches prove sight-reading improvement.
 
 ## Participants and setup
 
@@ -12,14 +12,14 @@ Install the same prerelease on each device. Record build number, phone/Android v
 
 1. Before opening the app, show the C4, D4 and E4 staff positions in mixed order on paper, without labels. Ask whether they recognise any and record answers without teaching or correcting them. Do not use spoken note names to cue them.
 2. Say: “Use this app to practise connecting a written note with a sound. Start wherever makes sense to you. Please tell me what you expect as you go.” Observe without describing the buttons.
-3. Time from the first app screen to the first successful match. Record each permission, playback-volume, pitch-detection or navigation obstacle. If they are stuck for a minute, offer help, record the exact intervention, and continue. Do not count an assisted start as independent success.
-4. Let them finish the six-note round. They may use listening or note buttons whenever they choose. Record completion time, input method, skips and the app's three-note check result. Matching a heard pitch is imitation; a touch name answer and an unaided microphone answer measure different things, so retain the input-method distinction.
-5. Ask: “What does the green note mean? What does G2 mean if the green note appears near a higher written note? What would you practise next?” Record their interpretation before explaining octave folding. Ask what they expected the Low/High bar to do.
+3. Record the chosen first activity and time to its first correct response. If they enter sound practice, separately time from choosing that activity to the first successful match. Record each permission, playback-volume, pitch-detection or navigation obstacle. If they are stuck for a minute, offer help, record the exact intervention, and continue. Do not count an assisted start as independent success.
+4. Let them finish their chosen activity: the guided three-position reading check or a six-note fixed-input sound session. Record completion time, skill/input, first reading answers, matched/skipped sound notes, and preview/demonstration/target-reference requests as applicable. Quiet touch opens reading; do not combine its result with sound matching. If time permits, invite them to choose the recommended next activity without explaining it. A sound match without requesting a reference during the session is not proof of independent pitch finding.
+5. For sound participants, ask: “What does the green note mean? What does G2 mean if the green note appears near a higher written note? What would you practise next?” Record their interpretation before explaining octave folding. Ask what they expected the Low/High bar to do. For quiet readers, ask what the position description and hint meant and what they would practise next; do not require knowledge of an unseen sound interface.
 6. Show the same three paper staff positions again in a new order, without app/reference sound. Record recognition answers. This is a small immediate check, not evidence of retained learning. Ask whether they would choose to practise again tomorrow, and why.
 
 ## Evidence sheet
 
-| Participant | Phone / Android / build | Input / room | First match time / help needed | Six-note completion time | Check result / skips / help | Staff recognition before → after | Ghost/octave understood? | Next-session choice / main obstacle |
+| Participant | Phone / Android / build | Input / room | First response / sound match time / help | Chosen activity / completion time | Skill-specific result / skips / help | Staff recognition before → after | Ghost/octave understood? | Next-session choice / main obstacle |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | P1 | | | | | | | | |
 | P2 | | | | | | | | |
@@ -29,6 +29,6 @@ Install the same prerelease on each device. Record build number, phone/Android v
 
 ## Decision after five sessions
 
-Treat these as working acceptance targets, not statistically validated thresholds: at least four participants reach a first match within one minute without facilitator help, four complete a round without navigation help, and four can explain the target versus heard note and the octave display. Record voice/detection failures separately from notation mistakes. Any recurring blocker gets priority over adding modes.
+Treat these as working acceptance targets, not statistically validated thresholds: at least four participants complete their chosen activity without navigation help and can explain its result and next action. Among participants who choose sound, examine time from sound setup to the first match (an initial target is one minute without facilitator help) and whether they can explain the target, detected pitch and octave display. Report the sound subgroup denominator; quiet readers are not failed microphone users. Record voice/detection failures separately from notation mistakes. Any recurring blocker gets priority over adding modes.
 
 If microphone or reference playback blocks two people, prioritise device/audio reliability. If people can match sounds but do not recognise the staff positions afterwards, revise the teaching/check sequence. If the ghost or pitch-direction display confuses two people, revise that display before expanding lessons. A claimed willingness to return is weak evidence: invite an optional second session a few days later to check actual return and retention. Do not add tracking or contact participants automatically.
