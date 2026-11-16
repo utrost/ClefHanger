@@ -21,7 +21,7 @@ The first meaningful outcome is small: recognise C, D and E on a treble staff, m
 
 Retention is a later observation of one of these skills, not a fifth combined score. Voice and instrument evidence stay separate. Changing clef or written register also changes the learning context.
 
-**Current implementation:** guided recognition and imitation exist. The current Read and perform exercise permits playing the target itself and counts held matches; it does not yet establish the Relate objective. A match without an in-session reference request must not be labelled relative-pitch success or independence: the learner may have heard a setup preview, a demonstration, or a recent target.
+**Current implementation:** guided recognition and imitation exist. The current Read and perform exercise permits playing the target itself and counts held matches; it does not establish the Relate objective. The separate new learning hub implements direction/anchor tasks; it does not reinterpret these older matching results. A match without an in-session reference request must not be labelled relative-pitch success or independence: the learner may have heard a setup preview, a demonstration, or a recent target.
 
 ## The lesson loop
 
@@ -46,7 +46,7 @@ Reading checks can withhold names while describing staff positions. Sound checks
 | 5. Read a tiny pattern | Start with a reference and show C–D–E, then E–D–C | Produce one note at a time, with optional target help | Try a new ordering of the same notes. No rhythm score or fluency claim |
 | 6. Return and retrieve | Before replaying the teaching, invite a brief check of familiar positions and relationships | Offer the lesson again when wanted | Record first responses on a later visit, with the same reference/help conditions stated explicitly |
 
-Lessons 3–6 are proposed. The existing C→D→E demonstration supports Lesson 2 but is not a substitute for teaching descending motion, repeated notes or finding an unplayed neighbour.
+Update 2026-11-16: lessons 3–5 and the relationship return-check path in Lesson 6 now have a native implementation under [epic #17](https://github.com/utrost/ClefHanger/issues/17). They remain learning-design hypotheses pending device and participant evaluation; recognition retention checks still use the existing reading lesson. See [exact task contracts](lesson-contracts.md). The existing C→D→E demonstration supports Lesson 2 but is not a substitute for teaching descending motion, repeated notes or finding an unplayed neighbour.
 
 C→D and D→E are whole-tone steps in this example. Teach “next note name” and “next staff position” first; do not imply that every adjacent pair has the same pitch distance. Introduce E→F explicitly before extending the sequence upward. Letter names stay the initial naming system; fixed-do/movable-do solfège would require a separate, consistent design.
 

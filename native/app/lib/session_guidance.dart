@@ -71,9 +71,9 @@ class SessionGuidance {
     }
     if (skill == SoundSkill.imitate) {
       return SessionGuidance(
-        'Try reading and performing with ${input.label.toLowerCase()}',
-        'You matched all six references with this input. Try finding the written notes next, using Hear note whenever needed. $context This does not establish retained learning.',
-        'Try read and perform',
+        'Learn relationships after ${input.label.toLowerCase()} imitation',
+        'You matched all six references with this input. Learn repeat, up and down next, then find a written neighbour from a starting reference. $context This does not establish retained learning.',
+        'Learn relationships',
         soundSkill: SoundSkill.perform,
       );
     }

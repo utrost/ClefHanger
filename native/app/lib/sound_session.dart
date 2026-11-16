@@ -32,11 +32,13 @@ class SoundSession extends ChangeNotifier {
     this.setupPreviewRequested = false,
     this.demonstrationRequested = false,
     bool automaticAdvance = true,
+    NativeNote? initialPrompt,
     int Function()? nowMs,
   }) : _automaticAdvance = automaticAdvance,
        _nowOverride = nowMs,
        practice = PracticeSession(core) {
     practice.start();
+    if (initialPrompt != null) practice.prompt = initialPrompt;
   }
   final PracticeCore core;
   final AudioBridge audio;
@@ -187,7 +189,7 @@ class SoundSession extends ChangeNotifier {
     });
   }
 
-  Future<void> hear() async {
+  Future<void> hear({int? anchorMidi}) async {
     if (_disposed || finished || playing || practice.completed || starting) {
       return;
     }
@@ -198,12 +200,16 @@ class SoundSession extends ChangeNotifier {
     phase = SoundPhase.playback;
     _clearPitch();
     _silence?.cancel();
-    practice.hear(now);
+    if (anchorMidi == null) {
+      practice.hear(now);
+    } else {
+      practice.blockPlayback(now);
+    }
     _notify();
     try {
-      await audio.playTone(core.frequency(referenceMidi));
+      await audio.playTone(core.frequency(anchorMidi ?? referenceMidi));
       if (_disposed || generation != _generation) return;
-      _heardReference = true;
+      if (anchorMidi == null) _heardReference = true;
       // Android completes the playback call after the tone. Retain a tail even
       // if a bridge returns immediately; never score app sound or buffered PCM.
       final delay = (1020 - (now - playbackStarted)).clamp(300, 1020);

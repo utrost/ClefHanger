@@ -7,6 +7,7 @@ import 'sound_evidence.dart';
 import 'sound_session.dart';
 import 'sound_demo_page.dart';
 import 'session_guidance.dart';
+import 'learning_page.dart';
 import 'staff.dart';
 import 'voice_range.dart';
 import 'voice_range_page.dart';
@@ -161,16 +162,17 @@ class _SoundSetupPageState extends State<SoundSetupPage> {
                   ).soundSkill !=
                   widget.skill)
                 TextButton(
-                  onPressed: () => _practice(
-                    input,
-                    nextSkill: SessionGuidance.sound(
-                      widget.skill,
-                      input,
-                      previous[input],
-                    ).soundSkill,
-                  ),
+                  onPressed: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) =>
+                            LearningHub(core: widget.core, audio: widget.audio),
+                      ),
+                    );
+                    if (mounted) await _load();
+                  },
                   child: Text(
-                    'Try read and perform with ${input.label.toLowerCase()}',
+                    'Learn relationships after ${input.label.toLowerCase()} imitation',
                   ),
                 ),
               const SizedBox(height: 12),

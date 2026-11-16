@@ -5,7 +5,8 @@ import 'package:clefhanger/reading_lesson.dart';
 import 'package:clefhanger/session_guidance.dart';
 import 'package:clefhanger/sound_evidence.dart';
 import 'package:clefhanger/sound_practice_page.dart';
-import 'package:clefhanger/sound_demo_page.dart';
+import 'package:clefhanger/learning_page.dart';
+import 'package:clefhanger/learning_session.dart';
 import 'widget_test.dart' show FakeAudio, SingingCore;
 
 class FallibleStorage extends FakeAudio {
@@ -175,17 +176,84 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      final next = find.text('Try read and perform with instrument');
+      final next = find.widgetWithText(
+        TextButton,
+        'Learn relationships after instrument imitation',
+      );
       await tester.scrollUntilVisible(next, 150);
       await tester.ensureVisible(next);
       await tester.pumpAndSettle();
-      expect(find.text('Try read and perform with voice'), findsNothing);
+      expect(
+        find.text('Learn relationships after voice imitation'),
+        findsNothing,
+      );
       await tester.tap(next);
       await tester.pumpAndSettle();
-      final demo = tester.widget<SoundDemoPage>(find.byType(SoundDemoPage));
-      expect(demo.skill, SoundSkill.perform);
-      expect(demo.input, SoundInput.instrument);
+      expect(find.byType(LearningHub), findsOneWidget);
+      await tester.scrollUntilVisible(
+        find.text('Repeat or move · listening'),
+        100,
+      );
+      expect(find.text('Repeat or move · listening'), findsOneWidget);
       expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox());
+    },
+  );
+  testWidgets(
+    'home recommends relationships after imitation and refreshes after a new check',
+    (tester) async {
+      final audio = FakeAudio();
+      audio.saved[ReadingLesson.storageKey] = const ReadingResult(
+        3,
+        [],
+      ).encode();
+      audio.saved[SoundEvidence.key(
+        SoundSkill.imitate,
+        SoundInput.voice,
+      )] = const SoundEvidence(
+        skill: SoundSkill.imitate,
+        input: SoundInput.voice,
+        withReference: 6,
+        withoutReference: 0,
+        skipped: 0,
+      ).encode();
+      var opened = 0;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: JourneyHome(
+            storage: audio,
+            openReading: () async {},
+            openSound: (_) async {},
+            openPractice: () async {},
+            openRush: () async {},
+            openLearning: () async {
+              opened++;
+              final session = LearningSession(
+                task: LearningTask.direction,
+                input: 'listening',
+              );
+              while (!session.finished) {
+                session.skip();
+                session.next(DateTime.utc(2026, 11, 16));
+              }
+              await LearningHistory(audio).save(session);
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('matched six references with voice'),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('Choose a relationship lesson'));
+      await tester.pumpAndSettle();
+      expect(opened, 1);
+      expect(
+        find.textContaining('Last repeat or move check (listening)'),
+        findsOneWidget,
+      );
+      expect(find.text('Practise reading again'), findsOneWidget);
       await tester.pumpWidget(const SizedBox());
     },
   );
